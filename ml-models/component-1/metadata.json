@@ -1,0 +1,74 @@
+{
+  "features": [
+    "Total_Chargers",
+    "Available_Chargers",
+    "Vehicle_Arrivals_Last_30_Min",
+    "Queue_Length",
+    "Average_Charging_Duration_Min",
+    "Hour",
+    "Minute",
+    "Day_Type",
+    "Holiday_Flag",
+    "Observed_Station"
+  ],
+  "best_models": {
+    "queue_length": "linear_regression",
+    "waiting_time": "xgboost",
+    "congestion": "xgboost"
+  },
+  "results": {
+    "queue_length": {
+      "linear_regression": {
+        "MAE": 1.9645585926747275,
+        "RMSE": 2.3308638292163986,
+        "R2": 0.05290134689566617
+      },
+      "random_forest": {
+        "MAE": 2.071093932178932,
+        "RMSE": 2.471126577095244,
+        "R2": -0.0645140485252651
+      },
+      "xgboost": {
+        "MAE": 2.1293778809425032,
+        "RMSE": 2.582931781728252,
+        "R2": -0.16302027604584657
+      }
+    },
+    "waiting_time": {
+      "linear_regression": {
+        "MAE": 15.052968597687608,
+        "RMSE": 20.480399743718436,
+        "R2": 0.7795811239599669
+      },
+      "random_forest": {
+        "MAE": 7.44127337912088,
+        "RMSE": 12.63904128590943,
+        "R2": 0.9160539645680926
+      },
+      "xgboost": {
+        "MAE": 7.42164034374239,
+        "RMSE": 10.437878439878643,
+        "R2": 0.942747244338155
+      }
+    },
+    "congestion": {
+      "logistic_regression": {
+        "Accuracy": 0.9166666666666666,
+        "F1": 0.9201598855294263
+      },
+      "random_forest": {
+        "Accuracy": 0.925,
+        "F1": 0.9233159697445411
+      },
+      "xgboost": {
+        "Accuracy": 0.9333333333333333,
+        "F1": 0.9342694166180058
+      }
+    }
+  },
+  "dataset_rows": 600,
+  "train_rows": 480,
+  "test_rows": 120,
+  "queue_target_note": "Future_Queue_Length is the next chronological queue observation at the same station for this PP1 prototype.",
+  "waiting_target_note": "Waiting_Time_Target currently uses the supplied Predicted_Waiting_Time_Min field. Replace with observed waiting time when ground-truth arrival/start timestamps are available."
+}
