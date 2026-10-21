@@ -1,0 +1,1 @@
+"""Duration model HTTP API."""

@@ -6,6 +6,7 @@ import importlib
 import importlib.util
 import json
 import logging
+import os
 import sys
 from pathlib import Path
 from typing import Any
@@ -60,9 +61,18 @@ def load_component4() -> dict[str, Any]:
     }
 
 
+def _env_url(name: str) -> str:
+    return os.getenv(name, "").strip().rstrip("/")
+
+
 def load_component3() -> dict[str, Any]:
     _activate(C3)
     cost_mod = importlib.import_module("src.calculate_charging_cost")
+    remote = _env_url("ENERGY_API_URL")
+    if remote:
+        from remote_models import load_remote_energy
+
+        return load_remote_energy(remote, cost_mod.estimate_charging_cost)
     pipeline_path = C3 / "models" / "energy_consumption_pipeline.joblib"
     bundle: dict[str, Any] = {
         "estimate_charging_cost": cost_mod.estimate_charging_cost,
@@ -112,6 +122,11 @@ def load_component3() -> dict[str, Any]:
 
 
 def load_component2() -> dict[str, Any]:
+    remote = _env_url("DURATION_API_URL")
+    if remote:
+        from remote_models import load_remote_duration
+
+        return load_remote_duration(remote)
     _activate(C2)
     predict_mod = importlib.import_module("src.predict_duration")
     pipeline, meta = predict_mod.load_pipeline()
@@ -137,6 +152,11 @@ def load_component2() -> dict[str, Any]:
 
 
 def load_component1() -> dict[str, Any]:
+    remote = _env_url("QUEUE_API_URL")
+    if remote:
+        from remote_models import load_remote_queue
+
+        return load_remote_queue(remote)
     _activate(C1)
     loader = importlib.import_module("api.model_loader")
     station_data = importlib.import_module("api.station_data")

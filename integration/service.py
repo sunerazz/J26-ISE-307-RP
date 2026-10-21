@@ -127,6 +127,12 @@ def duration_schema() -> dict:
     component2 = _bundle().get("component2")
     if component2 is None:
         raise HTTPException(status_code=503, detail=_bundle().get("errors", {}).get("component2", "Duration model is not loaded."))
+    refresh = component2.get("refresh")
+    if refresh:
+        try:
+            refresh()
+        except Exception as exc:  # noqa: BLE001
+            raise HTTPException(status_code=503, detail=str(exc)) from exc
     return {
         "feature_columns": component2["feature_columns"],
         "numeric_features": component2["meta"].get("numeric_features") or [],
@@ -143,6 +149,12 @@ def energy_schema() -> dict:
     component3 = _bundle().get("component3") or {}
     if not component3.get("energy_model_loaded"):
         raise HTTPException(status_code=503, detail=component3.get("energy_model_reason") or "Energy model is not loaded.")
+    refresh = component3.get("refresh")
+    if refresh:
+        try:
+            refresh()
+        except Exception as exc:  # noqa: BLE001
+            raise HTTPException(status_code=503, detail=str(exc)) from exc
     metrics = component3.get("metrics") or {}
     return {
         "feature_columns": component3.get("feature_columns") or [],
