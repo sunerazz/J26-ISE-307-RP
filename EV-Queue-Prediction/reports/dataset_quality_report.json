@@ -1,0 +1,214 @@
+{
+  "experiment_label": "SIMULATION-BASED (synthetic dataset)",
+  "source_path": "C:\\Users\\Charuka\\Desktop\\thanuka resarch\\system\\EV-Queue-Prediction\\data\\raw\\component1_ev_queue_prediction_synthetic.csv",
+  "filename_note": "Filename contains 'synthetic'; treat all records as simulated, not independently observed real-world queue measurements.",
+  "n_rows": 69108,
+  "n_columns": 29,
+  "columns": [
+    "timestamp",
+    "station_id",
+    "location_type",
+    "day_of_week",
+    "is_weekend",
+    "hour",
+    "minute",
+    "time_slot",
+    "weather_condition",
+    "temperature_C",
+    "traffic_index",
+    "traffic_level",
+    "vehicle_arrivals_15min",
+    "estimated_arrival_rate_vehicles_per_hour",
+    "current_queue_length",
+    "queue_after_current_arrivals",
+    "total_chargers",
+    "active_chargers",
+    "available_chargers",
+    "busy_chargers",
+    "charger_power_kW",
+    "average_charging_duration_min",
+    "station_utilization",
+    "station_load",
+    "estimated_waiting_time_now_min",
+    "congestion_level_now",
+    "target_queue_length_30min",
+    "target_waiting_time_30min_min",
+    "target_congestion_level_30min"
+  ],
+  "dtypes": {
+    "timestamp": "datetime64[ns]",
+    "station_id": "object",
+    "location_type": "object",
+    "day_of_week": "object",
+    "is_weekend": "int64",
+    "hour": "int64",
+    "minute": "int64",
+    "time_slot": "object",
+    "weather_condition": "object",
+    "temperature_C": "float64",
+    "traffic_index": "float64",
+    "traffic_level": "object",
+    "vehicle_arrivals_15min": "int64",
+    "estimated_arrival_rate_vehicles_per_hour": "float64",
+    "current_queue_length": "int64",
+    "queue_after_current_arrivals": "int64",
+    "total_chargers": "int64",
+    "active_chargers": "int64",
+    "available_chargers": "int64",
+    "busy_chargers": "int64",
+    "charger_power_kW": "int64",
+    "average_charging_duration_min": "float64",
+    "station_utilization": "float64",
+    "station_load": "float64",
+    "estimated_waiting_time_now_min": "float64",
+    "congestion_level_now": "object",
+    "target_queue_length_30min": "int64",
+    "target_waiting_time_30min_min": "float64",
+    "target_congestion_level_30min": "object"
+  },
+  "missing_values": {},
+  "total_missing": 0,
+  "duplicate_rows": 0,
+  "duplicate_station_timestamp": 0,
+  "invalid_timestamps": 0,
+  "negative_value_counts": {},
+  "timestamp_min": "2025-01-01 00:00:00",
+  "timestamp_max": "2025-04-30 23:15:00",
+  "n_unique_dates": 120,
+  "stations": [
+    "ST01",
+    "ST02",
+    "ST03",
+    "ST04",
+    "ST05",
+    "ST06"
+  ],
+  "n_stations": 6,
+  "rows_per_station": {
+    "ST01": 11518,
+    "ST02": 11518,
+    "ST03": 11518,
+    "ST04": 11518,
+    "ST05": 11518,
+    "ST06": 11518
+  },
+  "observation_intervals": {
+    "ST01": {
+      "median_interval_min": 15.0,
+      "unique_intervals_min": [
+        15.0
+      ],
+      "n_observations": 11518
+    },
+    "ST02": {
+      "median_interval_min": 15.0,
+      "unique_intervals_min": [
+        15.0
+      ],
+      "n_observations": 11518
+    },
+    "ST03": {
+      "median_interval_min": 15.0,
+      "unique_intervals_min": [
+        15.0
+      ],
+      "n_observations": 11518
+    },
+    "ST04": {
+      "median_interval_min": 15.0,
+      "unique_intervals_min": [
+        15.0
+      ],
+      "n_observations": 11518
+    },
+    "ST05": {
+      "median_interval_min": 15.0,
+      "unique_intervals_min": [
+        15.0
+      ],
+      "n_observations": 11518
+    },
+    "ST06": {
+      "median_interval_min": 15.0,
+      "unique_intervals_min": [
+        15.0
+      ],
+      "n_observations": 11518
+    }
+  },
+  "declared_sampling_interval_min": 15,
+  "queue_column": "current_queue_length",
+  "station_column": "station_id",
+  "timestamp_column": "timestamp",
+  "arrival_proxy_column": "vehicle_arrivals_15min",
+  "no_raw_arrival_or_charging_start_event_log": true,
+  "queue_provenance": "Queue length is provided as a column (current_queue_length) in a synthetic snapshot table at regular 15-minute intervals. It is not reconstructed from raw arrival/charging-start event logs in this CSV.",
+  "current_queue_summary": {
+    "count": 69108.0,
+    "mean": 64.03575562887076,
+    "std": 158.24709175835798,
+    "min": 0.0,
+    "25%": 0.0,
+    "50%": 0.0,
+    "75%": 10.0,
+    "max": 698.0
+  },
+  "queue_by_station": {
+    "ST01": {
+      "min": 0,
+      "median": 1.0,
+      "mean": 2.8108,
+      "max": 25,
+      "std": 4.2549
+    },
+    "ST02": {
+      "min": 0,
+      "median": 7.0,
+      "mean": 10.0961,
+      "max": 58,
+      "std": 10.5855
+    },
+    "ST03": {
+      "min": 0,
+      "median": 0.0,
+      "mean": 0.0649,
+      "max": 7,
+      "std": 0.3821
+    },
+    "ST04": {
+      "min": 0,
+      "median": 0.0,
+      "mean": 0.8205,
+      "max": 12,
+      "std": 1.6353
+    },
+    "ST05": {
+      "min": 0,
+      "median": 345.0,
+      "mean": 369.1044,
+      "max": 698,
+      "std": 195.8704
+    },
+    "ST06": {
+      "min": 0,
+      "median": 0.0,
+      "mean": 1.3178,
+      "max": 24,
+      "std": 2.9926
+    }
+  },
+  "n_rows_with_valid_reconstructed_30min_target": 69096,
+  "n_rows_without_future_observation": 12,
+  "csv_precomputed_target_vs_current_queue_at_t30_match_rate": 0.6274169271737872,
+  "csv_precomputed_target_vs_queue_after_arrivals_at_t30_match_rate": 1.0,
+  "csv_target_definition_finding": "The CSV column target_queue_length_30min matches queue_after_current_arrivals at t+30 minutes, not current_queue_length at t+30. For this experiment the modelling target is reconstructed as current_queue_length at the same station exactly 30 minutes later.",
+  "supports_queue_length_prediction": true,
+  "supports_waiting_time_or_congestion_claim": false,
+  "limitation_notes": [
+    "Dataset is synthetic/simulated; results do not demonstrate real-world deployment accuracy.",
+    "No raw vehicle arrival / charging-start / cancellation event log is present.",
+    "Station ST05 exhibits extreme queue lengths (median >> other stations), consistent with a synthetic runaway process.",
+    "This component predicts queue length only, not waiting time or congestion.",
+    "Last two snapshots per station lack a verifiable 30-minute-ahead observation and are excluded from modelling."
+  ]
+}

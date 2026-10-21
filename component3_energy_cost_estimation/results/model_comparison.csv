@@ -1,0 +1,5 @@
+split,model,mae_kwh,rmse_kwh,r2,n,available,params
+validation,median_baseline,5.342349333333333,7.582264698624019,-0.04557240670262064,750,True,"{""statistic"": ""training_median""}"
+validation,linear_regression,1.6998073071682538,2.552419806374341,0.881515799574813,750,True,{}
+validation,random_forest,1.586491091963889,2.422404600273885,0.8932790714640817,750,True,"{""n_estimators"": 300, ""max_depth"": 16, ""min_samples_leaf"": 4}"
+validation,xgboost,1.5179810009778338,2.3015582802709793,0.9036614327244614,750,True,"{""n_estimators"": 200, ""max_depth"": 4, ""learning_rate"": 0.05, ""subsample"": 0.9, ""colsample_bytree"": 0.9}"

@@ -1,0 +1,30 @@
+{
+  "selected_model": "xgboost",
+  "selected_params": {
+    "n_estimators": 200,
+    "max_depth": 4,
+    "learning_rate": 0.05,
+    "subsample": 0.9,
+    "colsample_bytree": 0.9
+  },
+  "test_metrics_raw": {
+    "mae_kwh": 1.471083629518509,
+    "rmse_kwh": 2.1276274816701433,
+    "r2": 0.9085997626341393,
+    "n": 750
+  },
+  "train_median_baseline_on_test": {
+    "mae_kwh": 5.206590666666667,
+    "rmse_kwh": 7.2075744705136415,
+    "r2": -0.0489008024858697,
+    "n": 750
+  },
+  "train_median_kwh": 9.1,
+  "train_median_baseline_note": "Median of the training labels, scored on the test block. It was not used to choose the model.",
+  "n": 750,
+  "excluded_as_leakage": [
+    "soc_end_pct",
+    "energy_consumption_kwh_per_km"
+  ],
+  "training_data": "synthetic"
+}

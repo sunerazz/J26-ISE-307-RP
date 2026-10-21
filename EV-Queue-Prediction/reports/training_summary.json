@@ -1,0 +1,118 @@
+{
+  "random_seed": 42,
+  "selection_rule": "lowest validation MAE among persistence, historical median, Random Forest, and XGBoost",
+  "selected_model": "persistence",
+  "selected_params": null,
+  "best_ml_model_by_validation": "random_forest",
+  "best_ml_val_metrics": {
+    "mae": 7.663379222670963,
+    "rmse": 23.692515779017093,
+    "r2": 0.987515552972075,
+    "n": 10368
+  },
+  "validation_metrics": {
+    "persistence": {
+      "mae": 0.7736304012345679,
+      "rmse": 1.3677206301808211,
+      "r2": 0.9999583953618355,
+      "n": 10368
+    },
+    "historical_median": {
+      "mae": 98.16203703703704,
+      "rmse": 233.66333517530495,
+      "r2": -0.21430587563898462,
+      "n": 10368
+    },
+    "random_forest": {
+      "mae": 7.663379222670963,
+      "rmse": 23.692515779017093,
+      "r2": 0.987515552972075,
+      "n": 10368
+    },
+    "xgboost": {
+      "mae": 8.785367940354032,
+      "rmse": 25.923835426707083,
+      "r2": 0.9850532949190768,
+      "n": 10368
+    }
+  },
+  "baselines": {
+    "persistence": {
+      "mae": 0.7736304012345679,
+      "rmse": 1.3677206301808211,
+      "r2": 0.9999583953618355,
+      "n": 10368
+    },
+    "historical_median": {
+      "mae": 98.16203703703704,
+      "rmse": 233.66333517530495,
+      "r2": -0.21430587563898462,
+      "n": 10368
+    }
+  },
+  "historical_median_value": 0.0,
+  "split_meta": {
+    "n_unique_dates": 120,
+    "n_train_dates": 84,
+    "n_val_dates": 18,
+    "n_test_dates": 18,
+    "train_date_start": "2025-01-01",
+    "train_date_end": "2025-03-25",
+    "val_date_start": "2025-03-26",
+    "val_date_end": "2025-04-12",
+    "test_date_start": "2025-04-13",
+    "test_date_end": "2025-04-30",
+    "overlap_train_val": [],
+    "overlap_train_test": [],
+    "overlap_val_test": [],
+    "dropped_no_target": 12,
+    "dropped_lag_warmup": 24,
+    "unmatched_target_rows": 12,
+    "n_train_rows": 48360,
+    "n_val_rows": 10368,
+    "n_test_rows": 10344,
+    "feature_columns": [
+      "is_weekend",
+      "hour",
+      "minute",
+      "temperature_C",
+      "traffic_index",
+      "vehicle_arrivals_15min",
+      "estimated_arrival_rate_vehicles_per_hour",
+      "current_queue_length",
+      "queue_after_current_arrivals",
+      "total_chargers",
+      "active_chargers",
+      "available_chargers",
+      "busy_chargers",
+      "charger_power_kW",
+      "average_charging_duration_min",
+      "station_utilization",
+      "station_load",
+      "estimated_waiting_time_now_min",
+      "station_id",
+      "location_type",
+      "day_of_week",
+      "time_slot",
+      "weather_condition",
+      "traffic_level",
+      "congestion_level_now",
+      "queue_lag_1",
+      "queue_lag_2",
+      "queue_lag_4",
+      "queue_roll_mean_4",
+      "queue_roll_mean_8",
+      "queue_roll_std_4",
+      "queue_delta_1",
+      "arrivals_lag_1",
+      "arrivals_lag_2",
+      "arrivals_roll_mean_4"
+    ]
+  },
+  "notes": [
+    "Test-set metrics are computed separately after selection.",
+    "Fractional predictions are valid continuous estimates of queue length; round only for operational display, not before regression metrics.",
+    "Predictions should be clipped at 0 for operational non-negativity when serving.",
+    "If persistence wins, queues are strongly autocorrelated at the 30-minute horizon on this synthetic 15-minute grid; ML models are still reported for comparison."
+  ]
+}

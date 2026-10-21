@@ -1,0 +1,108 @@
+{
+  "path": "C:\\Users\\Charuka\\Desktop\\thanuka resarch\\system\\component3_energy_cost_estimation\\data\\raw\\energy_consumption.csv",
+  "n_rows": 5000,
+  "n_columns": 16,
+  "columns": [
+    "trip_id",
+    "distance_km",
+    "average_speed_kmh",
+    "trip_duration_min",
+    "battery_capacity_kwh",
+    "soc_start_pct",
+    "soc_end_pct",
+    "elevation_gain_m",
+    "elevation_loss_m",
+    "ambient_temperature_c",
+    "ac_on",
+    "traffic_level",
+    "road_type",
+    "vehicle_mass_kg",
+    "energy_consumption_kwh",
+    "energy_consumption_kwh_per_km"
+  ],
+  "dtypes": {
+    "trip_id": "object",
+    "distance_km": "float64",
+    "average_speed_kmh": "float64",
+    "trip_duration_min": "float64",
+    "battery_capacity_kwh": "float64",
+    "soc_start_pct": "float64",
+    "soc_end_pct": "float64",
+    "elevation_gain_m": "float64",
+    "elevation_loss_m": "float64",
+    "ambient_temperature_c": "float64",
+    "ac_on": "int64",
+    "traffic_level": "object",
+    "road_type": "object",
+    "vehicle_mass_kg": "float64",
+    "energy_consumption_kwh": "float64",
+    "energy_consumption_kwh_per_km": "float64"
+  },
+  "missing_counts": {},
+  "duplicate_rows": 0,
+  "energy_column": "energy_consumption_kwh",
+  "target_status": "present_in_file",
+  "has_battery_capacity": true,
+  "has_start_and_end_soc": true,
+  "numeric_ranges": {
+    "distance_km": {
+      "min": 2.63,
+      "max": 220.0
+    },
+    "average_speed_kmh": {
+      "min": 10.0,
+      "max": 102.4
+    },
+    "trip_duration_min": {
+      "min": 3.0,
+      "max": 360.0
+    },
+    "battery_capacity_kwh": {
+      "min": 40.0,
+      "max": 90.0
+    },
+    "soc_start_pct": {
+      "min": 35.01,
+      "max": 99.99
+    },
+    "soc_end_pct": {
+      "min": 1.0,
+      "max": 97.43
+    },
+    "elevation_gain_m": {
+      "min": 0.22,
+      "max": 180.0
+    },
+    "elevation_loss_m": {
+      "min": 0.01,
+      "max": 198.73
+    },
+    "ambient_temperature_c": {
+      "min": 10.0,
+      "max": 42.0
+    },
+    "ac_on": {
+      "min": 0.0,
+      "max": 1.0
+    },
+    "vehicle_mass_kg": {
+      "min": 1300.0,
+      "max": 2800.0
+    },
+    "energy_consumption_kwh": {
+      "min": 0.458,
+      "max": 48.89
+    },
+    "energy_consumption_kwh_per_km": {
+      "min": 0.1,
+      "max": 0.38
+    }
+  },
+  "label_matches_soc_drop_times_capacity": {
+    "mae_kwh": 0.002113600000000285,
+    "max_abs_kwh": 0.008000000000004448,
+    "note": "energy_consumption_kwh matches (soc_start_pct - soc_end_pct) / 100 * battery_capacity_kwh within rounding. soc_end_pct is therefore the target written another way and is excluded."
+  },
+  "why_training_stopped": null,
+  "training_file_is_energy_table": true
+}

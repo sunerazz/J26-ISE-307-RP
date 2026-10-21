@@ -1,0 +1,66 @@
+{
+  "source_path": "C:\\Users\\Charuka\\Desktop\\thanuka resarch\\system\\component3_energy_cost_estimation\\data\\raw\\energy_consumption.csv",
+  "n_rows": 5000,
+  "rows_dropped_for_missing_values": 0,
+  "split": "trip_id order, first 70% train, next 15% validation, last 15% test",
+  "random_seed": null,
+  "reason": "The file has no timestamps. trip_id order is the generation order and is held out in blocks.",
+  "target": "energy_consumption_kwh",
+  "target_unit": "kWh",
+  "feature_columns": [
+    "distance_km",
+    "average_speed_kmh",
+    "trip_duration_min",
+    "battery_capacity_kwh",
+    "soc_start_pct",
+    "elevation_gain_m",
+    "elevation_loss_m",
+    "ambient_temperature_c",
+    "ac_on",
+    "vehicle_mass_kg",
+    "traffic_level",
+    "road_type"
+  ],
+  "numeric_features": [
+    "distance_km",
+    "average_speed_kmh",
+    "trip_duration_min",
+    "battery_capacity_kwh",
+    "soc_start_pct",
+    "elevation_gain_m",
+    "elevation_loss_m",
+    "ambient_temperature_c",
+    "ac_on",
+    "vehicle_mass_kg"
+  ],
+  "categorical_features": [
+    "traffic_level",
+    "road_type"
+  ],
+  "excluded_as_leakage": [
+    "soc_end_pct",
+    "energy_consumption_kwh_per_km"
+  ],
+  "leakage_reason": {
+    "mae_kwh": 0.002113600000000285,
+    "max_abs_kwh": 0.008000000000004448,
+    "note": "energy_consumption_kwh matches (soc_start_pct - soc_end_pct) / 100 * battery_capacity_kwh within rounding. soc_end_pct is therefore the target written another way and is excluded."
+  },
+  "categories": {
+    "traffic_level": [
+      "high",
+      "low",
+      "medium"
+    ],
+    "road_type": [
+      "highway",
+      "mixed",
+      "urban"
+    ]
+  },
+  "counts": {
+    "train": 3500,
+    "validation": 750,
+    "test": 750
+  }
+}

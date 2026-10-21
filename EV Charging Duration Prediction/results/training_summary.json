@@ -1,0 +1,90 @@
+{
+  "selected_model": "random_forest",
+  "selected_params": {
+    "n_estimators": 300,
+    "max_depth": 16,
+    "min_samples_leaf": 4
+  },
+  "validation": {
+    "median_baseline": {
+      "mae_min": 56.19339210954555,
+      "rmse_min": 69.98052151951805,
+      "r2": -0.0007335350582950984,
+      "n": 192
+    },
+    "linear_regression": {
+      "mae_min": 56.515904373853736,
+      "rmse_min": 71.24266498714852,
+      "r2": -0.03715679678173789,
+      "n": 192
+    },
+    "random_forest": {
+      "mae_min": 56.038786752949534,
+      "rmse_min": 69.90180148541161,
+      "r2": 0.0015166187940626186,
+      "n": 192
+    },
+    "xgboost": {
+      "mae_min": 56.8923150247001,
+      "rmse_min": 71.59993199856477,
+      "r2": -0.047585126608338246,
+      "n": 192
+    }
+  },
+  "split_meta": {
+    "method": "chronological_by_unique_calendar_date",
+    "fractions": {
+      "train": 0.7,
+      "val": 0.15,
+      "test": 0.15
+    },
+    "n_unique_dates": 55,
+    "n_train_dates": 38,
+    "n_val_dates": 8,
+    "n_test_dates": 9,
+    "train_date_start": "2024-01-01",
+    "train_date_end": "2024-02-07",
+    "val_date_start": "2024-02-08",
+    "val_date_end": "2024-02-15",
+    "test_date_start": "2024-02-16",
+    "test_date_end": "2024-02-24",
+    "n_train_rows": 912,
+    "n_val_rows": 192,
+    "n_test_rows": 216,
+    "date_overlap_train_val": [],
+    "date_overlap_train_test": [],
+    "date_overlap_val_test": [],
+    "limitation": "Sessions are ordered by charging start date. This is not a random split. The calendar covers only about eight weeks, so the test period is a short future window of the same table.",
+    "feature_columns": [
+      "Battery Capacity (kWh)",
+      "Charging Rate (kW)",
+      "State of Charge (Start %)",
+      "Distance Driven (since last charge) (km)",
+      "Vehicle Age (years)",
+      "Temperature (\u00c2\u00b0C)",
+      "Vehicle Model",
+      "Charging Station Location",
+      "Time of Day",
+      "Day of Week",
+      "Charger Type",
+      "User Type"
+    ],
+    "temperature_column": "Temperature (\u00c2\u00b0C)",
+    "numeric_features": [
+      "Battery Capacity (kWh)",
+      "Charging Rate (kW)",
+      "State of Charge (Start %)",
+      "Distance Driven (since last charge) (km)",
+      "Vehicle Age (years)",
+      "Temperature (\u00c2\u00b0C)"
+    ],
+    "categorical_features": [
+      "Vehicle Model",
+      "Charging Station Location",
+      "Time of Day",
+      "Day of Week",
+      "Charger Type",
+      "User Type"
+    ]
+  }
+}

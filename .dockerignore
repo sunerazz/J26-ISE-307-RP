@@ -1,0 +1,16 @@
+**/.pytest_cache
+**/__pycache__
+**/*.pyc
+**/.git
+frontend/node_modules
+frontend/dist
+mobile
+EV-Queue-Prediction/models/random_forest.joblib
+EV-Queue-Prediction/models/best_ml_model.joblib
+EV-Queue-Prediction/models/xgboost.joblib
+EV-Queue-Prediction/models/waiting_time_random_forest.joblib
+EV-Queue-Prediction/models/waiting_time_xgboost.joblib
+EV-Queue-Prediction/models/congestion_random_forest.joblib
+EV-Queue-Prediction/models/congestion_xgboost.joblib
+EV-Queue-Prediction/models/congestion_best_ml_model.joblib
+EV-Queue-Prediction/models/waiting_time_best_ml_model.joblib

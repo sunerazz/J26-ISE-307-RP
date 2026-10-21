@@ -1,0 +1,6 @@
+split,model,mae_min,rmse_min,r2,n,available,params
+validation,median_baseline,56.19339210954555,69.98052151951805,-0.000733535058295,192,True,"{""statistic"": ""training_median""}"
+validation,linear_regression,56.515904373853736,71.24266498714852,-0.0371567967817378,192,True,{}
+validation,random_forest,56.038786752949534,69.90180148541161,0.0015166187940626,192,True,"{""n_estimators"": 300, ""max_depth"": 16, ""min_samples_leaf"": 4}"
+validation,xgboost,56.8923150247001,71.59993199856477,-0.0475851266083382,192,True,"{""n_estimators"": 200, ""max_depth"": 4, ""learning_rate"": 0.05, ""subsample"": 0.9, ""colsample_bytree"": 0.9}"
+test,random_forest,53.639470500286734,62.59605044048705,-0.048412952620795924,216,True,"{""n_estimators"": 300, ""max_depth"": 16, ""min_samples_leaf"": 4}"

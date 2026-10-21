@@ -1,0 +1,102 @@
+{
+  "selected_model": "xgboost",
+  "selected_params": {
+    "n_estimators": 200,
+    "max_depth": 4,
+    "learning_rate": 0.05,
+    "subsample": 0.9,
+    "colsample_bytree": 0.9
+  },
+  "validation": {
+    "median_baseline": {
+      "mae_kwh": 5.342349333333333,
+      "rmse_kwh": 7.582264698624019,
+      "r2": -0.04557240670262064,
+      "n": 750
+    },
+    "linear_regression": {
+      "mae_kwh": 1.6998073071682538,
+      "rmse_kwh": 2.552419806374341,
+      "r2": 0.881515799574813,
+      "n": 750
+    },
+    "random_forest": {
+      "mae_kwh": 1.586491091963889,
+      "rmse_kwh": 2.422404600273885,
+      "r2": 0.8932790714640817,
+      "n": 750
+    },
+    "xgboost": {
+      "mae_kwh": 1.5179810009778338,
+      "rmse_kwh": 2.3015582802709793,
+      "r2": 0.9036614327244614,
+      "n": 750
+    }
+  },
+  "split_meta": {
+    "source_path": "C:\\Users\\Charuka\\Desktop\\thanuka resarch\\system\\component3_energy_cost_estimation\\data\\raw\\energy_consumption.csv",
+    "n_rows": 5000,
+    "rows_dropped_for_missing_values": 0,
+    "split": "trip_id order, first 70% train, next 15% validation, last 15% test",
+    "random_seed": null,
+    "reason": "The file has no timestamps. trip_id order is the generation order and is held out in blocks.",
+    "target": "energy_consumption_kwh",
+    "target_unit": "kWh",
+    "feature_columns": [
+      "distance_km",
+      "average_speed_kmh",
+      "trip_duration_min",
+      "battery_capacity_kwh",
+      "soc_start_pct",
+      "elevation_gain_m",
+      "elevation_loss_m",
+      "ambient_temperature_c",
+      "ac_on",
+      "vehicle_mass_kg",
+      "traffic_level",
+      "road_type"
+    ],
+    "numeric_features": [
+      "distance_km",
+      "average_speed_kmh",
+      "trip_duration_min",
+      "battery_capacity_kwh",
+      "soc_start_pct",
+      "elevation_gain_m",
+      "elevation_loss_m",
+      "ambient_temperature_c",
+      "ac_on",
+      "vehicle_mass_kg"
+    ],
+    "categorical_features": [
+      "traffic_level",
+      "road_type"
+    ],
+    "excluded_as_leakage": [
+      "soc_end_pct",
+      "energy_consumption_kwh_per_km"
+    ],
+    "leakage_reason": {
+      "mae_kwh": 0.002113600000000285,
+      "max_abs_kwh": 0.008000000000004448,
+      "note": "energy_consumption_kwh matches (soc_start_pct - soc_end_pct) / 100 * battery_capacity_kwh within rounding. soc_end_pct is therefore the target written another way and is excluded."
+    },
+    "categories": {
+      "traffic_level": [
+        "high",
+        "low",
+        "medium"
+      ],
+      "road_type": [
+        "highway",
+        "mixed",
+        "urban"
+      ]
+    },
+    "counts": {
+      "train": 3500,
+      "validation": 750,
+      "test": 750
+    }
+  }
+}

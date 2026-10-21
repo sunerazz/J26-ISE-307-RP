@@ -1,0 +1,216 @@
+{
+  "experiment_label": "SIMULATION-BASED",
+  "task": "waiting_time_30min",
+  "target_unit": "minutes",
+  "selected_model": "xgboost",
+  "model_version": "waiting_time_v1",
+  "selected_params": {
+    "n_estimators": 300,
+    "max_depth": 6,
+    "learning_rate": 0.05,
+    "subsample": 0.9,
+    "colsample_bytree": 0.9
+  },
+  "best_ml_model_by_validation": "xgboost",
+  "test_metrics_selected_raw": {
+    "mae_min": 8.083732929722974,
+    "rmse_min": 14.564999256498956,
+    "r2": 0.9743883937153289,
+    "n": 10344
+  },
+  "test_metrics_selected_clipped_at_0": {
+    "mae_min": 8.067558598371772,
+    "rmse_min": 14.564125764999508,
+    "r2": 0.9743914655794809,
+    "n": 10344
+  },
+  "interpretation": "Predictions are continuous waiting times in minutes. Raw regression metrics use unclipped (possibly fractional/negative) outputs. For operational display, clip at 0 and optionally round. R\u00b2 is not percentage accuracy.",
+  "baselines_test": {
+    "persistence": {
+      "mae_min": 8.510261020881671,
+      "rmse_min": 17.26804898863611,
+      "r2": 0.9640000060712518,
+      "n": 10344
+    },
+    "historical_median": {
+      "mae_min": 64.11678847641146,
+      "rmse_min": 104.14099171514437,
+      "r2": -0.3093606998507943,
+      "n": 10344
+    }
+  },
+  "by_station": {
+    "ST01": {
+      "mae_min": 12.88591184230221,
+      "rmse_min": 18.874426153487725,
+      "r2": 0.8972787412499623,
+      "n": 1724
+    },
+    "ST02": {
+      "mae_min": 13.584797014520955,
+      "rmse_min": 18.142218719786214,
+      "r2": 0.9240257348242283,
+      "n": 1724
+    },
+    "ST03": {
+      "mae_min": 1.962748755117948,
+      "rmse_min": 4.631873375310695,
+      "r2": 0.09584833593225794,
+      "n": 1724
+    },
+    "ST04": {
+      "mae_min": 14.567899238244607,
+      "rmse_min": 22.25291477627917,
+      "r2": 0.7322237647173868,
+      "n": 1724
+    },
+    "ST05": {
+      "mae_min": 0.3352664673134788,
+      "rmse_min": 0.5131421209621267,
+      "r2": 0.0,
+      "n": 1724
+    },
+    "ST06": {
+      "mae_min": 5.16577426083864,
+      "rmse_min": 8.398891326199335,
+      "r2": 0.8354430282730578,
+      "n": 1724
+    }
+  },
+  "by_peak": {
+    "peak": {
+      "mae_min": 9.928657942103976,
+      "rmse_min": 16.934226258487545,
+      "r2": 0.9656530741212765,
+      "n": 3456
+    },
+    "off_peak": {
+      "mae_min": 7.158056268458636,
+      "rmse_min": 13.217215295502093,
+      "r2": 0.9785869293306714,
+      "n": 6888
+    }
+  },
+  "zero_and_long_wait_analysis": {
+    "n_zero_actual": 4516,
+    "fraction_zero_actual": 0.4365815931941222,
+    "metrics_on_zero_actual": {
+      "mae_min": 3.9369875451224203,
+      "rmse_min": 6.688255692382625,
+      "r2": 0.0,
+      "n": 4516
+    },
+    "n_long_wait_ge_60min": 3277,
+    "fraction_long_wait_ge_60min": 0.31680201082753284,
+    "metrics_on_long_wait_ge_60min": {
+      "mae_min": 9.973342393932453,
+      "rmse_min": 19.585014636861025,
+      "r2": 0.9187159888718727,
+      "n": 3277
+    },
+    "actual_max_min": 240.0,
+    "note": "Difficult cases retained; no selective deletion for better scores."
+  },
+  "test_comparison": {
+    "persistence": {
+      "mae_min": 8.510261020881671,
+      "rmse_min": 17.26804898863611,
+      "r2": 0.9640000060712518,
+      "n": 10344
+    },
+    "historical_median": {
+      "mae_min": 64.11678847641146,
+      "rmse_min": 104.14099171514437,
+      "r2": -0.3093606998507943,
+      "n": 10344
+    },
+    "random_forest": {
+      "mae_min": 8.154879230080107,
+      "rmse_min": 14.839735106155784,
+      "r2": 0.973413070690175,
+      "n": 10344
+    },
+    "xgboost": {
+      "mae_min": 8.083732929722974,
+      "rmse_min": 14.564999256498956,
+      "r2": 0.9743883937153289,
+      "n": 10344
+    }
+  },
+  "best_ml_test_metrics": {
+    "mae_min": 8.083732929722974,
+    "rmse_min": 14.564999256498956,
+    "r2": 0.9743883937153289,
+    "n": 10344
+  },
+  "best_ml_by_station": {
+    "ST01": {
+      "mae_min": 12.88591184230221,
+      "rmse_min": 18.874426153487725,
+      "r2": 0.8972787412499623,
+      "n": 1724
+    },
+    "ST02": {
+      "mae_min": 13.584797014520955,
+      "rmse_min": 18.142218719786214,
+      "r2": 0.9240257348242283,
+      "n": 1724
+    },
+    "ST03": {
+      "mae_min": 1.962748755117948,
+      "rmse_min": 4.631873375310695,
+      "r2": 0.09584833593225794,
+      "n": 1724
+    },
+    "ST04": {
+      "mae_min": 14.567899238244607,
+      "rmse_min": 22.25291477627917,
+      "r2": 0.7322237647173868,
+      "n": 1724
+    },
+    "ST05": {
+      "mae_min": 0.3352664673134788,
+      "rmse_min": 0.5131421209621267,
+      "r2": 0.0,
+      "n": 1724
+    },
+    "ST06": {
+      "mae_min": 5.16577426083864,
+      "rmse_min": 8.398891326199335,
+      "r2": 0.8354430282730578,
+      "n": 1724
+    }
+  },
+  "best_ml_test_metrics_excluding_ST05": {
+    "mae_min": 9.633426222204871,
+    "rmse_min": 15.953506857205943,
+    "r2": 0.9012660024288215,
+    "n": 8620
+  },
+  "persistence_test_metrics_excluding_ST05": {
+    "mae_min": 10.212313225058004,
+    "rmse_min": 18.916199910360536,
+    "r2": 0.8611895427861417,
+    "n": 8620
+  },
+  "peak_hours_definition": [
+    7,
+    8,
+    9,
+    17,
+    18,
+    19,
+    20,
+    21
+  ],
+  "error_distribution": {
+    "mean_error_min": 0.29111134860498983,
+    "std_error_min": 14.562793679241219,
+    "median_abs_error_min": 3.07030557632447,
+    "p90_abs_error_min": 22.737875556945806,
+    "p95_abs_error_min": 31.47968575668337,
+    "min_error_min": -140.25690460205078,
+    "max_error_min": 86.57376159667969,
+    "fraction_negative_raw_preds": 0.04717710750193349
+  }
+}

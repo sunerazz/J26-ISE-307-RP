@@ -1,0 +1,56 @@
+{
+  "method": "chronological_by_unique_calendar_date",
+  "fractions": {
+    "train": 0.7,
+    "val": 0.15,
+    "test": 0.15
+  },
+  "n_unique_dates": 55,
+  "n_train_dates": 38,
+  "n_val_dates": 8,
+  "n_test_dates": 9,
+  "train_date_start": "2024-01-01",
+  "train_date_end": "2024-02-07",
+  "val_date_start": "2024-02-08",
+  "val_date_end": "2024-02-15",
+  "test_date_start": "2024-02-16",
+  "test_date_end": "2024-02-24",
+  "n_train_rows": 912,
+  "n_val_rows": 192,
+  "n_test_rows": 216,
+  "date_overlap_train_val": [],
+  "date_overlap_train_test": [],
+  "date_overlap_val_test": [],
+  "limitation": "Sessions are ordered by charging start date. This is not a random split. The calendar covers only about eight weeks, so the test period is a short future window of the same table.",
+  "feature_columns": [
+    "Battery Capacity (kWh)",
+    "Charging Rate (kW)",
+    "State of Charge (Start %)",
+    "Distance Driven (since last charge) (km)",
+    "Vehicle Age (years)",
+    "Temperature (\u00c2\u00b0C)",
+    "Vehicle Model",
+    "Charging Station Location",
+    "Time of Day",
+    "Day of Week",
+    "Charger Type",
+    "User Type"
+  ],
+  "temperature_column": "Temperature (\u00c2\u00b0C)",
+  "numeric_features": [
+    "Battery Capacity (kWh)",
+    "Charging Rate (kW)",
+    "State of Charge (Start %)",
+    "Distance Driven (since last charge) (km)",
+    "Vehicle Age (years)",
+    "Temperature (\u00c2\u00b0C)"
+  ],
+  "categorical_features": [
+    "Vehicle Model",
+    "Charging Station Location",
+    "Time of Day",
+    "Day of Week",
+    "Charger Type",
+    "User Type"
+  ]
+}

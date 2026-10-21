@@ -1,0 +1,135 @@
+{
+  "source_path": "C:\\Users\\Charuka\\Desktop\\thanuka resarch\\system\\component2_charging_duration\\data\\raw\\Component 2 ev_charging_patterns (2).xlsx",
+  "n_rows": 1320,
+  "n_columns": 20,
+  "columns": [
+    "User ID",
+    "Vehicle Model",
+    "Battery Capacity (kWh)",
+    "Charging Station ID",
+    "Charging Station Location",
+    "Charging Start Time",
+    "Charging End Time",
+    "Energy Consumed (kWh)",
+    "Charging Duration (hours)",
+    "Charging Rate (kW)",
+    "Charging Cost (USD)",
+    "Time of Day",
+    "Day of Week",
+    "State of Charge (Start %)",
+    "State of Charge (End %)",
+    "Distance Driven (since last charge) (km)",
+    "Temperature (\u00c2\u00b0C)",
+    "Vehicle Age (years)",
+    "Charger Type",
+    "User Type"
+  ],
+  "dtypes": {
+    "User ID": "object",
+    "Vehicle Model": "object",
+    "Battery Capacity (kWh)": "float64",
+    "Charging Station ID": "object",
+    "Charging Station Location": "object",
+    "Charging Start Time": "datetime64[ns]",
+    "Charging End Time": "datetime64[ns]",
+    "Energy Consumed (kWh)": "float64",
+    "Charging Duration (hours)": "float64",
+    "Charging Rate (kW)": "float64",
+    "Charging Cost (USD)": "float64",
+    "Time of Day": "object",
+    "Day of Week": "object",
+    "State of Charge (Start %)": "float64",
+    "State of Charge (End %)": "float64",
+    "Distance Driven (since last charge) (km)": "float64",
+    "Temperature (\u00c2\u00b0C)": "float64",
+    "Vehicle Age (years)": "float64",
+    "Charger Type": "object",
+    "User Type": "object"
+  },
+  "missing_counts": {
+    "Energy Consumed (kWh)": 66,
+    "Charging Rate (kW)": 66,
+    "Distance Driven (since last charge) (km)": 66
+  },
+  "duplicate_rows": 0,
+  "target_source_column": "Charging Duration (hours)",
+  "target_source_unit": "hours",
+  "target_modelling_unit": "minutes",
+  "conversion": "charging_duration_min = Charging Duration (hours) * 60",
+  "duration_hours": {
+    "min": 0.0953144165458864,
+    "median": 2.258136073508825,
+    "mean": 2.2693773889553466,
+    "max": 7.63514475934223,
+    "non_positive": 0,
+    "missing": 0
+  },
+  "soc_start_outside_0_100": 9,
+  "soc_end_outside_0_100": 23,
+  "soc_end_below_start": 268,
+  "battery_kwh_below_10": 8,
+  "battery_kwh_above_120": 17,
+  "timestamp_min": "2024-01-01 00:00:00",
+  "timestamp_max": "2024-02-24 23:00:00",
+  "n_unique_start_times": 1320,
+  "n_unique_dates": 55,
+  "categorical_levels": {
+    "Vehicle Model": {
+      "Tesla Model 3": 280,
+      "Hyundai Kona": 266,
+      "Nissan Leaf": 260,
+      "BMW i3": 258,
+      "Chevy Bolt": 256
+    },
+    "Charger Type": {
+      "Level 1": 459,
+      "Level 2": 431,
+      "DC Fast Charger": 430
+    },
+    "Time of Day": {
+      "Evening": 362,
+      "Morning": 336,
+      "Night": 312,
+      "Afternoon": 310
+    },
+    "Day of Week": {
+      "Saturday": 205,
+      "Tuesday": 200,
+      "Wednesday": 197,
+      "Sunday": 191,
+      "Friday": 188,
+      "Monday": 185,
+      "Thursday": 154
+    },
+    "User Type": {
+      "Commuter": 476,
+      "Long-Distance Traveler": 437,
+      "Casual Driver": 407
+    },
+    "Charging Station Location": {
+      "Los Angeles": 297,
+      "San Francisco": 264,
+      "Houston": 262,
+      "New York": 255,
+      "Chicago": 242
+    }
+  },
+  "temperature_column": "Temperature (\u00c2\u00b0C)",
+  "excluded_features": {
+    "Charging Duration (hours)": "Target source column (hours). Converted to minutes; never an input.",
+    "charging_duration_min": "Modelling target.",
+    "Charging End Time": "Known only when the session finishes; would reveal duration.",
+    "State of Charge (End %)": "Observed after charging completes.",
+    "Energy Consumed (kWh)": "Session energy is an outcome, not known when charging starts. 66 values are missing.",
+    "Charging Cost (USD)": "Billing result of the session, not an input available as a duration cause at start.",
+    "User ID": "Unique row identifier (1,320 distinct values). Not a generalisable feature.",
+    "Charging Station ID": "462 sparse station IDs. Known at start, but too high-cardinality to generalise; excluded.",
+    "Charging Start Time": "Used only to order the chronological split, not as a raw model feature. Time of day and day of week are used instead."
+  },
+  "data_limitations": [
+    "Duration in hours does not match Charging End Time minus Charging Start Time (near-zero correlation). The labelled duration column is used as the target, not the clock difference.",
+    "Energy consumed is almost uncorrelated with duration, and charging rate is not equal to energy/duration. Treat the table as a noisy or synthetic session table, not a physically consistent meter log.",
+    "A small number of SOC values exceed 100 percent and some end SOC values are below start SOC.",
+    "1,320 sessions over about eight weeks and five vehicle models is a small sample for strong generalisation claims."
+  ]
+}
