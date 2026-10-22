@@ -13,35 +13,35 @@
   },
   "best_ml_model_by_validation": "xgboost",
   "best_ml_val_metrics": {
-    "mae_min": 7.5637685671572426,
-    "rmse_min": 13.802451458054627,
-    "r2": 0.979016727803385,
-    "n": 10368
+    "mae_min": 14.449018629080168,
+    "rmse_min": 19.139663236227808,
+    "r2": 0.6003218176751564,
+    "n": 8640
   },
   "validation_metrics": {
     "persistence": {
-      "mae_min": 7.844192708333333,
-      "rmse_min": 16.20456524055541,
-      "r2": 0.9710775203097877,
-      "n": 10368
+      "mae_min": 18.244011574074076,
+      "rmse_min": 25.006911668187968,
+      "r2": 0.31772104191816397,
+      "n": 8640
     },
     "historical_median": {
-      "mae_min": 68.8617042824074,
-      "rmse_min": 110.3024878022458,
-      "r2": -0.3400819977662044,
-      "n": 10368
+      "mae_min": 24.22299074074074,
+      "rmse_min": 30.28377692262103,
+      "r2": -0.0006033078913882939,
+      "n": 8640
     },
     "random_forest": {
-      "mae_min": 7.61577696703959,
-      "rmse_min": 14.124779251487801,
-      "r2": 0.9780252422619005,
-      "n": 10368
+      "mae_min": 14.585489243353784,
+      "rmse_min": 19.31879871732977,
+      "r2": 0.5928053224887859,
+      "n": 8640
     },
     "xgboost": {
-      "mae_min": 7.5637685671572426,
-      "rmse_min": 13.802451458054627,
-      "r2": 0.979016727803385,
-      "n": 10368
+      "mae_min": 14.449018629080168,
+      "rmse_min": 19.139663236227808,
+      "r2": 0.6003218176751564,
+      "n": 8640
     }
   },
   "split_meta": {
@@ -61,12 +61,12 @@
     "task": "waiting_time_30min",
     "wait_column": "estimated_waiting_time_now_min",
     "target_column": "target_waiting_time_30min_min",
-    "dropped_no_target": 12,
-    "dropped_lag_warmup": 24,
-    "unmatched_target_rows": 12,
-    "n_train_rows": 48360,
-    "n_val_rows": 10368,
-    "n_test_rows": 10344,
+    "dropped_no_target": 10,
+    "dropped_lag_warmup": 20,
+    "unmatched_target_rows": 10,
+    "n_train_rows": 40300,
+    "n_val_rows": 8640,
+    "n_test_rows": 8620,
     "feature_columns": [
       "is_weekend",
       "hour",
@@ -112,8 +112,8 @@
     ],
     "target_unit": "minutes",
     "target_min_train": 0.0,
-    "target_max_train": 240.0,
-    "target_zero_fraction_train": 0.423697270471464
+    "target_max_train": 180.0,
+    "target_zero_fraction_train": 0.0017866004962779156
   },
   "notes": [
     "Waiting times are estimated/synthetic station snapshots, not measured arrival-to-charge-start stopwatch times from an event log.",

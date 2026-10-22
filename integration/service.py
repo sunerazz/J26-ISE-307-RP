@@ -2,12 +2,17 @@
 
 from __future__ import annotations
 
+import json
 import logging
 import os
 from contextlib import asynccontextmanager
+from datetime import datetime, timedelta
+from pathlib import Path
+from typing import Any
 
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
 from pydantic import BaseModel, Field
 
 from bootstrap import load_all
@@ -98,6 +103,25 @@ def colombo_stations() -> dict:
     }
 
 
+@app.get("/api/v1/component4/research")
+def component4_research() -> dict:
+    """Saved Component 4 evaluation outputs for the research panel. Missing files stay missing."""
+    component4 = _bundle().get("component4")
+    if component4 is None:
+        raise HTTPException(status_code=503, detail="Component 4 is not loaded.")
+    results = component4["results_path"]
+
+    def read(name: str) -> dict | None:
+        path = results / name
+        return json.loads(path.read_text(encoding="utf-8")) if path.exists() else None
+
+    return {
+        "data_completeness": read("data_completeness_report.json"),
+        "routing_evaluation": read("routing_evaluation_summary.json"),
+        "how_to_reproduce": ["python -m src.build_inventory", "python -m src.evaluate_routing"],
+    }
+
+
 @app.post("/api/v1/recommend")
 def recommend(body: TripRequest) -> dict:
     bundle = _bundle()
@@ -172,6 +196,87 @@ def energy_schema() -> dict:
     }
 
 
+class DurationRequest(BaseModel):
+    features: dict[str, Any]
+    # Local wall-clock time the session starts; used only to add the predicted minutes.
+    charging_start_time: datetime | None = None
+
+
+@app.post("/api/v1/duration/predict")
+def duration_predict(body: DurationRequest) -> dict:
+    """Component 2 on its own: one session-duration prediction and the expected completion time."""
+    component2 = _bundle().get("component2")
+    if component2 is None:
+        raise HTTPException(status_code=503, detail=_bundle().get("errors", {}).get("component2", "Duration model is not loaded."))
+    refresh = component2.get("refresh")
+    if refresh:
+        try:
+            refresh()
+        except Exception as exc:  # noqa: BLE001
+            raise HTTPException(status_code=503, detail=str(exc)) from exc
+    columns = component2["feature_columns"]
+    features = body.features
+    missing = [column for column in columns if features.get(column) in (None, "")]
+    if missing:
+        raise HTTPException(status_code=422, detail="Missing inputs: " + ", ".join(missing) + ". Nothing was guessed.")
+    for column, allowed in (component2.get("categories") or {}).items():
+        if str(features.get(column)) not in allowed:
+            raise HTTPException(status_code=422, detail=f"{column} must be one of the training values {allowed}.")
+    try:
+        prediction = component2["predict_duration"](
+            {column: features[column] for column in columns},
+            pipeline=component2.get("pipeline"),
+            meta=component2.get("meta"),
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+    minutes = float(prediction["predicted_charging_duration_min"])
+    result = {
+        **prediction,
+        "selected_model": component2.get("selected_model"),
+        "test_metrics": component2.get("metrics"),
+        "charging_start_time": None,
+        "expected_completion_time": None,
+        "note": (
+            "One session-duration prediction from the saved Component 2 pipeline. Its training sessions are from "
+            "five US cities, so the location must be one of them. Test R² is near zero, so treat the value as a "
+            "rough statistical estimate, not a guarantee."
+        ),
+    }
+    if body.charging_start_time is not None:
+        start = body.charging_start_time
+        result["charging_start_time"] = start.isoformat(timespec="minutes")
+        result["expected_completion_time"] = (start + timedelta(minutes=minutes)).isoformat(timespec="minutes")
+    return result
+
+
+class CostRequest(BaseModel):
+    energy_kwh: float = Field(..., ge=0)
+    tariff_lkr_per_kwh: float = Field(..., ge=0)
+    charging_efficiency: float | None = Field(default=None, gt=0, le=1)
+
+
+@app.post("/api/v1/energy/cost")
+def energy_cost(body: CostRequest) -> dict:
+    """Component 3 cost function: energy times a tariff the user supplies. No tariff is assumed."""
+    component3 = _bundle().get("component3") or {}
+    estimate = component3.get("estimate_charging_cost")
+    if estimate is None:
+        raise HTTPException(status_code=503, detail="The cost function is not loaded.")
+    grid_kwh = body.energy_kwh / body.charging_efficiency if body.charging_efficiency else None
+    try:
+        cost = estimate(
+            grid_kwh if grid_kwh is not None else body.energy_kwh,
+            body.tariff_lkr_per_kwh,
+            currency="LKR",
+            tariff_category="user_supplied_scenario",
+            energy_basis="station_energy_drawn_kwh" if grid_kwh is not None else "vehicle_energy_kwh",
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+    return {**cost, "battery_energy_kwh": body.energy_kwh, "grid_energy_kwh": grid_kwh}
+
+
 @app.post("/api/v1/energy/predict")
 def energy_predict(body: dict) -> dict:
     component3 = _bundle().get("component3") or {}
@@ -230,3 +335,24 @@ def synthetic_station_now(body: dict) -> dict:
     payload["training_data"] = "synthetic"
     payload["applies_to_colombo_inventory"] = False
     return payload
+
+
+def _dashboard_dir() -> Path | None:
+    configured = os.getenv("FRONTEND_DIST")
+    candidates = [Path(configured)] if configured else []
+    candidates.append(Path(__file__).resolve().parents[1] / "frontend" / "dist")
+    return next((path for path in candidates if (path / "index.html").is_file()), None)
+
+
+DASHBOARD = _dashboard_dir()
+
+if DASHBOARD is not None:
+    # Registered after every API route, so it never shadows one.
+    @app.get("/{path:path}", include_in_schema=False)
+    def dashboard(path: str) -> FileResponse:
+        if path.startswith("api/") or path == "api":
+            raise HTTPException(status_code=404, detail="Not found")
+        target = (DASHBOARD / path).resolve()
+        if path and target.is_file() and DASHBOARD.resolve() in target.parents:
+            return FileResponse(target)
+        return FileResponse(DASHBOARD / "index.html")

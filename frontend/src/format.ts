@@ -40,3 +40,18 @@ export function fmtLkr(value: number | null | undefined): string {
 export function osmLink(latitude: number, longitude: number): string {
   return `https://www.openstreetmap.org/?mlat=${latitude}&mlon=${longitude}#map=17/${latitude}/${longitude}`
 }
+
+/** '2026-10-22T14:35+05:30' -> '2:35 pm'. The API sends Sri Lanka local time. */
+export function fmtClock(value: string | null | undefined): string {
+  if (!value) return 'unknown'
+  const match = /T(\d{2}):(\d{2})/.exec(value)
+  if (!match) return value
+  const hour = Number(match[1])
+  const suffix = hour >= 12 ? 'pm' : 'am'
+  return `${hour % 12 || 12}:${match[2]} ${suffix}`
+}
+
+/** Feature names from the Component 2 spreadsheet carry a broken degree sign ('Â°C'). Display only. */
+export function fixLabel(label: string): string {
+  return label.replace('Â°', '°')
+}

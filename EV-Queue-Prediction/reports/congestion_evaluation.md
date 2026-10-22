@@ -17,19 +17,19 @@
 ```json
 {
   "train": {
-    "High": 21595,
-    "Low": 20489,
-    "Medium": 6276
+    "High": 39990,
+    "Medium": 194,
+    "Low": 116
   },
   "validation": {
-    "High": 4590,
-    "Low": 4464,
-    "Medium": 1314
+    "High": 8567,
+    "Medium": 51,
+    "Low": 22
   },
   "test": {
-    "High": 4531,
-    "Low": 4514,
-    "Medium": 1299
+    "High": 8575,
+    "Medium": 28,
+    "Low": 17
   }
 }
 ```
@@ -38,9 +38,9 @@
 
 ```json
 {
-  "accuracy": 0.8160286156225831,
-  "macro_f1": 0.7330586259418309,
-  "n": 10344,
+  "accuracy": 0.9945475638051045,
+  "macro_f1": 0.709649458265791,
+  "n": 8620,
   "labels_evaluated": [
     "Low",
     "Medium",
@@ -48,22 +48,22 @@
   ],
   "per_class": {
     "Low": {
-      "precision": 0.8567609712630876,
-      "recall": 0.8520159503766062,
-      "f1": 0.8543818727090969,
-      "support": 4514
+      "precision": 0.8666666666666667,
+      "recall": 0.7647058823529411,
+      "f1": 0.8125,
+      "support": 17
     },
     "Medium": {
-      "precision": 0.38412142440163455,
-      "recall": 0.5065434949961509,
-      "f1": 0.43691899070385126,
-      "support": 1299
+      "precision": 0.2682926829268293,
+      "recall": 0.39285714285714285,
+      "f1": 0.3188405797101449,
+      "support": 28
     },
     "High": {
-      "precision": 0.9505070014485756,
-      "recall": 0.8689031118958287,
-      "f1": 0.9078750144125447,
-      "support": 4531
+      "precision": 0.9982484820177487,
+      "recall": 0.9969679300291545,
+      "f1": 0.997607795087228,
+      "support": 8575
     }
   }
 }
@@ -74,9 +74,9 @@
 ```json
 {
   "most_frequent": {
-    "accuracy": 0.43803170920340295,
-    "macro_f1": 0.20307002801120447,
-    "n": 10344,
+    "accuracy": 0.9947795823665894,
+    "macro_f1": 0.332460986720946,
+    "n": 8620,
     "labels_evaluated": [
       "Low",
       "Medium",
@@ -87,26 +87,26 @@
         "precision": 0.0,
         "recall": 0.0,
         "f1": 0.0,
-        "support": 4514
+        "support": 17
       },
       "Medium": {
         "precision": 0.0,
         "recall": 0.0,
         "f1": 0.0,
-        "support": 1299
+        "support": 28
       },
       "High": {
-        "precision": 0.43803170920340295,
+        "precision": 0.9947795823665894,
         "recall": 1.0,
-        "f1": 0.6092100840336134,
-        "support": 4531
+        "f1": 0.997382960162838,
+        "support": 8575
       }
     }
   },
   "random_forest": {
-    "accuracy": 0.8240525908739366,
-    "macro_f1": 0.7406672998643405,
-    "n": 10344,
+    "accuracy": 0.9954756380510441,
+    "macro_f1": 0.7025557872417405,
+    "n": 8620,
     "labels_evaluated": [
       "Low",
       "Medium",
@@ -114,29 +114,29 @@
     ],
     "per_class": {
       "Low": {
-        "precision": 0.8517560870502047,
-        "recall": 0.8757199822773594,
-        "f1": 0.8635718186783179,
-        "support": 4514
+        "precision": 0.7647058823529411,
+        "recall": 0.7647058823529411,
+        "f1": 0.7647058823529411,
+        "support": 17
       },
       "Medium": {
-        "precision": 0.40991839296924043,
-        "recall": 0.5026943802925328,
-        "f1": 0.4515905947441217,
-        "support": 1299
+        "precision": 0.3333333333333333,
+        "recall": 0.35714285714285715,
+        "f1": 0.3448275862068966,
+        "support": 28
       },
       "High": {
-        "precision": 0.9532846715328467,
-        "recall": 0.8647097770911498,
-        "f1": 0.9068394861705821,
-        "support": 4531
+        "precision": 0.9982503207745247,
+        "recall": 0.9980174927113703,
+        "f1": 0.9981338931653837,
+        "support": 8575
       }
     }
   },
   "xgboost": {
-    "accuracy": 0.8160286156225831,
-    "macro_f1": 0.7330586259418309,
-    "n": 10344,
+    "accuracy": 0.9945475638051045,
+    "macro_f1": 0.709649458265791,
+    "n": 8620,
     "labels_evaluated": [
       "Low",
       "Medium",
@@ -144,22 +144,22 @@
     ],
     "per_class": {
       "Low": {
-        "precision": 0.8567609712630876,
-        "recall": 0.8520159503766062,
-        "f1": 0.8543818727090969,
-        "support": 4514
+        "precision": 0.8666666666666667,
+        "recall": 0.7647058823529411,
+        "f1": 0.8125,
+        "support": 17
       },
       "Medium": {
-        "precision": 0.38412142440163455,
-        "recall": 0.5065434949961509,
-        "f1": 0.43691899070385126,
-        "support": 1299
+        "precision": 0.2682926829268293,
+        "recall": 0.39285714285714285,
+        "f1": 0.3188405797101449,
+        "support": 28
       },
       "High": {
-        "precision": 0.9505070014485756,
-        "recall": 0.8689031118958287,
-        "f1": 0.9078750144125447,
-        "support": 4531
+        "precision": 0.9982484820177487,
+        "recall": 0.9969679300291545,
+        "f1": 0.997607795087228,
+        "support": 8575
       }
     }
   }
@@ -177,19 +177,19 @@
   ],
   "matrix": [
     [
-      3846,
-      635,
-      33
+      13,
+      4,
+      0
     ],
     [
-      469,
-      658,
-      172
+      2,
+      11,
+      15
     ],
     [
-      174,
-      420,
-      3937
+      0,
+      26,
+      8549
     ]
   ]
 }
@@ -200,64 +200,64 @@
 ```json
 [
   {
+    "feature": "num__queue_after_current_arrivals",
+    "importance": 0.2597842812538147
+  },
+  {
+    "feature": "cat__congestion_level_now_Medium",
+    "importance": 0.16495203971862793
+  },
+  {
     "feature": "num__estimated_waiting_time_now_min",
-    "importance": 0.1489410698413849
+    "importance": 0.12641294300556183
   },
   {
     "feature": "num__station_load",
-    "importance": 0.12124747037887573
+    "importance": 0.03798114135861397
   },
   {
     "feature": "cat__congestion_level_now_Low",
-    "importance": 0.08908601850271225
+    "importance": 0.026556340977549553
   },
   {
-    "feature": "num__station_utilization",
-    "importance": 0.061616163700819016
+    "feature": "num__current_queue_length",
+    "importance": 0.022779863327741623
   },
   {
-    "feature": "num__queue_after_current_arrivals",
-    "importance": 0.05857359617948532
+    "feature": "num__queue_roll_mean_8",
+    "importance": 0.016409939154982567
   },
   {
-    "feature": "cat__location_type_Highway",
-    "importance": 0.049835797399282455
+    "feature": "num__active_chargers",
+    "importance": 0.014580093324184418
   },
   {
-    "feature": "cat__congestion_level_now_High",
-    "importance": 0.020372359082102776
+    "feature": "cat__traffic_level_Low",
+    "importance": 0.0141060221940279
   },
   {
-    "feature": "num__total_chargers",
-    "importance": 0.01748587004840374
-  },
-  {
-    "feature": "cat__station_id_ST06",
-    "importance": 0.01523090060800314
-  },
-  {
-    "feature": "cat__station_id_ST01",
-    "importance": 0.014717447571456432
+    "feature": "num__queue_lag_1",
+    "importance": 0.01378925796598196
   },
   {
     "feature": "cat__time_slot_Overnight",
-    "importance": 0.014157001860439777
+    "importance": 0.013176226057112217
   },
   {
-    "feature": "cat__station_id_ST03",
-    "importance": 0.013595672324299812
+    "feature": "num__queue_roll_mean_4",
+    "importance": 0.012881604954600334
   },
   {
-    "feature": "cat__location_type_Urban",
-    "importance": 0.01303162332624197
+    "feature": "cat__time_slot_Morning",
+    "importance": 0.011601708829402924
   },
   {
-    "feature": "num__average_charging_duration_min",
-    "importance": 0.012887382879853249
+    "feature": "cat__day_of_week_Tuesday",
+    "importance": 0.01151310559362173
   },
   {
-    "feature": "num__available_chargers",
-    "importance": 0.01124898437410593
+    "feature": "num__wait_lag_4",
+    "importance": 0.01121312566101551
   }
 ]
 ```

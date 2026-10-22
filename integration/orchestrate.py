@@ -3,9 +3,12 @@
 from __future__ import annotations
 
 import logging
+from datetime import datetime, timedelta, timezone
 from typing import Any
 
 from pydantic import BaseModel, Field
+
+from area_models import match_trained_area
 
 logger = logging.getLogger("integration.orchestrate")
 
@@ -18,11 +21,9 @@ DEFAULT_WEIGHTS = {
 }
 
 QUEUE_REASON = (
-    "Queue length, waiting time and congestion were not predicted for this Colombo listing. "
-    "Component 1 was trained on synthetic stations ST01–ST06. It needs an observed queue and, "
-    "for waiting time and congestion, the lag features from that synthetic table. "
-    "Those observations are blank in the Colombo CSV and were not replaced with zero. "
-    "A value from the synthetic station checker is a separate demonstration, not this station's forecast."
+    "No queue, waiting time or congestion estimate for this charger. "
+    "The synthetic area models cover Nugegoda, Rajagiriya, Malabe, Pannipitiya and Panadura, "
+    "and this listing is not close to those towns. The blank listing was not filled with zero."
 )
 
 DURATION_REASON = (
@@ -49,8 +50,89 @@ class TripRequest(BaseModel):
     duration_features: dict[str, Any] | None = None
     energy_conditions: dict[str, Any] | None = None
     ranking_weights: dict[str, float] | None = None
+    max_charge_soc_percent: float = Field(default=80, gt=0, le=100)
+    # Local departure time for the trip timeline. Defaults to now in Sri Lanka.
+    departure_time: datetime | None = None
+    stop_overhead_min: float = Field(default=5, ge=0, le=60)
     include_explanation: bool = True
     follow_up_question: str | None = None
+
+
+# Sri Lanka has no daylight saving, so a fixed offset is exact.
+SRI_LANKA = timezone(timedelta(hours=5, minutes=30), "Asia/Colombo")
+
+
+def _departure(body: "TripRequest") -> datetime:
+    if body.departure_time is None:
+        return datetime.now(SRI_LANKA).replace(second=0, microsecond=0)
+    departure = body.departure_time
+    return departure if departure.tzinfo else departure.replace(tzinfo=SRI_LANKA)
+
+
+def _clock(moment: datetime) -> str:
+    return moment.isoformat(timespec="minutes")
+
+
+def _timeline(station: dict, departure: datetime) -> dict[str, Any]:
+    """Clock times for one station: drive there, wait (Component 1 when applied), charge, drive on.
+
+    A part that was not estimated stays out of the sum and is named in `missing`,
+    so a completion time is never shown as more certain than its parts.
+    """
+    to_station = station.get("origin_to_station") or {}
+    onward = station.get("station_to_destination") or {}
+    if not station.get("included_in_ranking") or to_station.get("duration_min") is None:
+        return {"available": False}
+    arrive = departure + timedelta(minutes=to_station["duration_min"])
+    queue = station.get("queue_prediction") or {}
+    wait = queue.get("predicted_waiting_time_min") if queue.get("status") == "area_model" else None
+    charge = station.get("listed_power_duration_min")
+    missing = []
+    if wait is None:
+        missing.append("waiting time (no queue forecast for this charger)")
+    if charge is None:
+        missing.append("charging time (no target charge level was given)")
+    start_charging = arrive + timedelta(minutes=wait or 0)
+    done = start_charging + timedelta(minutes=charge or 0)
+    arrive_destination = done + timedelta(minutes=onward["duration_min"]) if onward.get("duration_min") is not None else None
+    return {
+        "available": True,
+        "departure_time": _clock(departure),
+        "arrive_at_station_time": _clock(arrive),
+        "predicted_wait_min": wait,
+        "start_charging_time": _clock(start_charging),
+        "charging_min": charge,
+        "charging_complete_time": _clock(done) if charge is not None else None,
+        "arrive_destination_time": _clock(arrive_destination) if arrive_destination else None,
+        "missing": missing,
+        "basis": (
+            "Road times from the routing provider (not live traffic)"
+            + (", the Component 1 synthetic waiting-time forecast for the nearest trained town" if wait is not None else "")
+            + (", and charging at the listed kW of your plug (real chargers taper, so expect longer)." if charge is not None else ".")
+        ),
+    }
+
+
+def _congestion_metrics(report: dict | None) -> dict | None:
+    """Accuracy and macro F1 with the majority-class baseline. Classes are imbalanced, so accuracy alone misleads."""
+    selected = (report or {}).get("test_metrics_selected")
+    if not selected:
+        return None
+    baseline = ((report or {}).get("baselines_test") or {}).get("most_frequent") or {}
+    return {
+        "accuracy": selected.get("accuracy"),
+        "macro_f1": selected.get("macro_f1"),
+        "n": selected.get("n"),
+        "baseline_most_frequent_accuracy": baseline.get("accuracy"),
+        "baseline_most_frequent_macro_f1": baseline.get("macro_f1"),
+    }
+
+
+def _plan_arrival(plan: dict | None, departure: datetime) -> str | None:
+    totals = (plan or {}).get("totals") or {}
+    if totals.get("total_min") is None:
+        return None
+    return _clock(departure + timedelta(minutes=totals["total_min"]))
 
 
 def _penalty(value: float, values: list[float]) -> float:
@@ -548,11 +630,24 @@ def _quick_answer(body: TripRequest, result: dict[str, Any]) -> list[str]:
             f"{trip['soc_at_destination_without_charging_percent']:.0f}% (your reserve is "
             f"{body.minimum_reserve_percent:.0f}%)."
         )
+    plan = result.get("charging_plan") or {}
+    multi_stop = plan.get("status") == "planned" and len(plan.get("stops") or []) > 1
+    if multi_stop:
+        lines.append(
+            f"Charging to at most {plan['max_charge_soc_percent']:g}% per stop, one stop is not enough for this trip. "
+            + plan["explanation"]
+        )
     station = result.get("recommended_station")
     if station is None:
         lines.append("No station can be recommended from the information supplied.")
         return lines
-    lines.append(f"Best listed option: {station['station_id']} ({station['station_name']}).")
+    if multi_stop:
+        lines.append(
+            f"If you would rather stop once, the top-ranked station is {station['station_id']} ({station['station_name']}), "
+            "but you would need to charge above that limit, where DC charging is slow."
+        )
+    else:
+        lines.append(f"Best listed option: {station['station_id']} ({station['station_name']}).")
     lines.append(_plain_station_summary(body, station))
     lines.append("Call ahead or check the operator app before you go: these are listings, not live data.")
     return lines
@@ -713,8 +808,13 @@ def _duration(body: TripRequest, deps: dict[str, Any]) -> dict[str, Any]:
     }
 
 
-def _queue_block() -> dict[str, Any]:
-    return {
+def _queue_block(station: dict | None = None, deps: dict | None = None, cache: dict | None = None) -> dict[str, Any]:
+    """Forecast from the synthetic town model when this charger is close to one.
+
+    The listing's own queue and wait stay blank. The numbers are the trained
+    town's 30-minute forecast, not a count taken at this charger.
+    """
+    empty = {
         "status": "unavailable",
         "observed_queue_length": None,
         "predicted_queue_length": None,
@@ -723,11 +823,69 @@ def _queue_block() -> dict[str, Any]:
         "horizon_minutes": 30,
         "training_data": "synthetic",
         "basis": "not_applied",
+        "trained_station_id": None,
+        "trained_area": None,
+        "distance_km": None,
         "reason": QUEUE_REASON,
+    }
+    if station is None or not deps or deps.get("component1") is None:
+        return empty
+    area = match_trained_area(station)
+    if area is None:
+        return empty
+    store = cache if cache is not None else {}
+    key = area["station_id"]
+    if key not in store:
+        try:
+            request = deps["component1"]["StationNowRequest"](
+                station_id=key, use_current_time=True, include_llm=False
+            )
+            response = deps["component1"]["predict_station_now"](request)
+            store[key] = response.model_dump()
+        except Exception as exc:  # noqa: BLE001 — one town's model failure must not invent a queue
+            logger.warning("Area model %s failed: %s", key, exc)
+            store[key] = None
+    forecast = store.get(key)
+    if not forecast:
+        failed = dict(empty)
+        failed["trained_station_id"] = key
+        failed["trained_area"] = area["name"]
+        failed["distance_km"] = area["distance_km"]
+        failed["reason"] = (
+            f"The synthetic model for {area['name']} could not be applied. "
+            "No queue, waiting time or congestion was invented."
+        )
+        return failed
+    predictions = forecast.get("predictions") or {}
+    queue = predictions.get("queue") or {}
+    waiting = predictions.get("waiting_time") or {}
+    congestion = predictions.get("congestion") or {}
+    return {
+        "status": "area_model",
+        "observed_queue_length": None,
+        "predicted_queue_length": queue.get("predicted_queue_length"),
+        "predicted_waiting_time_min": waiting.get("predicted_waiting_time_min"),
+        "predicted_congestion_level": congestion.get("predicted_congestion_level"),
+        "horizon_minutes": 30,
+        "training_data": "synthetic",
+        "basis": "synthetic_area_snapshot",
+        "trained_station_id": key,
+        "trained_area": area["name"],
+        "distance_km": area["distance_km"],
+        "reason": (
+            f"Queue, waiting time and congestion are the synthetic forecast for {area['name']} "
+            f"({key}), {area['distance_km']:.2f} km from this charger. "
+            "They are not a count taken at this charger."
+        ),
     }
 
 
-def _model_catalog(deps: dict[str, Any], energy_ctx: dict[str, Any] | None = None) -> dict[str, Any]:
+def _model_catalog(
+    deps: dict[str, Any],
+    energy_ctx: dict[str, Any] | None = None,
+    stations: list[dict] | None = None,
+) -> dict[str, Any]:
+    applied = any((station.get("queue_prediction") or {}).get("status") == "area_model" for station in (stations or []))
     component1 = deps.get("component1") or {}
     registry = component1.get("registry")
     status = registry.status() if registry is not None else {}
@@ -745,7 +903,7 @@ def _model_catalog(deps: dict[str, Any], energy_ctx: dict[str, Any] | None = Non
             "predictor_kind": status.get("queue", {}).get("predictor_kind"),
             "horizon_minutes": 30,
             "training_data": "synthetic",
-            "applied_to_colombo_stations": False,
+            "applied_to_listed_stations": bool(applied),
             "test_metrics": metric_slice(metrics.get("queue"), "test_metrics_selected_raw"),
         },
         "waiting_time": {
@@ -753,7 +911,7 @@ def _model_catalog(deps: dict[str, Any], energy_ctx: dict[str, Any] | None = Non
             "model_name": status.get("waiting_time", {}).get("model_name"),
             "horizon_minutes": 30,
             "training_data": "synthetic",
-            "applied_to_colombo_stations": False,
+            "applied_to_listed_stations": bool(applied),
             "test_metrics": metric_slice(metrics.get("waiting_time"), "test_metrics_selected_raw"),
         },
         "congestion": {
@@ -761,8 +919,9 @@ def _model_catalog(deps: dict[str, Any], energy_ctx: dict[str, Any] | None = Non
             "model_name": status.get("congestion", {}).get("model_name"),
             "horizon_minutes": 30,
             "training_data": "synthetic",
-            "applied_to_colombo_stations": False,
-            "test_metrics": metric_slice(metrics.get("congestion"), "test_metrics_selected_raw"),
+            "applied_to_listed_stations": bool(applied),
+            # A classifier: its report uses test_metrics_selected (accuracy, macro F1), not the regression key.
+            "test_metrics": _congestion_metrics(metrics.get("congestion")),
         },
         "duration": {
             "loaded": deps.get("component2") is not None,
@@ -813,6 +972,8 @@ def build_recommendation(body: TripRequest, deps: dict[str, Any], explain=True) 
         minimum_reserve_percent=body.minimum_reserve_percent,
         required_connector=body.required_connector,
         maximum_detour_km=body.maximum_detour_km,
+        max_charge_soc_percent=body.max_charge_soc_percent,
+        stop_overhead_min=body.stop_overhead_min,
         # Charging energy depends on the SOC at each station, so it is calculated below per station.
         energy_to_add_kwh=None,
     )
@@ -824,12 +985,15 @@ def build_recommendation(body: TripRequest, deps: dict[str, Any], explain=True) 
         stations.append(routed_data["recommended_station"])
     stations.extend(routed_data.get("alternatives") or [])
     energy_ctx = _apply_energy_model(body, deps, routed_data, stations)
+    area_forecasts: dict[str, dict | None] = {}
+    departure = _departure(body)
     for station in stations:
-        station["queue_prediction"] = _queue_block()
+        station["queue_prediction"] = _queue_block(station, deps, area_forecasts)
         plan = _station_plan(body, station)
         station["trip_plan"] = plan
         kwh = plan["charging_energy_kwh"]
-        power = station.get("max_power_kw_listed")
+        # Listed kW of the driver's plug at this station; the station maximum when no plug was named.
+        power = station.get("charging_power_kw") or station.get("max_power_kw_listed")
         minutes = kwh / power * 60.0 if kwh is not None and power else None
         station["estimated_charging_duration_min"] = minutes
         station["estimated_charging_cost_lkr"] = None
@@ -848,6 +1012,7 @@ def build_recommendation(body: TripRequest, deps: dict[str, Any], explain=True) 
         )
         station["live_availability"] = False
         station["factor_contributions"] = []
+        station["timeline"] = _timeline(station, departure)
     ranking_summary = rank_candidates(stations, weights)
     ranked = sorted(
         [station for station in stations if station.get("included_in_ranking") and station.get("rank")],
@@ -886,12 +1051,12 @@ def build_recommendation(body: TripRequest, deps: dict[str, Any], explain=True) 
         "ranking_weights": weights,
         "charging_duration": duration,
         "energy_and_cost": energy,
-        "models": _model_catalog(deps, energy_ctx),
+        "models": _model_catalog(deps, energy_ctx, stations),
         "data_freshness": routed_data.get("data_freshness"),
         "limitations": list(routed_data.get("limitations") or [])
         + [
             "Road times are OSRM estimates on OpenStreetMap data, not live traffic. © OpenStreetMap contributors.",
-            "Component 1 predictions are withheld for ST001–ST004 because the required observations do not exist.",
+            "Queue, waiting time and congestion are synthetic town forecasts when a charger is near Nugegoda, Rajagiriya, Malabe, Pannipitiya or Panadura. They are not a count at that charger. Farther listings stay blank.",
             energy_ctx.get("reason")
             or "The energy model was not applied to this search.",
         ],
@@ -899,6 +1064,13 @@ def build_recommendation(body: TripRequest, deps: dict[str, Any], explain=True) 
         "live_queue_prediction": False,
         "station_count": len(stations),
         "trip_check": _trip_check(body, routed_data.get("direct_route")),
+        # Component 4 route optimisation: multi-stop plan, baseline rules and routing cost.
+        "charging_plan": routed_data.get("charging_plan"),
+        "strategy_comparison": routed_data.get("strategy_comparison"),
+        "routing_summary": routed_data.get("routing_summary"),
+        "inventory_summary": routed_data.get("inventory_summary"),
+        "departure_time": _clock(departure),
+        "plan_arrival_time": _plan_arrival(routed_data.get("charging_plan"), departure),
     }
     if not recommended:
         result["warnings"].append(

@@ -179,8 +179,8 @@ def predict_station_now(body: StationNowRequest) -> StationNowResponse:
     try:
         q = predict_queue(
             {
+                **features,
                 "station_id": body.station_id,
-                "current_queue_length": features["current_queue_length"],
                 "timestamp": ts,
             },
             model=registry.queue.artifact,

@@ -1,0 +1,96 @@
+{
+  "scenarios": 3420,
+  "places": 20,
+  "vehicles": {
+    "Leaf 24 kWh": {
+      "usable_kwh": 21.0,
+      "kwh_per_100km": 15.0
+    },
+    "Leaf 40 kWh": {
+      "usable_kwh": 37.0,
+      "kwh_per_100km": 16.0
+    },
+    "Leaf e+ 62 kWh": {
+      "usable_kwh": 56.0,
+      "kwh_per_100km": 17.0
+    }
+  },
+  "start_soc_percent": [
+    30.0,
+    50.0,
+    80.0
+  ],
+  "reserve_percent": 10.0,
+  "connector": "CHAdeMO",
+  "trips_without_charging": 1005,
+  "trips_needing_charging": 2415,
+  "trips_from_colombo_needing_charging": 279,
+  "strategies": {
+    "nearest_station": {
+      "label": "Nearest station",
+      "trips_scored": 2415,
+      "trips_completed": 832,
+      "success_rate": 0.3445,
+      "mean_total_trip_min": 176.69,
+      "mean_charging_min": 20.8,
+      "mean_detour_km": 7.63,
+      "mean_minutes_slower_than_optimised": 8.47,
+      "max_minutes_slower_than_optimised": 178.49
+    },
+    "minimum_detour": {
+      "label": "Minimum detour",
+      "trips_scored": 2415,
+      "trips_completed": 1114,
+      "success_rate": 0.4613,
+      "mean_total_trip_min": 192.64,
+      "mean_charging_min": 22.43,
+      "mean_detour_km": 0.63,
+      "mean_minutes_slower_than_optimised": 5.98,
+      "max_minutes_slower_than_optimised": 120.57
+    },
+    "weighted_ranking": {
+      "label": "Weighted ranking",
+      "trips_scored": 2415,
+      "trips_completed": 933,
+      "success_rate": 0.3863,
+      "mean_total_trip_min": 191.96,
+      "mean_charging_min": 20.77,
+      "mean_detour_km": -0.34,
+      "mean_minutes_slower_than_optimised": 5.04,
+      "max_minutes_slower_than_optimised": 120.57
+    },
+    "optimised_plan": {
+      "label": "Optimised plan",
+      "trips_scored": 2415,
+      "trips_completed": 1941,
+      "success_rate": 0.8037,
+      "mean_total_trip_min": 236.35,
+      "mean_charging_min": 28.8,
+      "mean_detour_km": 11.04,
+      "mean_minutes_slower_than_optimised": 0.0,
+      "max_minutes_slower_than_optimised": 0.0
+    }
+  },
+  "optimised_plan": {
+    "completed": 1941,
+    "infeasible_with_listed_stations": 474,
+    "rescued_trips": 816,
+    "rescued_note": "Trips the optimised plan completes where none of the single-stop rules does.",
+    "stops_distribution": {
+      "1": 1169,
+      "2": 550,
+      "3": 151,
+      "4": 71
+    },
+    "mean_minutes_saved_vs_best_single_stop": 3.13,
+    "trips_where_best_single_stop_is_slower_by_5_min_or_more": 178
+  },
+  "routing_requests": {
+    "mean_matrix_method": 6.51,
+    "mean_per_station_method": 71.0,
+    "note": "Per trip, the matrix method sends one direct route, one table request and road shapes for the top three stations. The per-station method used before sends one direct route plus two routes per station."
+  },
+  "runtime_seconds": 68.8,
+  "matrix_source": "OSRM table service at https://router.project-osrm.org (OpenStreetMap data)",
+  "matrix_retrieved_on": "2026-10-22"
+}

@@ -52,11 +52,11 @@ def reconstruct_target_from_observations(df: pd.DataFrame) -> pd.DataFrame:
 
 def inspect_dataset(df: pd.DataFrame) -> dict:
     report: dict = {
-        "experiment_label": "SIMULATION-BASED (synthetic dataset)",
+        "experiment_label": "SIMULATION-BASED (named Sri Lankan stations)",
         "source_path": str(RAW_DATA_PATH),
         "filename_note": (
-            "Filename contains 'synthetic'; treat all records as simulated, "
-            "not independently observed real-world queue measurements."
+            "Station names are Sri Lankan places. The rows are a generated "
+            "15-minute snapshot grid with estimated waits, not a field log."
         ),
         "n_rows": int(len(df)),
         "n_columns": int(df.shape[1]),
@@ -176,10 +176,10 @@ def inspect_dataset(df: pd.DataFrame) -> dict:
     )
     report["supports_waiting_time_or_congestion_claim"] = False
     report["limitation_notes"] = [
-        "Dataset is synthetic/simulated; results do not demonstrate real-world deployment accuracy.",
+        "Station identities are Sri Lankan places. The 15-minute queue, wait and congestion values are generated snapshots, not observed charger logs.",
         "No raw vehicle arrival / charging-start / cancellation event log is present.",
-        "Station ST05 exhibits extreme queue lengths (median >> other stations), consistent with a synthetic runaway process.",
-        "This component predicts queue length only, not waiting time or congestion.",
+        "Queue length in this file does not exceed 12 vehicles at any station.",
+        "congestion_level_now is High on nearly every row, so accuracy alone is not a useful congestion score.",
         "Last two snapshots per station lack a verifiable 30-minute-ahead observation and are excluded from modelling.",
     ]
     return report

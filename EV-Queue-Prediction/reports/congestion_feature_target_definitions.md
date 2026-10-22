@@ -16,7 +16,7 @@
 - Name: `target_congestion_level_30min`
 - Definition: `congestion_level_now` at the **same** `station_id` exactly **30 minutes** later.
 - Construction: exact timestamp match (`t + 30 min`).
-- Unmatched rows dropped (never filled as Low): **12**.
+- Unmatched rows dropped (never filled as Low): **10**.
 - Current `congestion_level_now` is an input feature, not the future target.
 - Future queue and future waiting-time values are **not** used as labels or features.
 
@@ -112,12 +112,12 @@ Because congestion is closely related to wait/queue, current wait and queue are 
     "High"
   ],
   "label_provenance": "synthetic_rule_derived_station_snapshots",
-  "dropped_no_target": 12,
-  "dropped_lag_warmup": 24,
-  "unmatched_target_rows": 12,
-  "n_train_rows": 48360,
-  "n_val_rows": 10368,
-  "n_test_rows": 10344,
+  "dropped_no_target": 10,
+  "dropped_lag_warmup": 20,
+  "unmatched_target_rows": 10,
+  "n_train_rows": 40300,
+  "n_val_rows": 8640,
+  "n_test_rows": 8620,
   "feature_columns": [
     "is_weekend",
     "hour",
@@ -162,19 +162,19 @@ Because congestion is closely related to wait/queue, current wait and queue are 
     "wait_delta_1"
   ],
   "class_counts_train": {
-    "High": 21595,
-    "Low": 20489,
-    "Medium": 6276
+    "High": 39990,
+    "Medium": 194,
+    "Low": 116
   },
   "class_counts_val": {
-    "High": 4590,
-    "Low": 4464,
-    "Medium": 1314
+    "High": 8567,
+    "Medium": 51,
+    "Low": 22
   },
   "class_counts_test": {
-    "High": 4531,
-    "Low": 4514,
-    "Medium": 1299
+    "High": 8575,
+    "Medium": 28,
+    "Low": 17
   },
   "queue_available_at_prediction_time": true,
   "wait_available_at_prediction_time": true

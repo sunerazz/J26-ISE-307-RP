@@ -1,0 +1,60 @@
+# Alternative Render Blueprint: four separate services (three model APIs + integration).
+# Not recommended on the free plan: each service sleeps separately, so a cold request can
+# wait for several start-ups in a row. The default render.yaml runs everything in one service.
+
+services:
+  - type: web
+    name: ev-queue-api
+    runtime: docker
+    plan: free
+    region: singapore
+    dockerfilePath: deploy/queue.Dockerfile
+    dockerContext: .
+    healthCheckPath: /health
+
+  - type: web
+    name: ev-duration-api
+    runtime: docker
+    plan: free
+    region: singapore
+    dockerfilePath: deploy/duration.Dockerfile
+    dockerContext: .
+    healthCheckPath: /health
+
+  - type: web
+    name: ev-energy-api
+    runtime: docker
+    plan: free
+    region: singapore
+    dockerfilePath: deploy/energy.Dockerfile
+    dockerContext: .
+    healthCheckPath: /health
+
+  - type: web
+    name: ev-integration-api
+    runtime: docker
+    plan: free
+    region: singapore
+    dockerfilePath: deploy/integration.Dockerfile
+    dockerContext: .
+    healthCheckPath: /health
+    envVars:
+      - key: QUEUE_API_URL
+        fromService:
+          name: ev-queue-api
+          type: web
+          envVarKey: RENDER_EXTERNAL_URL
+      - key: DURATION_API_URL
+        fromService:
+          name: ev-duration-api
+          type: web
+          envVarKey: RENDER_EXTERNAL_URL
+      - key: ENERGY_API_URL
+        fromService:
+          name: ev-energy-api
+          type: web
+          envVarKey: RENDER_EXTERNAL_URL
+      - key: OSRM_BASE_URL
+        value: https://router.project-osrm.org
+      - key: CORS_ORIGINS
+        value: "*"

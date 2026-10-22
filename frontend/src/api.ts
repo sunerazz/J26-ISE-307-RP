@@ -52,6 +52,7 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
 
 export type StationInfo = {
   station_id: string
+  station_name?: string
   location_type: string
   n_snapshots: number
   first_timestamp: string
@@ -160,6 +161,21 @@ export type TripStation = {
     predicted_congestion_level: string | null
     reason: string
     training_data: string
+    trained_area?: string | null
+    trained_station_id?: string | null
+    distance_km?: number | null
+  }
+  timeline?: {
+    available: boolean
+    departure_time?: string
+    arrive_at_station_time?: string
+    predicted_wait_min?: number | null
+    start_charging_time?: string
+    charging_min?: number | null
+    charging_complete_time?: string | null
+    arrive_destination_time?: string | null
+    missing?: string[]
+    basis?: string
   }
   ranking_explanation: string
   plain_summary: string
@@ -173,6 +189,142 @@ export type TripStation = {
     reaches_destination_with_reserve: boolean | null
   }
   factor_contributions?: { factor: string; value: number; factor_score: number; weight: number }[]
+  area?: string
+  city?: string | null
+  number_of_points?: number | null
+  connector_details?: { connector: string; quantity: number | null; power_kw: number | null; supply: string | null }[]
+  usage_type?: string | null
+  access_note?: string | null
+  opening_hours_listed?: string | null
+  phone?: string | null
+  charging_power_kw?: number | null
+  tariff_for_connector_lkr_per_kwh?: number | null
+  tariff_basis?: string | null
+  pareto_optimal?: boolean | null
+}
+
+export type PlanStop = {
+  stop: number
+  station_id: string
+  station_name: string
+  area: string
+  latitude: number
+  longitude: number
+  arrival_soc_percent: number
+  departure_soc_percent: number
+  energy_added_kwh: number
+  charging_power_kw: number
+  charging_min: number
+  overhead_min: number
+  listed_tariff_lkr_per_kwh: number | null
+  listed_cost_lkr: number | null
+  drive_km_from_previous: number
+  drive_min_from_previous: number
+}
+
+export type ChargingPlan = {
+  status: 'no_charge_needed' | 'planned' | 'infeasible'
+  objective: string
+  algorithm: string
+  assumptions: string[]
+  explanation: string
+  stops: PlanStop[]
+  final_leg: { distance_km: number; duration_min: number } | null
+  arrival_soc_at_destination_percent: number | null
+  candidates_considered: number
+  labels_explored: number
+  max_charge_soc_percent: number
+  totals: {
+    drive_km: number
+    drive_min: number
+    charging_min: number
+    overhead_min: number
+    total_min: number
+    energy_added_kwh: number
+    listed_cost_lkr: number | null
+    listed_cost_complete: boolean
+    stops: number
+  } | null
+}
+
+export type StrategyRow = {
+  strategy: string
+  label: string
+  station_ids: string[]
+  feasible: boolean
+  reason: string | null
+  stops?: number
+  total_trip_min?: number
+  charging_min?: number
+  detour_km?: number | null
+  listed_cost_lkr?: number | null
+}
+
+export type RoutingSummary = {
+  provider: string
+  stations_in_inventory: number
+  stations_routed: number
+  table_requests: number
+  route_requests: number
+  total_requests: number
+  per_station_requests_equivalent: number
+  note: string
+}
+
+export type ResearchSummary = {
+  data_completeness: {
+    retrieved_on: string
+    source: string
+    license: string
+    stations_in_inventory: number
+    original_station_count: number
+    operational_listings: number
+    in_greater_colombo: number
+    with_dc_fast_charging: number
+    fields: {
+      field: string
+      label: string
+      original_csv_filled: number
+      original_csv_total: number
+      same_four_stations_now_filled: number
+      inventory_filled: number
+      inventory_total: number
+    }[]
+    corrections_to_original_rows: { station_id: string; field: string; original: string; rebuilt: string; why: string }[]
+    still_unknown: string
+  } | null
+  routing_evaluation: {
+    scenarios: number
+    places: number
+    vehicles: Record<string, { usable_kwh: number; kwh_per_100km: number }>
+    start_soc_percent: number[]
+    reserve_percent: number
+    trips_without_charging: number
+    trips_needing_charging: number
+    strategies: Record<
+      string,
+      {
+        label: string
+        trips_scored: number
+        trips_completed: number
+        success_rate: number
+        mean_total_trip_min: number | null
+        mean_minutes_slower_than_optimised: number | null
+        mean_detour_km: number | null
+      }
+    >
+    optimised_plan: {
+      completed: number
+      infeasible_with_listed_stations: number
+      rescued_trips: number
+      stops_distribution: Record<string, number>
+      mean_minutes_saved_vs_best_single_stop: number | null
+    }
+    routing_requests: { mean_matrix_method: number; mean_per_station_method: number; note: string }
+    matrix_source: string
+    matrix_retrieved_on: string
+  } | null
+  how_to_reproduce: string[]
 }
 
 export type TripResponse = {
@@ -199,16 +351,34 @@ export type TripResponse = {
   }
   energy_and_cost: {
     energy_model_loaded: boolean
+    energy_model_applied?: boolean
+    energy_model_reason?: string | null
+    trip_energy_method?: string
     charging_energy_kwh: number | null
     grid_energy_kwh: number | null
     summary: string
     scenario_cost: { estimated_total: number; currency: string; energy_basis: string } | null
   }
-  models: Record<string, { loaded?: boolean; model_name?: string | null; test_metrics?: unknown; reason?: string }>
+  models: Record<
+    string,
+    {
+      loaded?: boolean
+      model_name?: string | null
+      test_metrics?: Record<string, number | null> | null
+      reason?: string
+      applied_to_listed_stations?: boolean
+      applied_to_this_trip?: boolean
+    }
+  >
+  departure_time?: string
+  plan_arrival_time?: string | null
   limitations: string[]
   explanation?: { text: string; llm_used: boolean; provider: string }
   live_availability: boolean
   live_queue_prediction: boolean
+  charging_plan?: ChargingPlan | null
+  strategy_comparison?: { rows: StrategyRow[]; summary: string; note: string } | null
+  routing_summary?: RoutingSummary | null
 }
 
 export type TripRequest = {
@@ -225,11 +395,69 @@ export type TripRequest = {
   user_tariff_lkr_per_kwh?: number | null
   charging_efficiency?: number | null
   duration_features?: Record<string, string | number> | null
+  max_charge_soc_percent?: number
+  energy_conditions?: EnergyConditions | null
+}
+
+export type EnergyConditions = {
+  elevation_gain_m: number
+  elevation_loss_m: number
+  ambient_temperature_c: number
+  ac_on: boolean
+  traffic_level: string
+  road_type: string
+  vehicle_mass_kg: number
+}
+
+export type DurationPrediction = {
+  predicted_charging_duration_min: number
+  raw_prediction_min: number
+  model_name: string | null
+  selected_model: string | null
+  test_metrics: { mae_min?: number; rmse_min?: number; r2?: number; n?: number } | null
+  charging_start_time: string | null
+  expected_completion_time: string | null
+  note: string
+}
+
+export type EnergyPrediction = {
+  predicted_energy_kwh: number
+  model_name?: string | null
+  [key: string]: unknown
+}
+
+export type CostEstimate = {
+  estimated_total: number
+  currency: string
+  formula: string
+  assumptions: string[]
+  battery_energy_kwh: number
+  grid_energy_kwh: number | null
+}
+
+export type EnergySchema = {
+  feature_columns: string[]
+  condition_features: string[]
+  categories: Record<string, string[]>
+  selected_model: string | null
+  test_metrics: { mae_kwh?: number; rmse_kwh?: number; r2?: number; n?: number } | null
+  note: string
 }
 
 export const api = {
   health: () =>
     request<{ status: string; routing_ready: boolean; energy_model_loaded: boolean }>('/health'),
+  component4Research: () => request<ResearchSummary>('/api/v1/component4/research'),
+  predictDuration: (features: Record<string, string | number>, chargingStartTime: string | null) =>
+    request<DurationPrediction>('/api/v1/duration/predict', {
+      method: 'POST',
+      body: JSON.stringify({ features, charging_start_time: chargingStartTime }),
+    }),
+  energySchema: () => request<EnergySchema>('/api/v1/energy-schema'),
+  predictEnergy: (record: Record<string, string | number>) =>
+    request<EnergyPrediction>('/api/v1/energy/predict', { method: 'POST', body: JSON.stringify(record) }),
+  energyCost: (body: { energy_kwh: number; tariff_lkr_per_kwh: number; charging_efficiency?: number | null }) =>
+    request<CostEstimate>('/api/v1/energy/cost', { method: 'POST', body: JSON.stringify(body) }),
   colomboStations: () => request<{ count: number; stations: ColomboStation[]; source: string }>('/api/v1/colombo-stations'),
   recommend: (body: TripRequest) =>
     request<TripResponse>('/api/v1/recommend', { method: 'POST', body: JSON.stringify(body) }),

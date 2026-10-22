@@ -2,25 +2,46 @@
 
 Phone app for the Colombo station recommendation API.
 
-The home screen follows the research dashboard layout: origin, destination, battery, connector, a map, one recommended listing, and the other candidates. Waiting time, congestion, and cost stay unavailable unless the API actually has those values. The sample numbers in the design mock are not stored in the app.
+## How it is organised
 
-## Run on a phone or emulator
+- `lib/screens/plan_page.dart` — pick start (or GPS) and destination, set battery, choose how much to charge.
+- `lib/screens/results_page.dart` — best charger, extra drive, battery on arrival, charge time and cost, reasons, other chargers with why they were skipped, and Google Maps navigation through the charger.
+- `lib/screens/stations_page.dart` — every charger on a map, with plugs, power and listed prices.
+- `lib/screens/history_page.dart` — past trips; tap one to plan it again.
+- `lib/screens/settings_page.dart` — car (preset or custom), plug, safety reserve, electricity price and charging losses. Saved once and used for every search.
+- `lib/app_state.dart` — trip draft, search, location and history; `lib/widgets/` — shared UI.
 
-From this folder, after the API is reachable:
+Car details are stored on the phone. Reserve, price and charging efficiency are also backed up to Supabase when sign-in works.
+
+Run the tests with `flutter test`.
+
+The default API is `https://j26-ise-307-rp.onrender.com`. The Supabase URL, anon public key, and MapTiler key are the defaults in `lib/config.dart`. A `--dart-define` flag replaces a default when you pass one.
+
+## Environment values
+
+Pass these on the computer that builds the app. Do not put the Supabase service-role key or a MapTiler secret in source code.
 
 ```powershell
 flutter pub get
-flutter run --dart-define=API_BASE_URL=https://YOUR-APP.up.railway.app
+flutter run `
+  --dart-define=API_BASE_URL=https://j26-ise-307-rp.onrender.com `
+  --dart-define=SUPABASE_URL=https://YOUR-PROJECT.supabase.co `
+  --dart-define=SUPABASE_ANON_KEY=YOUR-ANON-KEY `
+  --dart-define=MAPTILER_API_KEY=YOUR-MAPTILER-KEY
 ```
 
-An installable Android package:
+The same three `--dart-define` flags belong on `flutter build apk`.
 
-```powershell
-flutter build apk --dart-define=API_BASE_URL=https://YOUR-APP.up.railway.app
-```
+## Supabase
 
-The APK is written to `build/app/outputs/flutter-apk/app-release.apk`.
+1. Create a project at https://supabase.com.
+2. Open **SQL Editor**, paste `supabase/schema.sql`, and run it.
+3. Open **Authentication → Sign In / Providers** and turn on **Anonymous Sign-Ins**.
+4. Open **Project Settings → API**. Copy the project URL and the `anon` `public` key.
 
-`127.0.0.1` points at the phone itself. Use the Railway URL, or your computer's LAN address, when the API is running on a computer.
+## MapTiler
 
-Place names such as Fort and Mount Lavinia are approximate centres for the form. Station names and coordinates come from the API.
+1. Create a key at https://cloud.maptiler.com/account/keys/.
+2. Pass it as `MAPTILER_API_KEY`.
+
+Road distance and the blue line still come from the API’s OSRM route. MapTiler only draws the background map.

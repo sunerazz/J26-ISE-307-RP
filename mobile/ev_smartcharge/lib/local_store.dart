@@ -2,17 +2,23 @@ import 'dart:convert';
 
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'config.dart';
 import 'models.dart';
 
 class LocalStore {
   static const _profileKey = 'driver_profile';
-  static const _routesKey = 'saved_trips';
+  static const _tripsKey = 'saved_trips';
+  static const maxTrips = 20;
 
   Future<DriverProfile> loadProfile() async {
     final prefs = await SharedPreferences.getInstance();
     final raw = prefs.getString(_profileKey);
     if (raw == null) return DriverProfile();
-    return DriverProfile.fromJson(jsonDecode(raw) as Map<String, dynamic>);
+    try {
+      return DriverProfile.fromJson(jsonDecode(raw) as Map<String, dynamic>);
+    } catch (_) {
+      return DriverProfile();
+    }
   }
 
   Future<void> saveProfile(DriverProfile profile) async {
@@ -22,14 +28,21 @@ class LocalStore {
 
   Future<List<SavedTrip>> loadTrips() async {
     final prefs = await SharedPreferences.getInstance();
-    final raw = prefs.getString(_routesKey);
+    final raw = prefs.getString(_tripsKey);
     if (raw == null) return [];
-    final rows = jsonDecode(raw) as List;
-    return rows.whereType<Map>().map((row) => SavedTrip.fromJson(Map<String, dynamic>.from(row))).toList();
+    try {
+      final rows = jsonDecode(raw) as List;
+      return rows
+          .whereType<Map>()
+          .map((row) => SavedTrip.fromJson(Map<String, dynamic>.from(row), placeNamed))
+          .toList();
+    } catch (_) {
+      return [];
+    }
   }
 
   Future<void> saveTrips(List<SavedTrip> trips) async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(_routesKey, jsonEncode(trips.map((trip) => trip.toJson()).toList()));
+    await prefs.setString(_tripsKey, jsonEncode(trips.take(maxTrips).map((trip) => trip.toJson()).toList()));
   }
 }

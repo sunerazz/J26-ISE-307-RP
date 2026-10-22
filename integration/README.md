@@ -2,7 +2,7 @@
 
 This service is the dashboard backend. It loads the four components in one process:
 
-- Component 1 models from `EV-Queue-Prediction` (synthetic stations ST01–ST06 only).
+- Component 1 models from `EV-Queue-Prediction` (synthetic 15-minute snapshots for ST01 Nugegoda LECO, ST02 Rajagiriya, ST03 Malabe, ST04 Pannipitiya, ST05 Panadura).
 - Component 2 duration pipeline from `EV Charging Duration Prediction`.
 - Component 3 cost function and the energy model trained on `component3_energy_consumption.csv`. The model is used only when the request includes elevation, temperature, air conditioning, traffic, road type, and vehicle mass.
 - Component 4 route optimizer and `data/raw/colombo_ev_stations.csv`.
@@ -33,38 +33,11 @@ python -m pytest tests/test_integration.py -q
 
 `GET /health` does not call OSRM. `POST /api/v1/recommend` does, unless a test replaces the provider.
 
-## Render
+## Hosting
 
-The phone and the web dashboard call only the integration service. The three model services are separate. `render.yaml` wires them:
+Render and Railway run one container from the repository root `Dockerfile`. It holds this service with all four components loaded in-process, and it serves the web dashboard at `/`. See `../DEPLOY.md`.
 
-| Service | What it runs | Environment variable on the integration service |
-| --- | --- | --- |
-| `ev-queue-api` | Queue, waiting time, congestion | `QUEUE_API_URL` |
-| `ev-duration-api` | Charging-duration model | `DURATION_API_URL` |
-| `ev-energy-api` | Trip-energy model | `ENERGY_API_URL` |
-| `ev-integration-api` | Colombo routes, battery check, ranking | none; this is the URL the app uses |
-
-Leave those three variables empty on a local machine. The integration process then loads the models itself. On Render they are set from the other services' public URLs.
-
-After the blueprint is live, the value to put in the phone is the integration URL:
-
-```powershell
-flutter run --dart-define=API_BASE_URL=https://ev-integration-api.onrender.com
-```
-
-Use the URL Render shows for `ev-integration-api`. The model URLs stay on the server. They are not put in the phone.
-
-## Railway
-
-The repository root `Dockerfile` and `railway.toml` are the hosting setup. The image copies the integration service, the four component source trees, and only the model files the API loads. The large unused random-forest artifacts are not copied.
-
-On Railway, set:
-
-- `OSRM_BASE_URL` if you are not using the public demo
-- `OPENAI_API_KEY` only if you want language-model explanations
-- `PORT` is provided by Railway
-
-Health check path: `/health`. The phone app uses the public Railway URL as `API_BASE_URL`.
+Setting `QUEUE_API_URL`, `DURATION_API_URL` or `ENERGY_API_URL` makes this service call a separate model service instead (`deploy/render.four-services.yaml`). Leave them empty for the single-service deployment.
 
 ## Trip plan fields
 

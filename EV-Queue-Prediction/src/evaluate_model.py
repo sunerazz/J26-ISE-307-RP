@@ -328,7 +328,7 @@ def _write_results_summary(results: dict) -> None:
         "",
         "- Synthetic labels/features; not independently observed real-world queues.",
         "- Does **not** predict waiting time or congestion (separate future tasks).",
-        "- Station ST05 has extreme synthetic queue magnitudes that dominate ML absolute errors.",
+        "- Queue length in this file does not exceed 12 vehicles at any of the five stations.",
         "- On this 15-minute synthetic grid, queue length is strongly autocorrelated at +30 minutes, "
         "so a persistence baseline can outperform complex models.",
         "- Pre-computed CSV target differed from observational `current_queue_length@t+30`; "

@@ -20,7 +20,11 @@ class RoutingProvider(Protocol):
     name: str
 
     def route(self, origin: LatLon, destination: LatLon) -> RouteLeg:
-        """Return road distance in km and travel time in minutes."""
+        """Return road distance in km and travel time in minutes.
+
+        A provider may also offer table(points) -> (km, minutes) matrices. The
+        recommender then asks for every leg in one request.
+        """
 
 
 @dataclass
@@ -41,6 +45,9 @@ class OsrmRoutingProvider:
         configured = self.base_url or os.getenv("OSRM_BASE_URL") or "https://router.project-osrm.org"
         self.base_url = configured.rstrip("/")
 
+    # The public OSRM server accepts at most 100 coordinates in one table request.
+    max_table_points: int = 100
+
     def route(self, origin: LatLon, destination: LatLon) -> RouteLeg:
         url = (
             f"{self.base_url}/route/v1/driving/"
@@ -48,6 +55,21 @@ class OsrmRoutingProvider:
             f"{destination.longitude},{destination.latitude}"
             "?overview=full&geometries=geojson"
         )
+        payload = self._get_json(url)
+        return parse_osrm_payload(payload, provider=self.name, require_geometry=True)
+
+    def table(self, points: list[LatLon]) -> tuple[list[list[float | None]], list[list[float | None]]]:
+        """Road km and minutes between every pair of points, from one OSRM table request.
+
+        A pair OSRM cannot route stays None. It is never replaced with a straight line.
+        """
+        if len(points) > self.max_table_points:
+            raise RoutingError(f"OSRM table requests are limited to {self.max_table_points} points.")
+        coordinates = ";".join(f"{point.longitude},{point.latitude}" for point in points)
+        payload = self._get_json(f"{self.base_url}/table/v1/driving/{coordinates}?annotations=distance,duration")
+        return parse_osrm_table(payload, len(points))
+
+    def _get_json(self, url: str) -> dict:
         request = Request(url, headers={"User-Agent": "colombo-ev-route-prototype/1.0"})
         try:
             with urlopen(request, timeout=self.timeout_seconds) as response:
@@ -80,7 +102,25 @@ class OsrmRoutingProvider:
             ) from exc
         except json.JSONDecodeError as exc:
             raise RoutingError("OSRM returned a response that was not valid JSON.") from exc
-        return parse_osrm_payload(payload, provider=self.name, require_geometry=True)
+        return payload
+
+
+def parse_osrm_table(payload: dict, size: int) -> tuple[list[list[float | None]], list[list[float | None]]]:
+    if not isinstance(payload, dict) or payload.get("code") != "Ok":
+        message = payload.get("message") if isinstance(payload, dict) else None
+        raise RoutingError(f"OSRM could not produce a distance table ({message or 'no table'}).")
+    distances = payload.get("distances")
+    durations = payload.get("durations")
+    if not isinstance(distances, list) or not isinstance(durations, list) or len(distances) != size or len(durations) != size:
+        raise RoutingError("OSRM table did not include a full distance and duration matrix.")
+    km: list[list[float | None]] = []
+    minutes: list[list[float | None]] = []
+    for distance_row, duration_row in zip(distances, durations):
+        if len(distance_row) != size or len(duration_row) != size:
+            raise RoutingError("OSRM table rows have the wrong length.")
+        km.append([None if value is None or value < 0 else float(value) / 1000.0 for value in distance_row])
+        minutes.append([None if value is None or value < 0 else float(value) / 60.0 for value in duration_row])
+    return km, minutes
 
 
 def _geometry_lat_lon(route: dict) -> list[list[float]] | None:

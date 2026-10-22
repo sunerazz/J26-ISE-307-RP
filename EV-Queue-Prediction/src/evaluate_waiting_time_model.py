@@ -396,7 +396,7 @@ def _write_evaluation_md(results: dict) -> None:
         "",
         "- Synthetic/estimated waiting times; not independently observed real-world waits.",
         "- Does **not** predict queue length or congestion (separate tasks).",
-        "- ST05 waiting times are frequently capped near 240 minutes.",
+        "- Waiting times in this file are capped at 180 minutes.",
         "- Strong autocorrelation at +30 minutes can favour persistence on this grid.",
         "",
         "## Artifacts",

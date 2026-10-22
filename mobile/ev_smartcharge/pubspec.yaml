@@ -38,8 +38,10 @@ dependencies:
   flutter_map: ^8.2.2
   latlong2: ^0.9.1
   shared_preferences: ^2.5.3
+  supabase_flutter: ^2.10.0
   provider: ^6.1.5
   url_launcher: ^6.3.2
+  geolocator: ^14.1.2
 
 dev_dependencies:
   flutter_test:

@@ -17,7 +17,7 @@ from src.recommend_stations import recommend
 from src.route_optimizer import detour
 from src.routing_provider import RoutingError, parse_osrm_payload
 from src.schemas import LatLon, RecommendRequest, RouteLeg
-from src.stations import RAW_CSV, load_stations, save_processed
+from src.stations import LEGACY_CSV, RAW_CSV, load_stations, save_processed
 
 VALID = dict(
     origin_latitude=6.9271,
@@ -65,7 +65,7 @@ def _request(**overrides) -> RecommendRequest:
 
 
 def test_csv_loads_four_stations_and_keeps_blanks_unknown():
-    stations = load_stations(RAW_CSV)
+    stations = load_stations(LEGACY_CSV)
     assert [row["station_id"] for row in stations] == ["ST001", "ST002", "ST003", "ST004"]
     assert all(row["availability_status"] == "unknown" for row in stations)
     assert all(row["queue_length_current"] is None for row in stations)
@@ -132,7 +132,7 @@ def test_osrm_parser_rejects_invalid_payloads():
 
 
 def test_routing_provider_error_does_not_invent_a_route():
-    stations = load_stations(RAW_CSV)
+    stations = load_stations(LEGACY_CSV)
     with pytest.raises(RoutingError, match="unavailable"):
         recommend(_request(), FakeRouter(fail={"all"}), stations)
 
@@ -156,7 +156,7 @@ def test_battery_feasibility_cases():
 
 
 def test_connector_incompatibility_excludes_station():
-    stations = load_stations(RAW_CSV)
+    stations = load_stations(LEGACY_CSV)
     result = recommend(_request(required_connector="CCS"), FakeRouter(), stations)
     excluded = {item.station_id: item.exclusion_reason for item in result.alternatives}
     assert result.recommended_station is None
@@ -165,7 +165,7 @@ def test_connector_incompatibility_excludes_station():
 
 
 def test_unknown_availability_is_not_called_available():
-    stations = load_stations(RAW_CSV)
+    stations = load_stations(LEGACY_CSV)
     result = recommend(_request(), FakeRouter(), stations)
     assert result.live_availability is False
     assert result.recommended_station is not None
@@ -176,7 +176,7 @@ def test_unknown_availability_is_not_called_available():
 
 
 def test_missing_tariff_and_wait_are_not_zero_and_weights_renormalize():
-    stations = load_stations(RAW_CSV)
+    stations = load_stations(LEGACY_CSV)
     router = FakeRouter(
         legs={
             (round(6.9271, 5), round(79.8612, 5), round(6.8649, 5), round(79.8997, 5)): (10, 20),
@@ -199,7 +199,7 @@ def test_missing_tariff_and_wait_are_not_zero_and_weights_renormalize():
 
 
 def test_lower_detour_ranks_first():
-    stations = [load_stations(RAW_CSV)[0], load_stations(RAW_CSV)[2]]
+    stations = [load_stations(LEGACY_CSV)[0], load_stations(LEGACY_CSV)[2]]
     origin = (round(6.9271, 5), round(79.8612, 5))
     dest = (round(6.8649, 5), round(79.8997, 5))
     st1 = (round(stations[0]["latitude"], 5), round(stations[0]["longitude"], 5))
@@ -219,7 +219,7 @@ def test_lower_detour_ranks_first():
 
 
 def test_no_feasible_station_when_battery_is_too_low():
-    stations = load_stations(RAW_CSV)
+    stations = load_stations(LEGACY_CSV)
     result = recommend(
         _request(current_soc_percent=5, minimum_reserve_percent=20, consumption_kwh_per_100km=30),
         FakeRouter(),
@@ -233,7 +233,7 @@ def test_no_feasible_station_when_battery_is_too_low():
 def test_api_validation_and_response_shape(monkeypatch):
     from api.main import app
 
-    app.state.stations = load_stations(RAW_CSV)
+    app.state.stations = load_stations(LEGACY_CSV)
     app.state.provider = FakeRouter()
     client = TestClient(app)
     health = client.get("/health")

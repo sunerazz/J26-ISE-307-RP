@@ -28,6 +28,12 @@ class RecommendRequest(BaseModel):
     maximum_detour_km: float | None = Field(default=None, gt=0)
     energy_to_add_kwh: float | None = Field(default=None, gt=0)
     ranking_weights: dict[str, float] | None = None
+    # Multi-stop planner settings. Charging above about 80% is slow on DC chargers.
+    max_charge_soc_percent: float = Field(default=80, gt=0, le=100)
+    stop_overhead_min: float = Field(default=5, ge=0, le=60)
+    max_stops: int = Field(default=4, ge=1, le=8)
+    # Road shapes are fetched for this many top-ranked stations; the rest keep table distances only.
+    geometry_for_top: int = Field(default=3, ge=1, le=10)
 
     @field_validator("ranking_weights")
     @classmethod
@@ -93,6 +99,23 @@ class StationRecommendation(BaseModel):
     ranking_explanation: str
     source_url: str | None
     source_note: str | None
+    # Listing detail from the rebuilt inventory. None when the listing does not state it.
+    city: str | None = None
+    province: str | None = None
+    number_of_points: int | None = None
+    connector_details: list[dict[str, Any]] = []
+    usage_type: str | None = None
+    access_note: str | None = None
+    opening_hours_listed: str | None = None
+    phone: str | None = None
+    # Power and listed rate of the plug the driver asked for (DC or AC side of the station).
+    charging_power_kw: float | None = None
+    tariff_for_connector_lkr_per_kwh: float | None = None
+    tariff_basis: str | None = None
+    # Drive there, charge just enough to finish above the reserve, drive on.
+    single_stop: dict[str, Any] | None = None
+    # True when no other station is both faster overall and cheaper at listed tariffs.
+    pareto_optimal: bool | None = None
 
 
 class RecommendResponse(BaseModel):
@@ -106,6 +129,10 @@ class RecommendResponse(BaseModel):
     limitations: list[str]
     live_availability: bool = False
     live_queue_prediction: bool = False
+    charging_plan: dict[str, Any] | None = None
+    strategy_comparison: dict[str, Any] | None = None
+    routing_summary: dict[str, Any] | None = None
+    inventory_summary: dict[str, Any] | None = None
 
 
 class HealthResponse(BaseModel):

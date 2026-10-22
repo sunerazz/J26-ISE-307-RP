@@ -7,13 +7,13 @@ from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
-StationId = Literal["ST01", "ST02", "ST03", "ST04", "ST05", "ST06"]
-LocationType = Literal["Urban", "Highway", "Suburban"]
+StationId = Literal["ST01", "ST02", "ST03", "ST04", "ST05"]
+LocationType = Literal["Urban", "Suburban"]
 DayOfWeek = Literal[
     "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"
 ]
 TimeSlot = Literal["Overnight", "Morning", "Afternoon", "Evening"]
-WeatherCondition = Literal["Clear", "Rainy", "Cloudy"]
+WeatherCondition = Literal["Clear", "Rain", "Cloudy"]
 TrafficLevel = Literal["Low", "Medium", "High"]
 CongestionLevel = Literal["Low", "Medium", "High"]
 
@@ -46,12 +46,16 @@ class _ForbidFutureMixin(BaseModel):
 
 
 class QueuePredictRequest(_ForbidFutureMixin):
-    """Request for the selected queue model (persistence: current_queue_length).
+    """Request for the selected queue model.
 
-    The validation-selected Model 1 artifact is persistence, which only uses
-    current_queue_length. station_id and timestamp are included for response
-    metadata. Extra ML features are not required for this selected artifact.
+    A persistence artifact needs only current_queue_length. An ML artifact
+    (the current selection is XGBoost) needs the full prediction-time feature
+    row, the same fields as StationFeatureRequest, so other fields are accepted
+    here. predict_queue rejects a request missing the selected model's features.
+    Future and target fields are still refused by the mixin.
     """
+
+    model_config = ConfigDict(extra="allow")
 
     station_id: StationId
     current_queue_length: int = Field(..., ge=0, description="Vehicles waiting now")

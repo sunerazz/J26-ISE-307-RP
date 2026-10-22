@@ -14,3 +14,5 @@ EV-Queue-Prediction/models/congestion_random_forest.joblib
 EV-Queue-Prediction/models/congestion_xgboost.joblib
 EV-Queue-Prediction/models/congestion_best_ml_model.joblib
 EV-Queue-Prediction/models/waiting_time_best_ml_model.joblib
+component4_station_recommendation/data/raw/ocm_pages
+component4_station_recommendation/results/routing_evaluation_scenarios.csv

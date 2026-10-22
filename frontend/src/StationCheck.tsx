@@ -66,8 +66,9 @@ export default function StationCheck() {
   return (
     <div>
       <p className="banner">
-        Synthetic-data demonstration. These stations are ST01–ST06 from the queue dataset. They are
-        not the Colombo listings ST001–ST004, and these numbers are not live station readings.
+        Component 1 · AI-based queue length, waiting time and congestion prediction, 30 minutes ahead. The models were
+        trained on simulated 15-minute snapshots for five Colombo-area towns. The trip planner uses the nearest
+        town's forecast for chargers within 15 km. These are not live readings at a charger.
       </p>
       <p className={`api-pill ${apiOk ? 'ok' : apiOk === false ? 'down' : ''}`}>
         {apiOk === null
@@ -83,7 +84,7 @@ export default function StationCheck() {
           <select value={stationId} onChange={(e) => setStationId(e.target.value)}>
             {stations.map((s) => (
               <option key={s.station_id} value={s.station_id}>
-                {s.station_id} · {s.location_type}
+                {s.station_id} · {s.station_name ?? s.location_type} ({s.location_type})
               </option>
             ))}
           </select>

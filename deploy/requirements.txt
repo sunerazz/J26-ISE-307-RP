@@ -1,0 +1,14 @@
+# Runtime dependencies for the hosted service (root Dockerfile).
+# scikit-learn, xgboost, pandas, numpy and joblib are pinned to the versions the
+# saved models were trained with (see each component's environment_versions.json).
+# A different scikit-learn version can fail to load, or silently change, a pickled pipeline.
+fastapi==0.121.3
+uvicorn[standard]==0.38.0
+pydantic==2.12.4
+httpx==0.28.1
+pandas==2.3.3
+numpy==2.3.5
+scipy==1.16.3
+scikit-learn==1.7.2
+xgboost==3.4.1
+joblib==1.5.2

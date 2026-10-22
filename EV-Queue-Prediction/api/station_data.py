@@ -41,15 +41,16 @@ def list_stations() -> list[dict[str, Any]]:
     df = load_station_snapshots()
     rows = []
     for sid, g in df.groupby(STATION_COL):
-        rows.append(
-            {
-                "station_id": str(sid),
-                "location_type": str(g["location_type"].iloc[0]),
-                "n_snapshots": int(len(g)),
-                "first_timestamp": g[TIMESTAMP_COL].min().isoformat(sep=" "),
-                "last_timestamp": g[TIMESTAMP_COL].max().isoformat(sep=" "),
-            }
-        )
+        row = {
+            "station_id": str(sid),
+            "location_type": str(g["location_type"].iloc[0]),
+            "n_snapshots": int(len(g)),
+            "first_timestamp": g[TIMESTAMP_COL].min().isoformat(sep=" "),
+            "last_timestamp": g[TIMESTAMP_COL].max().isoformat(sep=" "),
+        }
+        if "station_name" in g.columns:
+            row["station_name"] = str(g["station_name"].iloc[0])
+        rows.append(row)
     return sorted(rows, key=lambda r: r["station_id"])
 
 
@@ -103,7 +104,7 @@ def station_error_profile(station_id: str) -> dict[str, Any]:
         "queue_mae_vehicles": queue.get("mae"),
         "waiting_time_mae_min": wait.get("mae_min"),
         "congestion_accuracy": congestion.get("accuracy"),
-        "source": "test split (13-30 April 2025 synthetic dates), per station",
+        "source": "held-out chronological test split, per station",
     }
 
 

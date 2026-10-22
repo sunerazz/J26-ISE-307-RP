@@ -6,7 +6,7 @@ RANDOM_SEED = 42
 
 # Project paths (repository root = parent of src/)
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
-RAW_DATA_PATH = PROJECT_ROOT / "data" / "raw" / "component1_ev_queue_prediction_synthetic.csv"
+RAW_DATA_PATH = PROJECT_ROOT / "data" / "raw" / "component1_ev_queue_prediction_sri_lanka.csv"
 PROCESSED_DIR = PROJECT_ROOT / "data" / "processed"
 REPORTS_DIR = PROJECT_ROOT / "reports"
 MODELS_DIR = PROJECT_ROOT / "models"

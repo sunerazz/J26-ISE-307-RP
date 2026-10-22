@@ -58,6 +58,8 @@ def load_component4() -> dict[str, Any]:
         "RecommendRequest": schemas_mod.RecommendRequest,
         "RouteLeg": schemas_mod.RouteLeg,
         "csv_path": stations_mod.RAW_CSV,
+        "legacy_csv_path": stations_mod.LEGACY_CSV,
+        "results_path": C4 / "results",
     }
 
 

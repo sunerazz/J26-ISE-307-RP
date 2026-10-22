@@ -1,0 +1,2437 @@
+{
+  "source": "Open Charge Map public location pages, country Sri Lanka",
+  "source_url": "https://openchargemap.io/poi?CountryIDs=211&CountryName=srilanka",
+  "license": "Creative Commons Attribution 4.0 International (CC BY 4.0), © Open Charge Map contributors",
+  "retrieved_on": "2026-10-22",
+  "record_count": 68,
+  "records": [
+    {
+      "ocm_id": 263886,
+      "title": "Fairway Colombo",
+      "address_lines": [
+        "No. 7, Hospital Street, Colombo 01.",
+        "Colombo",
+        "Western Province",
+        "Sri Lanka"
+      ],
+      "phone": "0702440521",
+      "number_of_points": 1,
+      "usage": "Public",
+      "status": "Operational",
+      "latitude": 6.9337401023704075,
+      "longitude": 79.84410506852555,
+      "operator": "chargeNET (lk)",
+      "general_info": "chargeNET\r\nL2 6.6kW - 70LKR/kWh\r\n\r\nchargeNET NFC card or Android app is required.\r\nFor new users, create account and top-up online:\r\nhttps://portal.chargenet.lk/Register.aspx",
+      "data_quality_score": 70,
+      "not_recently_verified": true,
+      "equipment": [
+        {
+          "connector": "Type 1 (J1772)",
+          "quantity": 1,
+          "status": "Operational",
+          "power_kw": 6.6,
+          "voltage_v": 220.0,
+          "current_a": 30.0,
+          "supply": "AC (Single-Phase)"
+        }
+      ],
+      "source_url": "https://openchargemap.io/poi/details/263886"
+    },
+    {
+      "ocm_id": 263887,
+      "title": "Araliya Carpark",
+      "address_lines": [
+        "No89, Galle Road, Colombo 03",
+        "Colombo",
+        "Western Province",
+        "Sri Lanka"
+      ],
+      "phone": "0112152179",
+      "number_of_points": 1,
+      "usage": "Public - Membership Required",
+      "status": "Operational",
+      "latitude": 6.916571267723441,
+      "longitude": 79.84931981544912,
+      "operator": "chargeNET (lk)",
+      "general_info": "chargeNET\r\nL2 6.6kW - 70LKR/kWh\r\n\r\nchargeNET NFC card or Android app is required.\r\nFor new users, create account and top-up online:\r\nhttps://portal.chargenet.lk/Register.aspx\r\n\r\n8.30AM to 7PM",
+      "data_quality_score": 70,
+      "not_recently_verified": true,
+      "equipment": [
+        {
+          "connector": "Type 1 (J1772)",
+          "quantity": 1,
+          "status": "Operational",
+          "power_kw": 6.6,
+          "voltage_v": 217.0,
+          "current_a": 30.0,
+          "supply": null
+        }
+      ],
+      "source_url": "https://openchargemap.io/poi/details/263887"
+    },
+    {
+      "ocm_id": 263888,
+      "title": "Colombo City Centre",
+      "address_lines": [
+        "137, Sir James Pieris Mawatha Colombo 02, Sri Lanka",
+        "Colombo",
+        "Western Province",
+        "Sri Lanka"
+      ],
+      "phone": "0770555553",
+      "number_of_points": 2,
+      "usage": "Public - Membership Required",
+      "status": "Operational",
+      "latitude": 6.917504142811708,
+      "longitude": 79.85579917847951,
+      "operator": "chargeNET (lk)",
+      "general_info": "chargeNET\r\nL3 30kW DCFC - 120LKR/kWh\r\nL2 6.6kW - 70LKR/kWh\r\n\r\nchargeNET NFC card or Android app is required.\r\nFor new users, create account and top-up online:\r\nhttps://portal.chargenet.lk/Register.aspx",
+      "data_quality_score": 70,
+      "not_recently_verified": true,
+      "equipment": [
+        {
+          "connector": "Type 1 (J1772)",
+          "quantity": 1,
+          "status": "Operational",
+          "power_kw": 6.6,
+          "voltage_v": 220.0,
+          "current_a": 30.0,
+          "supply": null
+        },
+        {
+          "connector": "CHAdeMO",
+          "quantity": 1,
+          "status": "Operational",
+          "power_kw": 24.0,
+          "voltage_v": 400.0,
+          "current_a": 60.0,
+          "supply": "DC"
+        }
+      ],
+      "source_url": "https://openchargemap.io/poi/details/263888"
+    },
+    {
+      "ocm_id": 263889,
+      "title": "TRACE Expert City, Maradana Road, Colombo 10",
+      "address_lines": [
+        "TRACE Expert City, Maradana Road, Colombo 10",
+        "Colombo",
+        "Western Province",
+        "Sri Lanka"
+      ],
+      "phone": "0115 551 551",
+      "number_of_points": 5,
+      "usage": "Public - Membership Required",
+      "status": "Operational",
+      "latitude": 6.92936077371219,
+      "longitude": 79.86104428955178,
+      "operator": "chargeNET (lk)",
+      "general_info": "chargeNET\r\nL3 30kW DCFC - 120LKR/kWh\r\nL2 6.6kW - 70LKR/kWh\r\n\r\nchargeNET NFC card or Android app is required.\r\nFor new users, create account and top-up online:\r\nhttps://portal.chargenet.lk/Register.aspx",
+      "data_quality_score": 70,
+      "not_recently_verified": true,
+      "equipment": [
+        {
+          "connector": "Type 1 (J1772)",
+          "quantity": 2,
+          "status": "Operational",
+          "power_kw": 6.6,
+          "voltage_v": 220.0,
+          "current_a": 30.0,
+          "supply": "AC (Single-Phase)"
+        },
+        {
+          "connector": "Type 2 (Socket Only)",
+          "quantity": 1,
+          "status": "Operational",
+          "power_kw": 6.6,
+          "voltage_v": 220.0,
+          "current_a": 30.0,
+          "supply": "AC (Single-Phase)"
+        },
+        {
+          "connector": "CHAdeMO",
+          "quantity": 2,
+          "status": "Operational",
+          "power_kw": 24.0,
+          "voltage_v": 400.0,
+          "current_a": 60.0,
+          "supply": "DC"
+        }
+      ],
+      "source_url": "https://openchargemap.io/poi/details/263889"
+    },
+    {
+      "ocm_id": 263890,
+      "title": "Ocean Combine (Pvt) Ltd",
+      "address_lines": [
+        "No. 49, Kopiyawatta Rd., Colombo 9",
+        "Colombo",
+        "Western",
+        "Sri Lanka"
+      ],
+      "phone": "0702233000",
+      "number_of_points": 1,
+      "usage": "Public - Membership Required",
+      "status": "Operational",
+      "latitude": 6.9336251671984,
+      "longitude": 79.87915704175572,
+      "operator": "chargeNET (lk)",
+      "general_info": "chargeNET\r\nL3 30kW DCFC - 120LKR/kWh\r\n\r\nchargeNET NFC card or Android app is required.\r\nFor new users, create account and top-up online:\r\nhttps://portal.chargenet.lk/Register.aspx",
+      "data_quality_score": 70,
+      "not_recently_verified": true,
+      "equipment": [
+        {
+          "connector": "CHAdeMO",
+          "quantity": 1,
+          "status": "Operational",
+          "power_kw": 18.0,
+          "voltage_v": 400.0,
+          "current_a": 45.0,
+          "supply": "DC"
+        }
+      ],
+      "source_url": "https://openchargemap.io/poi/details/263890"
+    },
+    {
+      "ocm_id": 263891,
+      "title": "IOC - Horton Place",
+      "address_lines": [
+        "Lanka IOC Fuel Filling Station, Horton Place",
+        "Colombo",
+        "Western Province",
+        "00700",
+        "Sri Lanka"
+      ],
+      "phone": "0770555553",
+      "number_of_points": 1,
+      "usage": "Public - Membership Required",
+      "status": "Operational",
+      "latitude": 6.911454013388436,
+      "longitude": 79.86512193162997,
+      "operator": "chargeNET (lk)",
+      "general_info": "chargeNET\r\nL3 30kW DCFC - 120LKR/kWh\r\n\r\nchargeNET NFC card or Android app is required.\r\nFor new users, create account and top-up online:\r\nhttps://portal.chargenet.lk/Register.aspx",
+      "data_quality_score": 70,
+      "not_recently_verified": true,
+      "equipment": [
+        {
+          "connector": "CHAdeMO",
+          "quantity": 1,
+          "status": "Operational",
+          "power_kw": 24.0,
+          "voltage_v": 400.0,
+          "current_a": 60.0,
+          "supply": "DC"
+        }
+      ],
+      "source_url": "https://openchargemap.io/poi/details/263891"
+    },
+    {
+      "ocm_id": 263892,
+      "title": "Vortex Energy",
+      "address_lines": [
+        "No. 57, Pereira Lane, Colombo 06",
+        "Colombo",
+        "Western",
+        "Sri Lanka"
+      ],
+      "phone": "0704101258",
+      "number_of_points": 2,
+      "usage": "Public - Membership Required",
+      "status": "Operational",
+      "latitude": 6.870944621124039,
+      "longitude": 79.86528065326968,
+      "operator": "chargeNET (lk)",
+      "general_info": "chargeNET\r\nL3 30kW DCFC - 120LKR/kWh\r\nL2 6.6kW - 70LKR/kWh\r\n\r\nchargeNET NFC card or Android app is required.\r\nFor new users, create account and top-up online:\r\nhttps://portal.chargenet.lk/Register.aspx",
+      "data_quality_score": 70,
+      "not_recently_verified": true,
+      "equipment": [
+        {
+          "connector": "CHAdeMO",
+          "quantity": 1,
+          "status": "Operational",
+          "power_kw": 24.0,
+          "voltage_v": 400.0,
+          "current_a": 60.0,
+          "supply": "DC"
+        },
+        {
+          "connector": "Type 1 (J1772)",
+          "quantity": 1,
+          "status": "Operational",
+          "power_kw": 6.6,
+          "voltage_v": 220.0,
+          "current_a": 30.0,
+          "supply": "AC (Single-Phase)"
+        }
+      ],
+      "source_url": "https://openchargemap.io/poi/details/263892"
+    },
+    {
+      "ocm_id": 263894,
+      "title": "IOC - Battaramulla",
+      "address_lines": [
+        "404/5A, Kaduwela Rd , Thalangama North, Battaramulla",
+        "Colombo",
+        "Western Province",
+        "Sri Lanka"
+      ],
+      "phone": "0115 551 551",
+      "number_of_points": 1,
+      "usage": "Public - Membership Required",
+      "status": "Operational",
+      "latitude": 6.908449367066481,
+      "longitude": 79.93924937860436,
+      "operator": "chargeNET (lk)",
+      "general_info": "chargeNET\r\nL3 30kW DCFC - 120LKR/kWh\r\n\r\nchargeNET NFC card or Android app is required.\r\nFor new users, create account and top-up online:\r\nhttps://portal.chargenet.lk/Register.aspx",
+      "data_quality_score": 70,
+      "not_recently_verified": true,
+      "equipment": [
+        {
+          "connector": "CHAdeMO",
+          "quantity": 1,
+          "status": "Operational",
+          "power_kw": 24.0,
+          "voltage_v": 400.0,
+          "current_a": 60.0,
+          "supply": "DC"
+        }
+      ],
+      "source_url": "https://openchargemap.io/poi/details/263894"
+    },
+    {
+      "ocm_id": 263896,
+      "title": "Shanthi Plastic",
+      "address_lines": [
+        "Shanthi Plastic (Pvt) Ltd. Kawdana broadway, Dehiwala",
+        "Colombo",
+        "Western Province",
+        "Sri Lanka"
+      ],
+      "phone": "0759400017",
+      "number_of_points": 1,
+      "usage": "Public - Membership Required",
+      "status": "Operational",
+      "latitude": 6.842561905890761,
+      "longitude": 79.88459230718775,
+      "operator": "chargeNET (lk)",
+      "general_info": "chargeNET\r\nL2 6.6kW - 70LKR/kWh\r\n\r\nchargeNET NFC card or Android app is required.\r\nFor new users, create account and top-up online:\r\nhttps://portal.chargenet.lk/Register.aspx\r\n\r\n8Am to 7Pm",
+      "data_quality_score": 70,
+      "not_recently_verified": true,
+      "equipment": [
+        {
+          "connector": "Type 1 (J1772)",
+          "quantity": 1,
+          "status": "Operational",
+          "power_kw": 6.6,
+          "voltage_v": 220.0,
+          "current_a": 30.0,
+          "supply": "AC (Single-Phase)"
+        }
+      ],
+      "source_url": "https://openchargemap.io/poi/details/263896"
+    },
+    {
+      "ocm_id": 263898,
+      "title": "Madawala Enterprises (Pvt) Ltd",
+      "address_lines": [
+        "370, High Level Road, Pannipitiya, Colomb",
+        "Colombo",
+        "Western Province",
+        "Sri Lanka"
+      ],
+      "phone": "0773864864",
+      "number_of_points": 1,
+      "usage": "Public - Membership Required",
+      "status": "Operational",
+      "latitude": 6.844936035511466,
+      "longitude": 79.94046165233817,
+      "operator": "chargeNET (lk)",
+      "general_info": "chargeNET\r\nL2 6.6kW - 70LKR/kWh\r\n\r\nchargeNET NFC card or Android app is required.\r\nFor new users, create account and top-up online:\r\nhttps://portal.chargenet.lk/Register.aspx",
+      "data_quality_score": 70,
+      "not_recently_verified": true,
+      "equipment": [
+        {
+          "connector": "Type 1 (J1772)",
+          "quantity": 1,
+          "status": "Operational",
+          "power_kw": 6.6,
+          "voltage_v": 220.0,
+          "current_a": 30.0,
+          "supply": "AC (Single-Phase)"
+        }
+      ],
+      "source_url": "https://openchargemap.io/poi/details/263898"
+    },
+    {
+      "ocm_id": 263899,
+      "title": "KINRO EV EV Chargers",
+      "address_lines": [
+        "416/6A High level Rd, Makumbura, Pannipitiya.",
+        "Colombo",
+        "Western Province",
+        "Sri Lanka"
+      ],
+      "phone": "0774448232",
+      "number_of_points": 2,
+      "usage": "Public - Membership Required",
+      "status": "Operational",
+      "latitude": 6.838690843368482,
+      "longitude": 79.97887778602808,
+      "operator": "chargeNET (lk)",
+      "general_info": "chargeNET\r\nL3 30kW DCFC - 120LKR/kWh\r\nL2 6.6kW - 70LKR/kWh\r\n\r\nchargeNET NFC card or Android app is required.\r\nFor new users, create account and top-up online:\r\nhttps://portal.chargenet.lk/Register.aspx",
+      "data_quality_score": 70,
+      "not_recently_verified": true,
+      "equipment": [
+        {
+          "connector": "CHAdeMO",
+          "quantity": 1,
+          "status": "Operational",
+          "power_kw": 24.0,
+          "voltage_v": 400.0,
+          "current_a": 60.0,
+          "supply": "DC"
+        },
+        {
+          "connector": "Type 1 (J1772)",
+          "quantity": 1,
+          "status": "Operational",
+          "power_kw": 6.6,
+          "voltage_v": 220.0,
+          "current_a": 30.0,
+          "supply": "AC (Single-Phase)"
+        }
+      ],
+      "source_url": "https://openchargemap.io/poi/details/263899"
+    },
+    {
+      "ocm_id": 263901,
+      "title": "SLINTEC, Nanotechnology & Science Park",
+      "address_lines": [
+        "SLINTEC, Nanotechnology & Science Park, Mahewatta, Pitipana, Homagama",
+        "Colombo",
+        "Western Province",
+        "10200",
+        "Sri Lanka"
+      ],
+      "phone": "0773671399",
+      "number_of_points": 2,
+      "usage": "Public - Membership Required",
+      "status": "Operational",
+      "latitude": 6.825838412683282,
+      "longitude": 80.03806658834674,
+      "operator": "chargeNET (lk)",
+      "general_info": "chargeNET\r\nL3 30kW DCFC - 120LKR/kWh\r\nL2 6.6kW - 70LKR/kWh\r\n\r\nchargeNET NFC card or Android app is required.\r\nFor new users, create account and top-up online:\r\nhttps://portal.chargenet.lk/Register.aspx",
+      "data_quality_score": 70,
+      "not_recently_verified": true,
+      "equipment": [
+        {
+          "connector": "CHAdeMO",
+          "quantity": 1,
+          "status": "Operational",
+          "power_kw": 24.0,
+          "voltage_v": 400.0,
+          "current_a": 60.0,
+          "supply": "DC"
+        },
+        {
+          "connector": "Type 1 (J1772)",
+          "quantity": 1,
+          "status": "Operational",
+          "power_kw": 6.6,
+          "voltage_v": 220.0,
+          "current_a": 30.0,
+          "supply": "AC (Single-Phase)"
+        }
+      ],
+      "source_url": "https://openchargemap.io/poi/details/263901"
+    },
+    {
+      "ocm_id": 263903,
+      "title": "K-Zone Moratuwa",
+      "address_lines": [
+        "No. 340, Galle Road, Katubedda, Moratuwa",
+        "Colombo",
+        "Western Province",
+        "Sri Lanka"
+      ],
+      "phone": "0770 555 553",
+      "number_of_points": 2,
+      "usage": "Public - Membership Required",
+      "status": "Operational",
+      "latitude": 6.7951702843362085,
+      "longitude": 79.88741411256888,
+      "operator": "chargeNET (lk)",
+      "general_info": "chargeNET\r\nL3 30kW DCFC - 120LKR/kWh\r\nL2 6.6kW - 70LKR/kWh\r\n\r\nchargeNET NFC card or Android app is required.\r\nFor new users, create account and top-up online:\r\nhttps://portal.chargenet.lk/Register.aspx",
+      "data_quality_score": 70,
+      "not_recently_verified": true,
+      "equipment": [
+        {
+          "connector": "CHAdeMO",
+          "quantity": 1,
+          "status": "Operational",
+          "power_kw": 24.0,
+          "voltage_v": 400.0,
+          "current_a": 60.0,
+          "supply": "DC"
+        },
+        {
+          "connector": "Type 1 (J1772)",
+          "quantity": 1,
+          "status": "Operational",
+          "power_kw": 6.6,
+          "voltage_v": 220.0,
+          "current_a": 30.0,
+          "supply": "AC (Single-Phase)"
+        }
+      ],
+      "source_url": "https://openchargemap.io/poi/details/263903"
+    },
+    {
+      "ocm_id": 263905,
+      "title": "IOC - Wattala",
+      "address_lines": [
+        "Lanka IOC Petrol Shed, No 180, Station Rd, Hunupitiya, Wattala",
+        "Colombo",
+        "Western Province",
+        "Sri Lanka"
+      ],
+      "phone": "0770555553",
+      "number_of_points": 1,
+      "usage": "Public - Membership Required",
+      "status": "Operational",
+      "latitude": 6.988686263367967,
+      "longitude": 79.89691008982857,
+      "operator": "chargeNET (lk)",
+      "general_info": "chargeNET\r\nL3 30kW DCFC - 120LKR/kWh\r\n\r\nchargeNET NFC card or Android app is required.\r\nFor new users, create account and top-up online:\r\nhttps://portal.chargenet.lk/Register.aspx",
+      "data_quality_score": 70,
+      "not_recently_verified": true,
+      "equipment": [
+        {
+          "connector": "CHAdeMO",
+          "quantity": 1,
+          "status": "Operational",
+          "power_kw": 24.0,
+          "voltage_v": 400.0,
+          "current_a": 60.0,
+          "supply": "DC"
+        }
+      ],
+      "source_url": "https://openchargemap.io/poi/details/263905"
+    },
+    {
+      "ocm_id": 263906,
+      "title": "Strogella Restaurant - Kadawatha",
+      "address_lines": [
+        "Strogella Restaurant, Ganemulla Road, Kadawatha",
+        "Gampaha",
+        "Western Province",
+        "Sri Lanka"
+      ],
+      "phone": "0773979214",
+      "number_of_points": 3,
+      "usage": "Public - Membership Required",
+      "status": "Operational",
+      "latitude": 7.0063892185992955,
+      "longitude": 79.95438805681437,
+      "operator": "chargeNET (lk)",
+      "general_info": "chargeNET\r\nL3 30kW DCFC - 120LKR/kWh\r\nL2 6.6kW - 70LKR/kWh\r\n\r\nchargeNET NFC card or Android app is required.\r\nFor new users, create account and top-up online:\r\nhttps://portal.chargenet.lk/Register.aspx",
+      "data_quality_score": 70,
+      "not_recently_verified": true,
+      "equipment": [
+        {
+          "connector": "CHAdeMO",
+          "quantity": 1,
+          "status": "Operational",
+          "power_kw": 24.0,
+          "voltage_v": 400.0,
+          "current_a": 60.0,
+          "supply": "DC"
+        },
+        {
+          "connector": "Type 1 (J1772)",
+          "quantity": 1,
+          "status": "Operational",
+          "power_kw": 6.6,
+          "voltage_v": 220.0,
+          "current_a": 30.0,
+          "supply": "AC (Single-Phase)"
+        },
+        {
+          "connector": "Type 1 (J1772)",
+          "quantity": 1,
+          "status": "Operational",
+          "power_kw": 6.6,
+          "voltage_v": 220.0,
+          "current_a": 30.0,
+          "supply": "AC (Single-Phase)"
+        }
+      ],
+      "source_url": "https://openchargemap.io/poi/details/263906"
+    },
+    {
+      "ocm_id": 263907,
+      "title": "Saninro Hotel",
+      "address_lines": [
+        "No : 7, Ketagawatte Road, Ragama.",
+        "Ragama",
+        "Western Province",
+        "Sri Lanka"
+      ],
+      "phone": "0337 634000",
+      "number_of_points": 2,
+      "usage": "Public - Membership Required",
+      "status": "Operational",
+      "latitude": 7.0299667576491345,
+      "longitude": 79.9230018259932,
+      "operator": "chargeNET (lk)",
+      "general_info": "chargeNET\r\nL3 30kW DCFC - 120LKR/kWh\r\nL2 6.6kW - 70LKR/kWh\r\n\r\nchargeNET NFC card or Android app is required.\r\nFor new users, create account and top-up online:\r\nhttps://portal.chargenet.lk/Register.aspx",
+      "data_quality_score": 70,
+      "not_recently_verified": true,
+      "equipment": [
+        {
+          "connector": "CHAdeMO",
+          "quantity": 1,
+          "status": "Operational",
+          "power_kw": 24.0,
+          "voltage_v": 400.0,
+          "current_a": 60.0,
+          "supply": "DC"
+        },
+        {
+          "connector": "Type 1 (J1772)",
+          "quantity": 1,
+          "status": "Operational",
+          "power_kw": 6.6,
+          "voltage_v": 220.0,
+          "current_a": 30.0,
+          "supply": "AC (Single-Phase)"
+        }
+      ],
+      "source_url": "https://openchargemap.io/poi/details/263907"
+    },
+    {
+      "ocm_id": 263908,
+      "title": "K-Zone Ja-Ela",
+      "address_lines": [
+        "K Zone, Chilaw - Colombo Main Road, Kapuwatta, Ja-Ela",
+        "Ja-Ela",
+        "Western Province",
+        "Sri Lanka"
+      ],
+      "phone": "0770 555 553",
+      "number_of_points": 2,
+      "usage": "Public - Membership Required",
+      "status": "Operational",
+      "latitude": 7.059902306807743,
+      "longitude": 79.89651359412966,
+      "operator": "chargeNET (lk)",
+      "general_info": "chargeNET\r\nL3 30kW DCFC - 120LKR/kWh\r\nL2 6.6kW - 70LKR/kWh\r\n\r\nchargeNET NFC card or Android app is required.\r\nFor new users, create account and top-up online:\r\nhttps://portal.chargenet.lk/Register.aspx",
+      "data_quality_score": 70,
+      "not_recently_verified": true,
+      "equipment": [
+        {
+          "connector": "CHAdeMO",
+          "quantity": 1,
+          "status": "Operational",
+          "power_kw": 24.0,
+          "voltage_v": 400.0,
+          "current_a": 60.0,
+          "supply": "DC"
+        },
+        {
+          "connector": "Type 1 (J1772)",
+          "quantity": 1,
+          "status": "Operational",
+          "power_kw": 6.6,
+          "voltage_v": 220.0,
+          "current_a": 30.0,
+          "supply": "AC (Single-Phase)"
+        }
+      ],
+      "source_url": "https://openchargemap.io/poi/details/263908"
+    },
+    {
+      "ocm_id": 263909,
+      "title": "Kurana Negambo Station",
+      "address_lines": [
+        "No 801A, Negombo Road, Kurana",
+        "Negombo",
+        "Western",
+        "Sri Lanka"
+      ],
+      "phone": "0775352759",
+      "number_of_points": 1,
+      "usage": "Public - Membership Required",
+      "status": "Operational",
+      "latitude": 7.186820402351884,
+      "longitude": 79.8595374136496,
+      "operator": "chargeNET (lk)",
+      "general_info": "chargeNET\r\nL3 30kW DCFC - 120LKR/kWh\r\nL2 6.6kW - 70LKR/kWh\r\n\r\nchargeNET NFC card or Android app is required.\r\nFor new users, create account and top-up online:\r\nhttps://portal.chargenet.lk/Register.aspx",
+      "data_quality_score": 70,
+      "not_recently_verified": true,
+      "equipment": [
+        {
+          "connector": "CHAdeMO",
+          "quantity": 1,
+          "status": "Operational",
+          "power_kw": 24.0,
+          "voltage_v": 400.0,
+          "current_a": 60.0,
+          "supply": "DC"
+        }
+      ],
+      "source_url": "https://openchargemap.io/poi/details/263909"
+    },
+    {
+      "ocm_id": 263910,
+      "title": "NKR Minuwangoda",
+      "address_lines": [
+        "No : 459/D, MAHAGAM, HORAMPELLA, MINUWANGODA",
+        "Minuwangoda",
+        "Western",
+        "Sri Lanka"
+      ],
+      "phone": "0779442113",
+      "number_of_points": 1,
+      "usage": "Public - Membership Required",
+      "status": "Operational",
+      "latitude": 7.17872168795553,
+      "longitude": 79.97274210568054,
+      "operator": "chargeNET (lk)",
+      "general_info": "chargeNET\r\nL3 30kW DCFC - 120LKR/kWh\r\nL2 6.6kW - 70LKR/kWh\r\n\r\nchargeNET NFC card or Android app is required.\r\nFor new users, create account and top-up online:\r\nhttps://portal.chargenet.lk/Register.aspx",
+      "data_quality_score": 70,
+      "not_recently_verified": true,
+      "equipment": [
+        {
+          "connector": "CHAdeMO",
+          "quantity": 1,
+          "status": "Operational",
+          "power_kw": 24.0,
+          "voltage_v": 400.0,
+          "current_a": 60.0,
+          "supply": "DC"
+        }
+      ],
+      "source_url": "https://openchargemap.io/poi/details/263910"
+    },
+    {
+      "ocm_id": 263911,
+      "title": "Veyangoda L2 Charger",
+      "address_lines": [
+        "No 162/5, Walpitamulla, Dewalapola, Veyangoda",
+        "Veyangoda",
+        "Western Province",
+        "Sri Lanka"
+      ],
+      "phone": "0773879037",
+      "number_of_points": 1,
+      "usage": "Public - Membership Required",
+      "status": "Operational",
+      "latitude": 7.1609379894247525,
+      "longitude": 80.01351561891147,
+      "operator": "chargeNET (lk)",
+      "general_info": "chargeNET\r\nL3 30kW DCFC - 120LKR/kWh\r\nL2 6.6kW - 70LKR/kWh\r\n\r\nchargeNET NFC card or Android app is required.\r\nFor new users, create account and top-up online:\r\nhttps://portal.chargenet.lk/Register.aspx",
+      "data_quality_score": 70,
+      "not_recently_verified": true,
+      "equipment": [
+        {
+          "connector": "Type 1 (J1772)",
+          "quantity": 1,
+          "status": "Operational",
+          "power_kw": 6.6,
+          "voltage_v": 220.0,
+          "current_a": 30.0,
+          "supply": "AC (Single-Phase)"
+        }
+      ],
+      "source_url": "https://openchargemap.io/poi/details/263911"
+    },
+    {
+      "ocm_id": 263912,
+      "title": "Ellakkala EV Charging Station",
+      "address_lines": [
+        "No.134C, Nahallawatta, Ellakkala.",
+        "Pasyala",
+        "Western Province",
+        "Sri Lanka"
+      ],
+      "phone": "0727453572",
+      "number_of_points": 2,
+      "usage": "Public - Membership Required",
+      "status": "Operational",
+      "latitude": 7.146629046778031,
+      "longitude": 80.13148863061156,
+      "operator": "chargeNET (lk)",
+      "general_info": "chargeNET\r\nL3 30kW DCFC - 120LKR/kWh\r\nL2 6.6kW - 70LKR/kWh\r\n\r\nchargeNET NFC card or Android app is required.\r\nFor new users, create account and top-up online:\r\nhttps://portal.chargenet.lk/Register.aspx",
+      "data_quality_score": 70,
+      "not_recently_verified": true,
+      "equipment": [
+        {
+          "connector": "CHAdeMO",
+          "quantity": 1,
+          "status": "Operational",
+          "power_kw": 24.0,
+          "voltage_v": 400.0,
+          "current_a": 60.0,
+          "supply": "DC"
+        },
+        {
+          "connector": "Type 1 (J1772)",
+          "quantity": 1,
+          "status": "Operational",
+          "power_kw": 6.6,
+          "voltage_v": 220.0,
+          "current_a": 30.0,
+          "supply": "AC (Single-Phase)"
+        }
+      ],
+      "source_url": "https://openchargemap.io/poi/details/263912"
+    },
+    {
+      "ocm_id": 263918,
+      "title": "Citrus Waskaduwa",
+      "address_lines": [
+        "427 Samanthara Rd, Waskaduwa",
+        "Kalutara",
+        "Western",
+        "12580",
+        "Sri Lanka"
+      ],
+      "phone": "0347634634",
+      "number_of_points": 2,
+      "usage": "Public - Membership Required",
+      "status": "Operational",
+      "latitude": 6.625280118774469,
+      "longitude": 79.94220264688329,
+      "operator": "chargeNET (lk)",
+      "general_info": "chargeNET  L2 6.6kW - 70LKR/kWh  chargeNET NFC card or Android app is required. For new users, create account and top-up online: https://portal.chargenet.lk/Register.aspx",
+      "data_quality_score": 70,
+      "not_recently_verified": true,
+      "equipment": [
+        {
+          "connector": "Type 1 (J1772)",
+          "quantity": 1,
+          "status": "Operational",
+          "power_kw": 6.6,
+          "voltage_v": 220.0,
+          "current_a": 30.0,
+          "supply": "AC (Single-Phase)"
+        },
+        {
+          "connector": "Type 1 (J1772)",
+          "quantity": 1,
+          "status": "Operational",
+          "power_kw": 6.6,
+          "voltage_v": 220.0,
+          "current_a": 30.0,
+          "supply": "AC (Single-Phase)"
+        }
+      ],
+      "source_url": "https://openchargemap.io/poi/details/263918"
+    },
+    {
+      "ocm_id": 263919,
+      "title": "Fonseka Charging Station",
+      "address_lines": [
+        "2/82, Viharakanda Road, Maha Payagala, Payagala",
+        "Payagala",
+        "Western",
+        "Sri Lanka"
+      ],
+      "phone": "0778967331",
+      "number_of_points": 1,
+      "usage": "Public - Membership Required",
+      "status": "Operational",
+      "latitude": 6.52772782151942,
+      "longitude": 79.97907414835322,
+      "operator": "chargeNET (lk)",
+      "general_info": "chargeNET L2 6.6kW - 70LKR/kWh  chargeNET NFC card or Android app is required. For new users, create account and top-up online: https://portal.chargenet.lk/Register.aspx",
+      "data_quality_score": 70,
+      "not_recently_verified": true,
+      "equipment": [
+        {
+          "connector": "Type 1 (J1772)",
+          "quantity": 1,
+          "status": "Operational",
+          "power_kw": 6.6,
+          "voltage_v": 220.0,
+          "current_a": 30.0,
+          "supply": "AC (Single-Phase)"
+        }
+      ],
+      "source_url": "https://openchargemap.io/poi/details/263919"
+    },
+    {
+      "ocm_id": 263920,
+      "title": "Cinnamon Bey Beruwala",
+      "address_lines": [
+        "Moragalla, Beruwala",
+        "Beruwala",
+        "Western",
+        "Sri Lanka"
+      ],
+      "phone": "0342297000",
+      "number_of_points": 1,
+      "usage": "Public - Membership Required",
+      "status": "Operational",
+      "latitude": 6.4530212111372975,
+      "longitude": 79.9790263949219,
+      "operator": "chargeNET (lk)",
+      "general_info": "chargeNET L2 6.6kW - 70LKR/kWh  chargeNET NFC card or Android app is required. For new users, create account and top-up online: https://portal.chargenet.lk/Register.aspx",
+      "data_quality_score": 70,
+      "not_recently_verified": true,
+      "equipment": [
+        {
+          "connector": "Type 1 (J1772)",
+          "quantity": 1,
+          "status": "Operational",
+          "power_kw": 6.6,
+          "voltage_v": 220.0,
+          "current_a": 30.0,
+          "supply": "AC (Single-Phase)"
+        }
+      ],
+      "source_url": "https://openchargemap.io/poi/details/263920"
+    },
+    {
+      "ocm_id": 263921,
+      "title": "US Power-Dharga Town",
+      "address_lines": [
+        "Thiloka Holdings, Galhena Junction, Beruwala",
+        "Beruwala",
+        "Western",
+        "Sri Lanka"
+      ],
+      "phone": "0777300688",
+      "number_of_points": 1,
+      "usage": "Public - Membership Required",
+      "status": "Operational",
+      "latitude": 6.452956842986239,
+      "longitude": 80.00526029895468,
+      "operator": "chargeNET (lk)",
+      "general_info": "chargeNET L2 6.6kW - 70LKR/kWh  chargeNET NFC card or Android app is required. For new users, create account and top-up online: https://portal.chargenet.lk/Register.aspx",
+      "data_quality_score": 70,
+      "not_recently_verified": true,
+      "equipment": [
+        {
+          "connector": "Type 1 (J1772)",
+          "quantity": 1,
+          "status": "Operational",
+          "power_kw": 6.6,
+          "voltage_v": 220.0,
+          "current_a": 30.0,
+          "supply": "AC (Single-Phase)"
+        }
+      ],
+      "source_url": "https://openchargemap.io/poi/details/263921"
+    },
+    {
+      "ocm_id": 263922,
+      "title": "Canowin Arcade Welipenna - Southbound Rest Stop",
+      "address_lines": [
+        "Canowin Arcade Welipenna",
+        "Welipenna",
+        "Western Province",
+        "12100",
+        "Sri Lanka"
+      ],
+      "phone": null,
+      "number_of_points": 2,
+      "usage": "Public - Membership Required",
+      "status": "Operational",
+      "latitude": 6.468380656163859,
+      "longitude": 80.07944217756074,
+      "operator": "chargeNET (lk)",
+      "general_info": "chargeNET L3 30kW DCFC - 120LKR/kWh L2 6.6kW - 70LKR/kWh  chargeNET NFC card or Android app is required. For new users, create account and top-up online: https://portal.chargenet.lk/Register.aspx",
+      "data_quality_score": 70,
+      "not_recently_verified": true,
+      "equipment": [
+        {
+          "connector": "CHAdeMO",
+          "quantity": 1,
+          "status": "Operational",
+          "power_kw": 24.0,
+          "voltage_v": 400.0,
+          "current_a": 60.0,
+          "supply": "DC"
+        },
+        {
+          "connector": "Type 1 (J1772)",
+          "quantity": 1,
+          "status": "Operational",
+          "power_kw": 6.6,
+          "voltage_v": 220.0,
+          "current_a": 30.0,
+          "supply": "AC (Single-Phase)"
+        }
+      ],
+      "source_url": "https://openchargemap.io/poi/details/263922"
+    },
+    {
+      "ocm_id": 263923,
+      "title": "Canowin Arcade Welipenna - Northbound Rest Stop",
+      "address_lines": [
+        "Canowin Arcade Welipenna",
+        "Welipenna",
+        "Western Province",
+        "12100",
+        "Sri Lanka"
+      ],
+      "phone": "0703727242",
+      "number_of_points": 2,
+      "usage": "Public - Membership Required",
+      "status": "Operational",
+      "latitude": 6.469595097031586,
+      "longitude": 80.07680434600206,
+      "operator": "chargeNET (lk)",
+      "general_info": "chargeNET L3 30kW DCFC - 120LKR/kWh L2 6.6kW - 70LKR/kWh  chargeNET NFC card or Android app is required. For new users, create account and top-up online: https://portal.chargenet.lk/Register.aspx",
+      "data_quality_score": 70,
+      "not_recently_verified": true,
+      "equipment": [
+        {
+          "connector": "CHAdeMO",
+          "quantity": 1,
+          "status": "Operational",
+          "power_kw": 24.0,
+          "voltage_v": 400.0,
+          "current_a": 60.0,
+          "supply": "DC"
+        },
+        {
+          "connector": "Type 1 (J1772)",
+          "quantity": 1,
+          "status": "Operational",
+          "power_kw": 6.6,
+          "voltage_v": 220.0,
+          "current_a": 30.0,
+          "supply": "AC (Single-Phase)"
+        }
+      ],
+      "source_url": "https://openchargemap.io/poi/details/263923"
+    },
+    {
+      "ocm_id": 263924,
+      "title": "Hikka Tranz by Cinnamon",
+      "address_lines": [
+        "Galle Road, Hikkaduwa",
+        "Hikkaduwa",
+        "Southern Province",
+        "Sri Lanka"
+      ],
+      "phone": "0912277188",
+      "number_of_points": 1,
+      "usage": "Public - Membership Required",
+      "status": "Operational",
+      "latitude": 6.131581484226828,
+      "longitude": 80.10110874347635,
+      "operator": "chargeNET (lk)",
+      "general_info": "chargeNET L2 6.6kW - 70LKR/kWh  chargeNET NFC card or Android app is required. For new users, create account and top-up online: https://portal.chargenet.lk/Register.aspx",
+      "data_quality_score": 70,
+      "not_recently_verified": true,
+      "equipment": [
+        {
+          "connector": "Type 1 (J1772)",
+          "quantity": 1,
+          "status": "Operational",
+          "power_kw": 6.6,
+          "voltage_v": 220.0,
+          "current_a": 30.0,
+          "supply": "AC (Single-Phase)"
+        }
+      ],
+      "source_url": "https://openchargemap.io/poi/details/263924"
+    },
+    {
+      "ocm_id": 263925,
+      "title": "EV Matara Malimbda Station",
+      "address_lines": [
+        "Tankiya Kade, Malimbada, Matara",
+        "Matara",
+        "Southern Province",
+        "Sri Lanka"
+      ],
+      "phone": "0743644257",
+      "number_of_points": 2,
+      "usage": "Public - Membership Required",
+      "status": "Operational",
+      "latitude": 6.0059245439870494,
+      "longitude": 80.51823671437705,
+      "operator": "chargeNET (lk)",
+      "general_info": "chargeNET L3 30kW DCFC - 120LKR/kWh L2 6.6kW - 70LKR/kWh  chargeNET NFC card or Android app is required. For new users, create account and top-up online: https://portal.chargenet.lk/Register.aspx",
+      "data_quality_score": 70,
+      "not_recently_verified": true,
+      "equipment": [
+        {
+          "connector": "CHAdeMO",
+          "quantity": 1,
+          "status": "Operational",
+          "power_kw": 24.0,
+          "voltage_v": 400.0,
+          "current_a": 60.0,
+          "supply": "DC"
+        },
+        {
+          "connector": "Type 1 (J1772)",
+          "quantity": 1,
+          "status": "Operational",
+          "power_kw": 6.6,
+          "voltage_v": 220.0,
+          "current_a": 30.0,
+          "supply": "AC (Single-Phase)"
+        }
+      ],
+      "source_url": "https://openchargemap.io/poi/details/263925"
+    },
+    {
+      "ocm_id": 263926,
+      "title": "MEV Matara EV Charging Station",
+      "address_lines": [
+        "No. 92/1, Yehiya Road, Issadeen Town, Matara",
+        "Matara",
+        "Southern Province",
+        "Sri Lanka"
+      ],
+      "phone": "0710168151",
+      "number_of_points": 2,
+      "usage": "Public - Membership Required",
+      "status": "Operational",
+      "latitude": 5.955080690490959,
+      "longitude": 80.52422555059604,
+      "operator": "chargeNET (lk)",
+      "general_info": "chargeNET L3 30kW DCFC - 120LKR/kWh L2 6.6kW - 70LKR/kWh  chargeNET NFC card or Android app is required. For new users, create account and top-up online: https://portal.chargenet.lk/Register.aspx",
+      "data_quality_score": 70,
+      "not_recently_verified": true,
+      "equipment": [
+        {
+          "connector": "CHAdeMO",
+          "quantity": 1,
+          "status": "Operational",
+          "power_kw": 24.0,
+          "voltage_v": 400.0,
+          "current_a": 60.0,
+          "supply": "DC"
+        },
+        {
+          "connector": "Type 1 (J1772)",
+          "quantity": 1,
+          "status": "Operational",
+          "power_kw": 6.6,
+          "voltage_v": 220.0,
+          "current_a": 30.0,
+          "supply": "AC (Single-Phase)"
+        }
+      ],
+      "source_url": "https://openchargemap.io/poi/details/263926"
+    },
+    {
+      "ocm_id": 263927,
+      "title": "Cinnamon Wild - Yala",
+      "address_lines": [
+        "PO Box 01, Kirinda, Tissamaharama,",
+        "Tissamaharama",
+        "Southern Province",
+        "Sri Lanka"
+      ],
+      "phone": "0112306600",
+      "number_of_points": 1,
+      "usage": "Public - Membership Required",
+      "status": "Operational",
+      "latitude": 6.259201529568315,
+      "longitude": 81.40469450276896,
+      "operator": "chargeNET (lk)",
+      "general_info": "chargeNET L2 6.6kW - 70LKR/kWh  chargeNET NFC card or Android app is required. For new users, create account and top-up online: https://portal.chargenet.lk/Register.aspx",
+      "data_quality_score": 70,
+      "not_recently_verified": true,
+      "equipment": [
+        {
+          "connector": "Type 1 (J1772)",
+          "quantity": 1,
+          "status": "Operational",
+          "power_kw": 6.6,
+          "voltage_v": 220.0,
+          "current_a": 30.0,
+          "supply": "AC (Single-Phase)"
+        }
+      ],
+      "source_url": "https://openchargemap.io/poi/details/263927"
+    },
+    {
+      "ocm_id": 264368,
+      "title": "EVTopUpPoint - Wellawaya",
+      "address_lines": [
+        "No.100, Yalabowa, Wellawaya",
+        "Wellawaya",
+        "Sri Lanka"
+      ],
+      "phone": "0777909498",
+      "number_of_points": 1,
+      "usage": "Public - Membership Required",
+      "status": "Operational",
+      "latitude": 6.719210786124748,
+      "longitude": 81.1045585974004,
+      "operator": "chargeNET (lk)",
+      "general_info": "chargeNET L2 6.6kW - 70LKR/kWh  chargeNET NFC card or Android app is required. For new users, create account and top-up online: https://portal.chargenet.lk/Register.aspx",
+      "data_quality_score": 70,
+      "not_recently_verified": true,
+      "equipment": [
+        {
+          "connector": "Type 1 (J1772)",
+          "quantity": 1,
+          "status": "Operational",
+          "power_kw": 6.6,
+          "voltage_v": 220.0,
+          "current_a": 30.0,
+          "supply": "AC (Single-Phase)"
+        }
+      ],
+      "source_url": "https://openchargemap.io/poi/details/264368"
+    },
+    {
+      "ocm_id": 264369,
+      "title": "Riviera Resort",
+      "address_lines": [
+        "Riviera Resort, New Dutch Bar Road Kallady, Batticaloa",
+        "Batticaloa",
+        "Eastern Province",
+        "Sri Lanka"
+      ],
+      "phone": "0654929165",
+      "number_of_points": 1,
+      "usage": "Public - Membership Required",
+      "status": "Operational",
+      "latitude": 7.720057248004565,
+      "longitude": 81.71012738138006,
+      "operator": "chargeNET (lk)",
+      "general_info": "chargeNET L2 6.6kW - 70LKR/kWh  chargeNET NFC card or Android app is required. For new users, create account and top-up online: https://portal.chargenet.lk/Register.aspx",
+      "data_quality_score": 70,
+      "not_recently_verified": true,
+      "equipment": [
+        {
+          "connector": "Type 1 (J1772)",
+          "quantity": 1,
+          "status": "Operational",
+          "power_kw": 6.6,
+          "voltage_v": 220.0,
+          "current_a": 30.0,
+          "supply": "AC (Single-Phase)"
+        }
+      ],
+      "source_url": "https://openchargemap.io/poi/details/264369"
+    },
+    {
+      "ocm_id": 264370,
+      "title": "Trinco Blu by Cinnamon",
+      "address_lines": [
+        "Sampaltive Post, Uppuveli, Trincomalee",
+        "Trincomalee",
+        "Eastern Province",
+        "Sri Lanka"
+      ],
+      "phone": "0262222307",
+      "number_of_points": 1,
+      "usage": "Public - Membership Required",
+      "status": "Operational",
+      "latitude": 8.61783208279516,
+      "longitude": 81.21750232354225,
+      "operator": "chargeNET (lk)",
+      "general_info": "chargeNET L2 6.6kW - 70LKR/kWh  chargeNET NFC card or Android app is required. For new users, create account and top-up online: https://portal.chargenet.lk/Register.aspx",
+      "data_quality_score": 70,
+      "not_recently_verified": true,
+      "equipment": [
+        {
+          "connector": "Type 1 (J1772)",
+          "quantity": 1,
+          "status": "Operational",
+          "power_kw": 6.6,
+          "voltage_v": 220.0,
+          "current_a": 30.0,
+          "supply": "AC (Single-Phase)"
+        }
+      ],
+      "source_url": "https://openchargemap.io/poi/details/264370"
+    },
+    {
+      "ocm_id": 264371,
+      "title": "SLNP Filling Station",
+      "address_lines": [
+        "SLNP Filling Station, No.155, 6th Mile Post, Nilaveli Main Road, Trincomalee",
+        "Trincomalee",
+        "Eastern",
+        "Sri Lanka"
+      ],
+      "phone": null,
+      "number_of_points": 1,
+      "usage": "Public - Membership Required",
+      "status": "Operational",
+      "latitude": 8.62833162137889,
+      "longitude": 81.20549849379847,
+      "operator": "chargeNET (lk)",
+      "general_info": "chargeNET L2 6.6kW - 70LKR/kWh  chargeNET NFC card or Android app is required. For new users, create account and top-up online: https://portal.chargenet.lk/Register.aspx",
+      "data_quality_score": 70,
+      "not_recently_verified": true,
+      "equipment": [
+        {
+          "connector": "Type 1 (J1772)",
+          "quantity": 1,
+          "status": "Operational",
+          "power_kw": 6.6,
+          "voltage_v": 220.0,
+          "current_a": 30.0,
+          "supply": "AC (Single-Phase)"
+        }
+      ],
+      "source_url": "https://openchargemap.io/poi/details/264371"
+    },
+    {
+      "ocm_id": 264372,
+      "title": "Habarana Village by Cinnamon",
+      "address_lines": [
+        "PO Box 01, Habarana",
+        "Habarana",
+        "North Central Province",
+        "Sri Lanka"
+      ],
+      "phone": "0662270047",
+      "number_of_points": 2,
+      "usage": "Public - Membership Required",
+      "status": "Operational",
+      "latitude": 8.037399720106592,
+      "longitude": 80.75116387661092,
+      "operator": "chargeNET (lk)",
+      "general_info": "chargeNET L2 6.6kW - 70LKR/kWh  chargeNET NFC card or Android app is required. For new users, create account and top-up online: https://portal.chargenet.lk/Register.aspx",
+      "data_quality_score": 70,
+      "not_recently_verified": true,
+      "equipment": [
+        {
+          "connector": "Type 1 (J1772)",
+          "quantity": 1,
+          "status": "Operational",
+          "power_kw": 6.6,
+          "voltage_v": 220.0,
+          "current_a": 30.0,
+          "supply": "AC (Single-Phase)"
+        },
+        {
+          "connector": "Type 1 (J1772)",
+          "quantity": 1,
+          "status": "Operational",
+          "power_kw": 6.6,
+          "voltage_v": 220.0,
+          "current_a": 30.0,
+          "supply": "AC (Single-Phase)"
+        }
+      ],
+      "source_url": "https://openchargemap.io/poi/details/264372"
+    },
+    {
+      "ocm_id": 264373,
+      "title": "Wood House Karuwalagaswewa",
+      "address_lines": [
+        "639/D, Palugassegama, Karuwalagaswewa",
+        "Karuwalagaswewa",
+        "North Central Province",
+        "Sri Lanka"
+      ],
+      "phone": "0772920991",
+      "number_of_points": 1,
+      "usage": "Public - Membership Required",
+      "status": "Operational",
+      "latitude": 8.174626539579904,
+      "longitude": 80.0794668998069,
+      "operator": "chargeNET (lk)",
+      "general_info": "chargeNET L2 6.6kW - 70LKR/kWh  chargeNET NFC card or Android app is required. For new users, create account and top-up online: https://portal.chargenet.lk/Register.aspx",
+      "data_quality_score": 70,
+      "not_recently_verified": true,
+      "equipment": [
+        {
+          "connector": "Type 1 (J1772)",
+          "quantity": 1,
+          "status": "Operational",
+          "power_kw": 6.6,
+          "voltage_v": 220.0,
+          "current_a": 30.0,
+          "supply": "AC (Single-Phase)"
+        }
+      ],
+      "source_url": "https://openchargemap.io/poi/details/264373"
+    },
+    {
+      "ocm_id": 264374,
+      "title": "Technokaru - Dambulla",
+      "address_lines": [
+        "Technokaru Private Limited, Dambulla",
+        "Dambulla",
+        "North Central Province",
+        "Sri Lanka"
+      ],
+      "phone": "0773040370",
+      "number_of_points": 1,
+      "usage": "Public - Membership Required",
+      "status": "Operational",
+      "latitude": 7.777798216134769,
+      "longitude": 80.66114760765367,
+      "operator": "chargeNET (lk)",
+      "general_info": "chargeNET L2 6.6kW - 70LKR/kWh  chargeNET NFC card or Android app is required. For new users, create account and top-up online: https://portal.chargenet.lk/Register.aspx",
+      "data_quality_score": 70,
+      "not_recently_verified": true,
+      "equipment": [
+        {
+          "connector": "Type 1 (J1772)",
+          "quantity": 1,
+          "status": "Operational",
+          "power_kw": 6.6,
+          "voltage_v": 220.0,
+          "current_a": 30.0,
+          "supply": "AC (Single-Phase)"
+        }
+      ],
+      "source_url": "https://openchargemap.io/poi/details/264374"
+    },
+    {
+      "ocm_id": 264375,
+      "title": "Wedamadura Medicare Charging Station",
+      "address_lines": [
+        "Wedamadura, Kuliyapitiya Road,Narammala",
+        "Narammala",
+        "North Central",
+        "Sri Lanka"
+      ],
+      "phone": "0714976692",
+      "number_of_points": 1,
+      "usage": "Public - Membership Required",
+      "status": "Operational",
+      "latitude": 7.433628737842412,
+      "longitude": 80.21199903799015,
+      "operator": "chargeNET (lk)",
+      "general_info": "chargeNET L3 30kW DCFC - 120LKR/kWh L2 6.6kW - 70LKR/kWh  chargeNET NFC card or Android app is required. For new users, create account and top-up online: https://portal.chargenet.lk/Register.aspx",
+      "data_quality_score": 70,
+      "not_recently_verified": true,
+      "equipment": [
+        {
+          "connector": "CHAdeMO",
+          "quantity": 1,
+          "status": "Operational",
+          "power_kw": 24.0,
+          "voltage_v": 400.0,
+          "current_a": 60.0,
+          "supply": "DC"
+        },
+        {
+          "connector": "Type 1 (J1772)",
+          "quantity": 1,
+          "status": "Operational",
+          "power_kw": 6.6,
+          "voltage_v": 220.0,
+          "current_a": 30.0,
+          "supply": "AC (Single-Phase)"
+        }
+      ],
+      "source_url": "https://openchargemap.io/poi/details/264375"
+    },
+    {
+      "ocm_id": 264376,
+      "title": "Currymuch Hotel and Restaurant",
+      "address_lines": [
+        "Palamagawa watta, Yattogoda, Nelundeniya",
+        "Nelundeniya",
+        "Central Province",
+        "Sri Lanka"
+      ],
+      "phone": "0770555553",
+      "number_of_points": 2,
+      "usage": "Public - Membership Required",
+      "status": "Operational",
+      "latitude": 7.237250713105548,
+      "longitude": 80.27218015256545,
+      "operator": "chargeNET (lk)",
+      "general_info": "chargeNET L3 30kW DCFC - 120LKR/kWh L2 6.6kW - 70LKR/kWh  chargeNET NFC card or Android app is required. For new users, create account and top-up online: https://portal.chargenet.lk/Register.aspx",
+      "data_quality_score": 70,
+      "not_recently_verified": true,
+      "equipment": [
+        {
+          "connector": "CHAdeMO",
+          "quantity": 1,
+          "status": "Operational",
+          "power_kw": 24.0,
+          "voltage_v": 400.0,
+          "current_a": 60.0,
+          "supply": "DC"
+        },
+        {
+          "connector": "Type 1 (J1772)",
+          "quantity": 1,
+          "status": "Operational",
+          "power_kw": 6.6,
+          "voltage_v": 220.0,
+          "current_a": 30.0,
+          "supply": "AC (Single-Phase)"
+        }
+      ],
+      "source_url": "https://openchargemap.io/poi/details/264376"
+    },
+    {
+      "ocm_id": 264377,
+      "title": "Kandylines Equipment Catering Service",
+      "address_lines": [
+        "No. 40, Club Road, Kegalle",
+        "Kegalle",
+        "Central Province",
+        "Sri Lanka"
+      ],
+      "phone": "0354354050",
+      "number_of_points": 1,
+      "usage": "Public - Membership Required",
+      "status": "Operational",
+      "latitude": 7.248294424699523,
+      "longitude": 80.34108477186231,
+      "operator": "chargeNET (lk)",
+      "general_info": "chargeNET L3 30kW DCFC - 120LKR/kWh L2 6.6kW - 70LKR/kWh  chargeNET NFC card or Android app is required. For new users, create account and top-up online: https://portal.chargenet.lk/Register.aspx",
+      "data_quality_score": 70,
+      "not_recently_verified": true,
+      "equipment": [
+        {
+          "connector": "Type 1 (J1772)",
+          "quantity": 1,
+          "status": "Operational",
+          "power_kw": 6.6,
+          "voltage_v": 220.0,
+          "current_a": 30.0,
+          "supply": "AC (Single-Phase)"
+        }
+      ],
+      "source_url": "https://openchargemap.io/poi/details/264377"
+    },
+    {
+      "ocm_id": 264378,
+      "title": "Jayasiri Windscreen House",
+      "address_lines": [
+        "No.607, Kandy road, Hingula, Mawanella",
+        "Mawanella",
+        "Central Province",
+        "Sri Lanka"
+      ],
+      "phone": "0727453572",
+      "number_of_points": 1,
+      "usage": "Public - Membership Required",
+      "status": "Operational",
+      "latitude": 7.247725472216552,
+      "longitude": 80.46596397024831,
+      "operator": "chargeNET (lk)",
+      "general_info": "chargeNET L3 30kW DCFC - 120LKR/kWh L2 6.6kW - 70LKR/kWh  chargeNET NFC card or Android app is required. For new users, create account and top-up online: https://portal.chargenet.lk/Register.aspx",
+      "data_quality_score": 70,
+      "not_recently_verified": true,
+      "equipment": [
+        {
+          "connector": "CHAdeMO",
+          "quantity": 1,
+          "status": "Operational",
+          "power_kw": 24.0,
+          "voltage_v": 400.0,
+          "current_a": 60.0,
+          "supply": "DC"
+        }
+      ],
+      "source_url": "https://openchargemap.io/poi/details/264378"
+    },
+    {
+      "ocm_id": 264379,
+      "title": "Bupasha Holiday Bungalow",
+      "address_lines": [
+        "Walliyakwatta, 2nd mile post, Ginigathhena road, Nawalapitiya",
+        "Nawalapitiya",
+        "Central Province",
+        "Sri Lanka"
+      ],
+      "phone": "0727453572",
+      "number_of_points": 1,
+      "usage": "Public - Membership Required",
+      "status": "Operational",
+      "latitude": 7.051427816828067,
+      "longitude": 80.5133520696424,
+      "operator": "chargeNET (lk)",
+      "general_info": "chargeNET L2 6.6kW - 70LKR/kWh  chargeNET NFC card or Android app is required. For new users, create account and top-up online: https://portal.chargenet.lk/Register.aspx",
+      "data_quality_score": 70,
+      "not_recently_verified": true,
+      "equipment": [
+        {
+          "connector": "Type 1 (J1772)",
+          "quantity": 1,
+          "status": "Operational",
+          "power_kw": 6.6,
+          "voltage_v": 220.0,
+          "current_a": 30.0,
+          "supply": "AC (Single-Phase)"
+        }
+      ],
+      "source_url": "https://openchargemap.io/poi/details/264379"
+    },
+    {
+      "ocm_id": 264380,
+      "title": "SIGNEX - Kiribathkubura",
+      "address_lines": [
+        "No:363, Colombo Road, Kehelwala, Kiribathkubura, Peradeniya",
+        "Peradeniya",
+        "Central Province",
+        "Sri Lanka"
+      ],
+      "phone": "0718705960",
+      "number_of_points": 1,
+      "usage": "Public - Membership Required",
+      "status": "Operational",
+      "latitude": 7.268413883518775,
+      "longitude": 80.5807821943767,
+      "operator": "chargeNET (lk)",
+      "general_info": "chargeNET L2 6.6kW - 70LKR/kWh  chargeNET NFC card or Android app is required. For new users, create account and top-up online: https://portal.chargenet.lk/Register.aspx",
+      "data_quality_score": 70,
+      "not_recently_verified": true,
+      "equipment": [
+        {
+          "connector": "Type 1 (J1772)",
+          "quantity": 1,
+          "status": "Operational",
+          "power_kw": 6.6,
+          "voltage_v": 220.0,
+          "current_a": 30.0,
+          "supply": "AC (Single-Phase)"
+        }
+      ],
+      "source_url": "https://openchargemap.io/poi/details/264380"
+    },
+    {
+      "ocm_id": 264381,
+      "title": "Cinnamon Citadel",
+      "address_lines": [
+        "No. 124, Srimath Kuda Ratwatte Mawatha, Kandy",
+        "Kandy",
+        "Central Province",
+        "Sri Lanka"
+      ],
+      "phone": "0812234365",
+      "number_of_points": 1,
+      "usage": "Public - Membership Required",
+      "status": "Operational",
+      "latitude": 7.305863827786368,
+      "longitude": 80.62442057438363,
+      "operator": "chargeNET (lk)",
+      "general_info": "chargeNET L2 6.6kW - 70LKR/kWh  chargeNET NFC card or Android app is required. For new users, create account and top-up online: https://portal.chargenet.lk/Register.aspx",
+      "data_quality_score": 70,
+      "not_recently_verified": true,
+      "equipment": [
+        {
+          "connector": "Type 1 (J1772)",
+          "quantity": 1,
+          "status": "Operational",
+          "power_kw": 6.6,
+          "voltage_v": 220.0,
+          "current_a": 30.0,
+          "supply": "AC (Single-Phase)"
+        }
+      ],
+      "source_url": "https://openchargemap.io/poi/details/264381"
+    },
+    {
+      "ocm_id": 264382,
+      "title": "ChargeNET - Kandy (Upali)",
+      "address_lines": [
+        "No.44/10, Banabus road, Watapuluwa, Kandy",
+        "Kandy",
+        "Central Province",
+        "Sri Lanka"
+      ],
+      "phone": "0727453572",
+      "number_of_points": 1,
+      "usage": "Public - Membership Required",
+      "status": "Operational",
+      "latitude": 7.314339373845542,
+      "longitude": 80.63905616427053,
+      "operator": "chargeNET (lk)",
+      "general_info": "chargeNET L2 6.6kW - 70LKR/kWh  chargeNET NFC card or Android app is required. For new users, create account and top-up online: https://portal.chargenet.lk/Register.aspx",
+      "data_quality_score": 70,
+      "not_recently_verified": true,
+      "equipment": [
+        {
+          "connector": "Type 1 (J1772)",
+          "quantity": 1,
+          "status": "Operational",
+          "power_kw": 6.6,
+          "voltage_v": 220.0,
+          "current_a": 30.0,
+          "supply": "AC (Single-Phase)"
+        }
+      ],
+      "source_url": "https://openchargemap.io/poi/details/264382"
+    },
+    {
+      "ocm_id": 264383,
+      "title": "Broad Auto Hybrid Service",
+      "address_lines": [
+        "Broad Auto Hybrid Service, Madawala Roadd, Polgolla, Katugastota.",
+        "Katugastota",
+        "Central Province",
+        "Sri Lanka"
+      ],
+      "phone": "0727453572",
+      "number_of_points": 1,
+      "usage": "Public - Membership Required",
+      "status": "Operational",
+      "latitude": 7.324777326878163,
+      "longitude": 80.64447343159065,
+      "operator": "chargeNET (lk)",
+      "general_info": "chargeNET L3 30kW DCFC - 120LKR/kWh  chargeNET NFC card or Android app is required. For new users, create account and top-up online: https://portal.chargenet.lk/Register.aspx",
+      "data_quality_score": 70,
+      "not_recently_verified": true,
+      "equipment": [
+        {
+          "connector": "CHAdeMO",
+          "quantity": 1,
+          "status": "Operational",
+          "power_kw": 24.0,
+          "voltage_v": 400.0,
+          "current_a": 60.0,
+          "supply": "DC"
+        }
+      ],
+      "source_url": "https://openchargemap.io/poi/details/264383"
+    },
+    {
+      "ocm_id": 264384,
+      "title": "MJ.COM Service L2 Charger",
+      "address_lines": [
+        "No 128, Nattarampotha, Kundasale, Kandy",
+        "Kandy",
+        "Central Province",
+        "Sri Lanka"
+      ],
+      "phone": "0772267135",
+      "number_of_points": 1,
+      "usage": "Public - Membership Required",
+      "status": "Operational",
+      "latitude": 7.279591860559506,
+      "longitude": 80.67698021255649,
+      "operator": "chargeNET (lk)",
+      "general_info": "chargeNET L2 6.6kW - 70LKR/kWh  chargeNET NFC card or Android app is required. For new users, create account and top-up online: https://portal.chargenet.lk/Register.aspx",
+      "data_quality_score": 70,
+      "not_recently_verified": true,
+      "equipment": [
+        {
+          "connector": "Type 1 (J1772)",
+          "quantity": 1,
+          "status": "Operational",
+          "power_kw": 6.6,
+          "voltage_v": 220.0,
+          "current_a": 30.0,
+          "supply": "AC (Single-Phase)"
+        }
+      ],
+      "source_url": "https://openchargemap.io/poi/details/264384"
+    },
+    {
+      "ocm_id": 264385,
+      "title": "Ceylon Electricity Board - Dehiwala",
+      "address_lines": [
+        "25 Council Ln, Dehiwala-Mount Lavinia",
+        "Colombo",
+        "Western Province",
+        "Sri Lanka"
+      ],
+      "phone": "0717219775",
+      "number_of_points": 1,
+      "usage": "Public - Membership Required",
+      "status": "Operational",
+      "latitude": 6.862169228518255,
+      "longitude": 79.86512609215788,
+      "operator": "chargeNET (lk)",
+      "general_info": "50kW ABB DC Fast Charger | Online payment only. https://ev.ceb.lk/",
+      "data_quality_score": 70,
+      "not_recently_verified": true,
+      "equipment": [
+        {
+          "connector": "CHAdeMO",
+          "quantity": 1,
+          "status": "Operational",
+          "power_kw": 50.0,
+          "voltage_v": 400.0,
+          "current_a": 125.0,
+          "supply": "DC"
+        }
+      ],
+      "source_url": "https://openchargemap.io/poi/details/264385"
+    },
+    {
+      "ocm_id": 264386,
+      "title": "Ceylon Electricity Board - Pannipitiya",
+      "address_lines": [
+        "370 High Level Rd, Pannipitiya 10230, Sri Lanka",
+        "Colombo",
+        "Western Province",
+        "Sri Lanka"
+      ],
+      "phone": "0717219775",
+      "number_of_points": 1,
+      "usage": "Public - Membership Required",
+      "status": "Operational",
+      "latitude": 6.844901395269417,
+      "longitude": 79.94073377775248,
+      "operator": "chargeNET (lk)",
+      "general_info": "50kW ABB DC Fast Charger rate  Online payment only. https://ev.ceb.lk/",
+      "data_quality_score": 70,
+      "not_recently_verified": true,
+      "equipment": [
+        {
+          "connector": "CHAdeMO",
+          "quantity": 1,
+          "status": "Operational",
+          "power_kw": 50.0,
+          "voltage_v": 400.0,
+          "current_a": 125.0,
+          "supply": "DC"
+        }
+      ],
+      "source_url": "https://openchargemap.io/poi/details/264386"
+    },
+    {
+      "ocm_id": 264387,
+      "title": "Ceylon Electricity Board - Anuradhapura",
+      "address_lines": [
+        "1871 Vidyala Mawatha, Anuradhapura",
+        "Anuradhapura",
+        "North Central Province",
+        "Sri Lanka"
+      ],
+      "phone": "0717219775",
+      "number_of_points": 1,
+      "usage": "Public - Membership Required",
+      "status": "Operational",
+      "latitude": 8.329664541564298,
+      "longitude": 80.40635525555717,
+      "operator": "chargeNET (lk)",
+      "general_info": "50kW ABB DC Fast Charger rate  Online payment only. https://ev.ceb.lk/",
+      "data_quality_score": 70,
+      "not_recently_verified": true,
+      "equipment": [
+        {
+          "connector": "CHAdeMO",
+          "quantity": 1,
+          "status": "Operational",
+          "power_kw": 50.0,
+          "voltage_v": 400.0,
+          "current_a": 125.0,
+          "supply": "DC"
+        }
+      ],
+      "source_url": "https://openchargemap.io/poi/details/264387"
+    },
+    {
+      "ocm_id": 264388,
+      "title": "Ceylon Electricity Board - Dambulla",
+      "address_lines": [
+        "352a Kurunegala Rd, Dambulla",
+        "Dambulla",
+        "Central Province",
+        "Sri Lanka"
+      ],
+      "phone": "0717219775",
+      "number_of_points": 1,
+      "usage": "Public - Membership Required",
+      "status": "Operational",
+      "latitude": 7.869633540843466,
+      "longitude": 80.64822474274945,
+      "operator": "chargeNET (lk)",
+      "general_info": "50kW ABB DC Fast Charger rate  Online payment only. https://ev.ceb.lk/",
+      "data_quality_score": 70,
+      "not_recently_verified": true,
+      "equipment": [
+        {
+          "connector": "CHAdeMO",
+          "quantity": 1,
+          "status": "Operational",
+          "power_kw": 50.0,
+          "voltage_v": 400.0,
+          "current_a": 125.0,
+          "supply": "DC"
+        }
+      ],
+      "source_url": "https://openchargemap.io/poi/details/264388"
+    },
+    {
+      "ocm_id": 264389,
+      "title": "Ceylon Electricity Board - Kandy",
+      "address_lines": [
+        "Thilak Ratnayake Mawatha, Kandy, Sri Lanka",
+        "Kandy",
+        "Central Province",
+        "Sri Lanka"
+      ],
+      "phone": "0717219775",
+      "number_of_points": 1,
+      "usage": "Public - Membership Required",
+      "status": "Operational",
+      "latitude": 7.294207787655225,
+      "longitude": 80.63379397673481,
+      "operator": "chargeNET (lk)",
+      "general_info": "50kW ABB DC Fast Charger rate  Online payment only. https://ev.ceb.lk/",
+      "data_quality_score": 70,
+      "not_recently_verified": true,
+      "equipment": [
+        {
+          "connector": "CHAdeMO",
+          "quantity": 1,
+          "status": "Operational",
+          "power_kw": 50.0,
+          "voltage_v": 400.0,
+          "current_a": 125.0,
+          "supply": "DC"
+        }
+      ],
+      "source_url": "https://openchargemap.io/poi/details/264389"
+    },
+    {
+      "ocm_id": 264391,
+      "title": "Ceylon Electricity Board - Nuwara Eliya",
+      "address_lines": [
+        "5 Upper Lake Rd, Nuwara Eliya, Sri Lanka",
+        "Nuwara Eliya",
+        "Central Province",
+        "22200",
+        "Sri Lanka"
+      ],
+      "phone": "0522 222 343",
+      "number_of_points": 1,
+      "usage": "Public - Membership Required",
+      "status": "Operational",
+      "latitude": 6.96580130041778,
+      "longitude": 80.77193220574014,
+      "operator": "chargeNET (lk)",
+      "general_info": "50kW ABB DC Fast Charger rate  Online payment only. https://ev.ceb.lk/",
+      "data_quality_score": 70,
+      "not_recently_verified": true,
+      "equipment": [
+        {
+          "connector": "CHAdeMO",
+          "quantity": 1,
+          "status": "Operational",
+          "power_kw": 50.0,
+          "voltage_v": 400.0,
+          "current_a": 125.0,
+          "supply": "DC"
+        }
+      ],
+      "source_url": "https://openchargemap.io/poi/details/264391"
+    },
+    {
+      "ocm_id": 264392,
+      "title": "Ceylon Electricity Board - Avissawella",
+      "address_lines": [
+        "Avissawella By Pass Rd, Avissawella",
+        "Avissawella",
+        "Western Province",
+        "Sri Lanka"
+      ],
+      "phone": "0717219775",
+      "number_of_points": 1,
+      "usage": "Public - Membership Required",
+      "status": "Operational",
+      "latitude": 6.94758866739781,
+      "longitude": 80.21436823239577,
+      "operator": "chargeNET (lk)",
+      "general_info": "50kW ABB DC Fast Charger Online payment only. https://ev.ceb.lk/",
+      "data_quality_score": 70,
+      "not_recently_verified": true,
+      "equipment": [
+        {
+          "connector": "CHAdeMO",
+          "quantity": 1,
+          "status": "Operational",
+          "power_kw": 50.0,
+          "voltage_v": 400.0,
+          "current_a": 125.0,
+          "supply": "DC"
+        }
+      ],
+      "source_url": "https://openchargemap.io/poi/details/264392"
+    },
+    {
+      "ocm_id": 264394,
+      "title": "Galle EV Point",
+      "address_lines": [
+        "Southern Expy Access Rd, Walahanduwa, Sri Lanka",
+        "Galle",
+        "Southern Province",
+        "Sri Lanka"
+      ],
+      "phone": "0767604103",
+      "number_of_points": 1,
+      "usage": "Public - Membership Required",
+      "status": "Operational",
+      "latitude": 6.051663709744403,
+      "longitude": 80.25802011710846,
+      "operator": "EV Point Moldova",
+      "general_info": "50kW multi standard Veefil DC Fast Charger CCS1 and CHAdeMO",
+      "data_quality_score": 70,
+      "not_recently_verified": true,
+      "equipment": [
+        {
+          "connector": "CHAdeMO",
+          "quantity": 1,
+          "status": "Operational",
+          "power_kw": 50.0,
+          "voltage_v": 400.0,
+          "current_a": 125.0,
+          "supply": "DC"
+        }
+      ],
+      "source_url": "https://openchargemap.io/poi/details/264394"
+    },
+    {
+      "ocm_id": 266281,
+      "title": "Modern Technology Lanka",
+      "address_lines": [
+        "299b Morris Rd",
+        "Galle",
+        "Southern Province",
+        "80000",
+        "Sri Lanka"
+      ],
+      "phone": "0771480884",
+      "number_of_points": 1,
+      "usage": "Public - Membership Required",
+      "status": "Operational",
+      "latitude": 6.069315662243753,
+      "longitude": 80.23406323762545,
+      "operator": "chargeNET (lk)",
+      "general_info": null,
+      "data_quality_score": 70,
+      "not_recently_verified": true,
+      "equipment": [
+        {
+          "connector": "Type 1 (J1772)",
+          "quantity": 1,
+          "status": "Operational",
+          "power_kw": 6.6,
+          "voltage_v": 220.0,
+          "current_a": 30.0,
+          "supply": "AC (Single-Phase)"
+        }
+      ],
+      "source_url": "https://openchargemap.io/poi/details/266281"
+    },
+    {
+      "ocm_id": 460066,
+      "title": "Keells",
+      "address_lines": [
+        "A10",
+        "Puttalam",
+        "Sri Lanka"
+      ],
+      "phone": null,
+      "number_of_points": 1,
+      "usage": "Public",
+      "status": "Operational",
+      "latitude": 8.028023445356112,
+      "longitude": 79.83711927207196,
+      "operator": "Volta Charging",
+      "general_info": null,
+      "data_quality_score": 70,
+      "not_recently_verified": true,
+      "equipment": [
+        {
+          "connector": "CHAdeMO",
+          "quantity": 1,
+          "status": "Operational",
+          "power_kw": 30.0,
+          "voltage_v": null,
+          "current_a": null,
+          "supply": null
+        }
+      ],
+      "source_url": "https://openchargemap.io/poi/details/460066"
+    },
+    {
+      "ocm_id": 460586,
+      "title": "Sooriya Wessagiri Resort",
+      "address_lines": [
+        "Kurunegala Road",
+        "Anuradhapura",
+        "Nort Central Province",
+        "Sri Lanka"
+      ],
+      "phone": null,
+      "number_of_points": 1,
+      "usage": "Public",
+      "status": "Operational",
+      "latitude": 8.32431510662309,
+      "longitude": 80.3851166220361,
+      "operator": "(Unknown Operator)",
+      "general_info": null,
+      "data_quality_score": 70,
+      "not_recently_verified": true,
+      "equipment": [
+        {
+          "connector": "Type 2 (Socket Only)",
+          "quantity": 1,
+          "status": "Operational",
+          "power_kw": 22.0,
+          "voltage_v": 400.0,
+          "current_a": 32.0,
+          "supply": "AC (Three-Phase)"
+        }
+      ],
+      "source_url": "https://openchargemap.io/poi/details/460586"
+    },
+    {
+      "ocm_id": 469431,
+      "title": "Sakalya Lake View",
+      "address_lines": [
+        "Sandungama Road",
+        "Tissamaharama",
+        "Southren",
+        "Sri Lanka"
+      ],
+      "phone": "0472239021",
+      "number_of_points": 1,
+      "usage": "Public - Pay At Location",
+      "status": "Operational",
+      "latitude": 6.2893443996299965,
+      "longitude": 81.27585759960607,
+      "operator": "(Unknown Operator)",
+      "general_info": null,
+      "data_quality_score": 70,
+      "not_recently_verified": true,
+      "equipment": [
+        {
+          "connector": "Type 2 (Socket Only)",
+          "quantity": 1,
+          "status": "Operational",
+          "power_kw": 7.0,
+          "voltage_v": null,
+          "current_a": null,
+          "supply": "AC (Single-Phase)"
+        },
+        {
+          "connector": "CHAdeMO",
+          "quantity": 1,
+          "status": "Operational",
+          "power_kw": 7.0,
+          "voltage_v": null,
+          "current_a": null,
+          "supply": "AC (Single-Phase)"
+        },
+        {
+          "connector": "Type 1 (J1772)",
+          "quantity": 1,
+          "status": "Operational",
+          "power_kw": 7.0,
+          "voltage_v": null,
+          "current_a": null,
+          "supply": "AC (Single-Phase)"
+        }
+      ],
+      "source_url": "https://openchargemap.io/poi/details/469431"
+    },
+    {
+      "ocm_id": 469432,
+      "title": "Sakalya Lake View",
+      "address_lines": [
+        "Sandungama Road",
+        "Tissamaharama",
+        "Southren",
+        "Sri Lanka"
+      ],
+      "phone": "0773481988",
+      "number_of_points": 3,
+      "usage": "Public - Pay At Location",
+      "status": "Operational",
+      "latitude": 6.289627510534132,
+      "longitude": 81.27550361151134,
+      "operator": "(Unknown Operator)",
+      "general_info": null,
+      "data_quality_score": 70,
+      "not_recently_verified": true,
+      "equipment": [
+        {
+          "connector": "Type 2 (Socket Only)",
+          "quantity": 1,
+          "status": "Operational",
+          "power_kw": 7.0,
+          "voltage_v": 230.0,
+          "current_a": 30.0,
+          "supply": "AC (Single-Phase)"
+        },
+        {
+          "connector": "CHAdeMO",
+          "quantity": 1,
+          "status": "Operational",
+          "power_kw": 7.0,
+          "voltage_v": 230.0,
+          "current_a": 30.0,
+          "supply": "AC (Single-Phase)"
+        },
+        {
+          "connector": "Type 1 (J1772)",
+          "quantity": 1,
+          "status": "Operational",
+          "power_kw": 7.0,
+          "voltage_v": 230.0,
+          "current_a": 30.0,
+          "supply": "AC (Single-Phase)"
+        }
+      ],
+      "source_url": "https://openchargemap.io/poi/details/469432"
+    },
+    {
+      "ocm_id": 472593,
+      "title": "EVO EV Charing Station - Matara",
+      "address_lines": [
+        "20/A/1, Servatius Rd",
+        "Matara",
+        "Southern",
+        "81000",
+        "Sri Lanka"
+      ],
+      "phone": "0768766088",
+      "number_of_points": 2,
+      "usage": "Public",
+      "status": "Operational",
+      "latitude": 5.944479570429479,
+      "longitude": 80.55141741530588,
+      "operator": "(Unknown Operator)",
+      "general_info": "Install EVO Charge App",
+      "data_quality_score": 70,
+      "not_recently_verified": true,
+      "equipment": [
+        {
+          "connector": "CHAdeMO",
+          "quantity": 2,
+          "status": "Operational",
+          "power_kw": 40.0,
+          "voltage_v": null,
+          "current_a": null,
+          "supply": "DC"
+        },
+        {
+          "connector": "Type 2 (Socket Only)",
+          "quantity": 1,
+          "status": "Operational",
+          "power_kw": 22.0,
+          "voltage_v": null,
+          "current_a": null,
+          "supply": "AC (Three-Phase)"
+        },
+        {
+          "connector": "Type 1 (J1772)",
+          "quantity": 1,
+          "status": "Operational",
+          "power_kw": 22.0,
+          "voltage_v": null,
+          "current_a": null,
+          "supply": "AC (Three-Phase)"
+        }
+      ],
+      "source_url": "https://openchargemap.io/poi/details/472593"
+    },
+    {
+      "ocm_id": 474960,
+      "title": "EVO Charge Mirigama",
+      "address_lines": [
+        "94/4",
+        "Indiparape",
+        "Mirigama",
+        "Gampaha",
+        "11200",
+        "Sri Lanka"
+      ],
+      "phone": "0718187989",
+      "number_of_points": 2,
+      "usage": "Public - Membership Required",
+      "status": "Operational",
+      "latitude": 7.217190119415733,
+      "longitude": 80.1129166277874,
+      "operator": "(Unknown Operator)",
+      "general_info": null,
+      "data_quality_score": 70,
+      "not_recently_verified": true,
+      "equipment": [
+        {
+          "connector": "Unknown",
+          "quantity": 2,
+          "status": "Operational",
+          "power_kw": 60.0,
+          "voltage_v": null,
+          "current_a": null,
+          "supply": "DC"
+        }
+      ],
+      "source_url": "https://openchargemap.io/poi/details/474960"
+    },
+    {
+      "ocm_id": 480695,
+      "title": "Hikka PlugZone",
+      "address_lines": [
+        "Pinkanda",
+        "Dodanduwa",
+        "Hikkaduwa",
+        "Southern",
+        "80240",
+        "Sri Lanka"
+      ],
+      "phone": "0710469730",
+      "number_of_points": 1,
+      "usage": "Public",
+      "status": "Operational",
+      "latitude": 6.129526568059632,
+      "longitude": 80.1328835032441,
+      "operator": "(Business Owner at Location)",
+      "general_info": "It has CCS2 Connector with 30KW DC Fast charging capability.",
+      "data_quality_score": 80,
+      "not_recently_verified": false,
+      "equipment": [
+        {
+          "connector": "Unknown",
+          "quantity": 1,
+          "status": "Operational",
+          "power_kw": 30.0,
+          "voltage_v": 400.0,
+          "current_a": 60.0,
+          "supply": "DC"
+        }
+      ],
+      "source_url": "https://openchargemap.io/poi/details/480695"
+    },
+    {
+      "ocm_id": 487590,
+      "title": "Al-Manar Road",
+      "address_lines": [
+        "Al-Manar Road",
+        "Maruthamunai",
+        "Periyaneelavanai",
+        "Eastern Province",
+        "32314",
+        "Sri Lanka"
+      ],
+      "phone": null,
+      "number_of_points": 10,
+      "usage": "Public",
+      "status": "Planned For Future Date",
+      "latitude": 7.436541894669972,
+      "longitude": 81.81362955937902,
+      "operator": "(Business Owner at Location)",
+      "general_info": null,
+      "data_quality_score": 70,
+      "not_recently_verified": false,
+      "equipment": [
+        {
+          "connector": "CCS (Type 2)",
+          "quantity": 12,
+          "status": "Operational",
+          "power_kw": 500.0,
+          "voltage_v": 500.0,
+          "current_a": 45.0,
+          "supply": "AC (Single-Phase)"
+        }
+      ],
+      "source_url": "https://openchargemap.io/poi/details/487590"
+    },
+    {
+      "ocm_id": 492048,
+      "title": "Sigiri EV Plug Share Ahangama",
+      "address_lines": [
+        "Public Market Complex",
+        "Galle Matara Road",
+        "Ahangama",
+        "Southern",
+        "80650",
+        "Sri Lanka"
+      ],
+      "phone": "0777900060",
+      "number_of_points": 1,
+      "usage": "Public",
+      "status": "Operational",
+      "latitude": 5.973221073246165,
+      "longitude": 80.36180725471195,
+      "operator": "(Unknown Operator)",
+      "general_info": "Pay online",
+      "data_quality_score": 70,
+      "not_recently_verified": false,
+      "equipment": [
+        {
+          "connector": "Unknown",
+          "quantity": 1,
+          "status": "Operational",
+          "power_kw": 3.0,
+          "voltage_v": 230.0,
+          "current_a": 13.0,
+          "supply": "AC (Single-Phase)"
+        }
+      ],
+      "source_url": "https://openchargemap.io/poi/details/492048"
+    },
+    {
+      "ocm_id": 498475,
+      "title": "Runaliya Resort",
+      "address_lines": [
+        "No.288/A",
+        "Yodha Ela Road",
+        "Abhayawewa",
+        "North Central Province",
+        "50000",
+        "Sri Lanka"
+      ],
+      "phone": "0767507462",
+      "number_of_points": 1,
+      "usage": "Public",
+      "status": "Operational",
+      "latitude": 8.361413312758202,
+      "longitude": 80.37598543841636,
+      "operator": "(Unknown Operator)",
+      "general_info": null,
+      "data_quality_score": 70,
+      "not_recently_verified": false,
+      "equipment": [
+        {
+          "connector": "CCS (Type 2)",
+          "quantity": 1,
+          "status": "Operational",
+          "power_kw": 7.0,
+          "voltage_v": null,
+          "current_a": null,
+          "supply": "AC (Three-Phase)"
+        }
+      ],
+      "source_url": "https://openchargemap.io/poi/details/498475"
+    },
+    {
+      "ocm_id": 509581,
+      "title": "Sasa EV Charging Station",
+      "address_lines": [
+        "1/1/20, Walawwatta",
+        "Andiambalama",
+        "Kovinna",
+        "Western",
+        "11450",
+        "Sri Lanka"
+      ],
+      "phone": "0773691421",
+      "number_of_points": 1,
+      "usage": "Public - Membership Required",
+      "status": "Operational",
+      "latitude": 7.1822992,
+      "longitude": 79.9000575,
+      "operator": "(Unknown Operator)",
+      "general_info": null,
+      "data_quality_score": 70,
+      "not_recently_verified": false,
+      "equipment": [
+        {
+          "connector": "Unknown",
+          "quantity": 1,
+          "status": "Operational",
+          "power_kw": 40.0,
+          "voltage_v": null,
+          "current_a": null,
+          "supply": "DC"
+        }
+      ],
+      "source_url": "https://openchargemap.io/poi/details/509581"
+    }
+  ]
+}

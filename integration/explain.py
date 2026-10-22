@@ -82,7 +82,7 @@ def template_explanation(result: dict[str, Any], question: str | None = None) ->
             lines.append(warning)
         lines.append(
             "Queue, waiting time and congestion were not filled in. "
-            "The Colombo listings do not contain those observations."
+            "The station listings do not contain those observations."
         )
         return "\n".join(lines)
 
@@ -127,7 +127,8 @@ def template_explanation(result: dict[str, Any], question: str | None = None) ->
     lines.append(result.get("ranking_summary") or "The ranking explanation is attached to each station.")
     lines.append(
         "Road distances come from the routing provider and are not live traffic. "
-        "Component 1 was trained on synthetic station data and was not applied to these four Colombo listings."
+        "Queue, waiting time and congestion use the synthetic town model named on the station when one is attached. "
+        "They are not a count taken at the charger."
     )
     return "\n\n".join(lines)
 

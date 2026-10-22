@@ -1,23 +1,42 @@
+/// A named point a trip can start or end at.
+class Place {
+  const Place(this.name, this.latitude, this.longitude, {this.isCurrentLocation = false});
+
+  final String name;
+  final double latitude;
+  final double longitude;
+  final bool isCurrentLocation;
+
+  Map<String, dynamic> toJson() => {'name': name, 'latitude': latitude, 'longitude': longitude};
+
+  static Place? fromJson(Object? raw) {
+    if (raw is! Map || raw['latitude'] is! num || raw['longitude'] is! num) return null;
+    return Place(
+      raw['name']?.toString() ?? 'Saved place',
+      (raw['latitude'] as num).toDouble(),
+      (raw['longitude'] as num).toDouble(),
+    );
+  }
+
+  @override
+  bool operator ==(Object other) =>
+      other is Place && other.name == name && other.latitude == latitude && other.longitude == longitude;
+
+  @override
+  int get hashCode => Object.hash(name, latitude, longitude);
+}
+
 class RouteLeg {
-  RouteLeg({
-    required this.distanceKm,
-    required this.durationMin,
-    required this.provider,
-    required this.geometry,
-  });
+  RouteLeg({required this.distanceKm, required this.durationMin});
 
   final double distanceKm;
   final double durationMin;
-  final String provider;
-  final List<List<double>> geometry;
 
   static RouteLeg? fromJson(Object? raw) {
-    if (raw is! Map) return null;
+    if (raw is! Map || raw['distance_km'] is! num || raw['duration_min'] is! num) return null;
     return RouteLeg(
       distanceKm: (raw['distance_km'] as num).toDouble(),
       durationMin: (raw['duration_min'] as num).toDouble(),
-      provider: raw['provider']?.toString() ?? '',
-      geometry: _points(raw['geometry']),
     );
   }
 }
@@ -28,30 +47,32 @@ class StationListing {
     required this.name,
     required this.address,
     required this.area,
+    required this.operator,
     required this.latitude,
     required this.longitude,
     required this.connectors,
     required this.powerKw,
     required this.tariffRaw,
-    required this.tariffStatus,
-    required this.availability,
     required this.sourceUrl,
-    required this.sourceNote,
+    this.nearColombo,
+    this.points,
+    this.city = '',
   });
 
   final String id;
   final String name;
   final String address;
   final String area;
+  final String operator;
   final double latitude;
   final double longitude;
   final List<String> connectors;
   final double? powerKw;
   final String? tariffRaw;
-  final String tariffStatus;
-  final String availability;
   final String? sourceUrl;
-  final String? sourceNote;
+  final bool? nearColombo;
+  final int? points;
+  final String city;
 
   factory StationListing.fromJson(Map<String, dynamic> json) {
     return StationListing(
@@ -59,22 +80,27 @@ class StationListing {
       name: json['station_name'] as String? ?? '',
       address: json['address'] as String? ?? '',
       area: json['area'] as String? ?? '',
+      operator: json['operator'] as String? ?? '',
       latitude: (json['latitude'] as num).toDouble(),
       longitude: (json['longitude'] as num).toDouble(),
       connectors: ((json['connector_types_listed'] as List?) ?? const []).map((e) => e.toString()).toList(),
       powerKw: (json['max_power_kw_listed'] as num?)?.toDouble(),
       tariffRaw: json['tariff_raw'] as String?,
-      tariffStatus: json['tariff_status'] as String? ?? 'missing',
-      availability: json['availability_status'] as String? ?? 'unknown',
       sourceUrl: json['source_url'] as String?,
-      sourceNote: json['source_note'] as String?,
+      nearColombo: json['in_greater_colombo'] as bool?,
+      points: (json['number_of_points'] as num?)?.toInt(),
+      city: json['city'] as String? ?? '',
     );
   }
 }
 
+/// One station in a recommendation response, read from the API's structured fields.
 class RankedStation {
   RankedStation(this.json);
   final Map<String, dynamic> json;
+
+  Map<String, dynamic> get _plan => Map<String, dynamic>.from((json['trip_plan'] as Map?) ?? const {});
+  Map<String, dynamic> get _battery => Map<String, dynamic>.from((json['battery'] as Map?) ?? const {});
 
   String get id => json['station_id'] as String;
   String get name => json['station_name'] as String? ?? '';
@@ -84,26 +110,51 @@ class RankedStation {
   double get longitude => (json['longitude'] as num).toDouble();
   int? get rank => json['rank'] as int?;
   bool get included => json['included_in_ranking'] == true;
-  String? get exclusion => json['exclusion_reason'] as String?;
-  String get availability => json['availability_status'] as String? ?? 'unknown';
+  bool? get connectorCompatible => json['connector_compatible'] as bool?;
   List<String> get connectors =>
       ((json['connector_types_listed'] as List?) ?? const []).map((e) => e.toString()).toList();
-  double? get powerKw => (json['max_power_kw_listed'] as num?)?.toDouble();
+  /// Listed kW of the driver's plug at this station, falling back to the station maximum.
+  double? get powerKw => ((json['charging_power_kw'] ?? json['max_power_kw_listed']) as num?)?.toDouble();
   String? get tariffRaw => json['tariff_raw'] as String?;
-  String get tariffStatus => json['tariff_status'] as String? ?? 'missing';
+  String? get sourceUrl => json['source_url'] as String?;
+  String? get exclusionReason => json['exclusion_reason'] as String?;
   RouteLeg? get toStation => RouteLeg.fromJson(json['origin_to_station']);
   RouteLeg? get onward => RouteLeg.fromJson(json['station_to_destination']);
   double? get detourKm => (json['detour_distance_km'] as num?)?.toDouble();
   double? get detourMin => (json['detour_duration_min'] as num?)?.toDouble();
-  String get batteryStatus => (json['battery'] as Map?)?['status']?.toString() ?? 'unknown';
-  double? get energyToReachKwh => ((json['battery'] as Map?)?['estimated_energy_kwh'] as num?)?.toDouble();
+  String get batteryStatus => _battery['status']?.toString() ?? 'unknown';
   double? get chargeMinutes => (json['listed_power_duration_min'] as num?)?.toDouble();
-  double? get scenarioCostLkr => (json['scenario_cost_lkr'] as num?)?.toDouble();
-  String? get plainSummary => json['plain_summary'] as String?;
-  String? get sourceUrl => json['source_url'] as String?;
-  String? get sourceNote => json['source_note'] as String?;
-  String get queueStatus => (json['queue_prediction'] as Map?)?['status']?.toString() ?? 'unavailable';
-  String? get queueReason => (json['queue_prediction'] as Map?)?['reason'] as String?;
+  double? get costLkr => (json['scenario_cost_lkr'] as num?)?.toDouble();
+
+  Map<String, dynamic> get _queue => Map<String, dynamic>.from((json['queue_prediction'] as Map?) ?? const {});
+  bool get hasQueueEstimate => _queue['status'] == 'area_model';
+
+  Map<String, dynamic> get _timeline => Map<String, dynamic>.from((json['timeline'] as Map?) ?? const {});
+
+  /// Clock time charging should finish: drive there, predicted wait, then charging at listed power.
+  String? get chargingDoneAt => _timeline['charging_complete_time'] as String?;
+  String? get destinationAt => _timeline['arrive_destination_time'] as String?;
+  int? get queueVehicles => (_queue['predicted_queue_length'] as num?)?.round();
+  double? get waitingMinutes => (_queue['predicted_waiting_time_min'] as num?)?.toDouble();
+  String? get congestion => _queue['predicted_congestion_level'] as String?;
+  String? get queueNote => _queue['reason'] as String?;
+
+  double? get arrivalPercent => (_plan['arrival_soc_percent'] as num?)?.toDouble();
+  double? get minimumTargetPercent => (_plan['minimum_target_soc_percent'] as num?)?.toDouble();
+  bool get fullChargeNotEnough => _plan['full_charge_insufficient'] == true;
+  double? get chargeKwh => (_plan['charging_energy_kwh'] as num?)?.toDouble();
+  double? get destinationPercent => (_plan['soc_at_destination_percent'] as num?)?.toDouble();
+  bool? get reachesDestination => _plan['reaches_destination_with_reserve'] as bool?;
+
+  /// Factor name -> score from 0 (worst) to 1 (best) among the stations that were compared.
+  Map<String, double> get factorScores {
+    final rows = (json['factor_contributions'] as List?) ?? const [];
+    return {
+      for (final row in rows.whereType<Map>())
+        if (row['factor'] != null && row['factor_score'] is num)
+          row['factor'].toString(): (row['factor_score'] as num).toDouble(),
+    };
+  }
 }
 
 class TripResult {
@@ -128,28 +179,65 @@ class TripResult {
   }
 
   RouteLeg? get direct => RouteLeg.fromJson(json['direct_route']);
-  List<List<double>> get recommendedGeometry => _points((json['recommended_route'] as Map?)?['geometry']);
-  String? get recommendedRouteNote => (json['recommended_route'] as Map?)?['note'] as String?;
-  List<String> get warnings => ((json['warnings'] as List?) ?? const []).map((e) => e.toString()).toList();
-  List<String> get quickAnswer => ((json['quick_answer'] as List?) ?? const []).map((e) => e.toString()).toList();
-  String? get explanation => (json['explanation'] as Map?)?['text'] as String?;
-  bool get liveAvailability => json['live_availability'] == true;
-  Map<String, dynamic>? get energyAndCost {
-    final raw = json['energy_and_cost'];
-    if (raw is! Map) return null;
-    return Map<String, dynamic>.from(raw);
+
+  ChargingPlan? get plan {
+    final raw = json['charging_plan'];
+    return raw is Map ? ChargingPlan(Map<String, dynamic>.from(raw)) : null;
   }
 
-  bool get energyModelApplied => energyAndCost?['energy_model_applied'] == true;
-  String? get tripEnergyMethod => energyAndCost?['trip_energy_method'] as String?;
-  String? get energyModelReason => energyAndCost?['energy_model_reason'] as String?;
+  /// Plain-language comparison with simple station-choice rules.
+  String? get strategySummary => (json['strategy_comparison'] as Map?)?['summary'] as String?;
+  List<List<double>> get routeGeometry => _points((json['recommended_route'] as Map?)?['geometry']);
+
+  Map<String, dynamic> get _tripCheck => Map<String, dynamic>.from((json['trip_check'] as Map?) ?? const {});
+  bool get canFinishWithoutCharging => _tripCheck['can_finish_without_charging'] == true;
+  double? get destinationPercentWithoutCharging =>
+      (_tripCheck['soc_at_destination_without_charging_percent'] as num?)?.toDouble();
+}
+
+/// The least-time charging plan from the route optimiser: zero, one or several stops.
+class ChargingPlan {
+  ChargingPlan(this.json);
+  final Map<String, dynamic> json;
+
+  String get status => json['status'] as String? ?? 'infeasible';
+  String get explanation => json['explanation'] as String? ?? '';
+  double? get arrivalPercent => (json['arrival_soc_at_destination_percent'] as num?)?.toDouble();
+  double? get maxChargePercent => (json['max_charge_soc_percent'] as num?)?.toDouble();
+  Map<String, dynamic> get _totals => Map<String, dynamic>.from((json['totals'] as Map?) ?? const {});
+  double? get totalMinutes => (_totals['total_min'] as num?)?.toDouble();
+  double? get chargingMinutes => (_totals['charging_min'] as num?)?.toDouble();
+  double? get drivingMinutes => (_totals['drive_min'] as num?)?.toDouble();
+
+  List<PlanStop> get stops {
+    final raw = json['stops'];
+    if (raw is! List) return const [];
+    return raw.whereType<Map>().map((item) => PlanStop(Map<String, dynamic>.from(item))).toList();
+  }
+}
+
+class PlanStop {
+  PlanStop(this.json);
+  final Map<String, dynamic> json;
+
+  String get id => json['station_id'] as String;
+  String get name => json['station_name'] as String? ?? '';
+  String get area => json['area'] as String? ?? '';
+  double get latitude => (json['latitude'] as num).toDouble();
+  double get longitude => (json['longitude'] as num).toDouble();
+  double? get arrivalPercent => (json['arrival_soc_percent'] as num?)?.toDouble();
+  double? get departurePercent => (json['departure_soc_percent'] as num?)?.toDouble();
+  double? get chargingMinutes => (json['charging_min'] as num?)?.toDouble();
+  double? get powerKw => (json['charging_power_kw'] as num?)?.toDouble();
+  double? get driveKm => (json['drive_km_from_previous'] as num?)?.toDouble();
+  double? get driveMinutes => (json['drive_min_from_previous'] as num?)?.toDouble();
 }
 
 List<List<double>> _points(Object? raw) {
   if (raw is! List) return const [];
   final points = <List<double>>[];
   for (final item in raw) {
-    if (item is List && item.length >= 2) {
+    if (item is List && item.length >= 2 && item[0] is num && item[1] is num) {
       points.add([(item[0] as num).toDouble(), (item[1] as num).toDouble()]);
     }
   }
@@ -159,63 +247,123 @@ List<List<double>> _points(Object? raw) {
 class SavedTrip {
   SavedTrip({
     required this.when,
-    required this.originName,
-    required this.destinationName,
-    required this.stationId,
+    required this.origin,
+    required this.destination,
     required this.stationName,
     required this.summary,
   });
 
-  final String when;
-  final String originName;
-  final String destinationName;
-  final String? stationId;
+  final DateTime when;
+  final Place origin;
+  final Place destination;
   final String? stationName;
   final String summary;
 
   Map<String, dynamic> toJson() => {
-        'when': when,
-        'origin_name': originName,
-        'destination_name': destinationName,
-        'station_id': stationId,
+        'when': when.toIso8601String(),
+        'origin': origin.toJson(),
+        'destination': destination.toJson(),
+        'origin_name': origin.name,
+        'destination_name': destination.name,
         'station_name': stationName,
         'summary': summary,
       };
 
-  factory SavedTrip.fromJson(Map<String, dynamic> json) {
+  /// Older saves (and cloud rows) only kept place names; they are matched back to the preset list.
+  factory SavedTrip.fromJson(Map<String, dynamic> json, Place? Function(String name) lookup) {
+    final originName = json['origin_name'] as String? ?? '';
+    final destinationName = json['destination_name'] as String? ?? '';
     return SavedTrip(
-      when: json['when'] as String? ?? '',
-      originName: json['origin_name'] as String? ?? '',
-      destinationName: json['destination_name'] as String? ?? '',
-      stationId: json['station_id'] as String?,
+      when: DateTime.tryParse(json['when'] as String? ?? json['created_at'] as String? ?? '')?.toLocal() ??
+          DateTime.now(),
+      origin: Place.fromJson(json['origin']) ?? lookup(originName) ?? Place(originName, 0, 0),
+      destination: Place.fromJson(json['destination']) ?? lookup(destinationName) ?? Place(destinationName, 0, 0),
       stationName: json['station_name'] as String?,
       summary: json['summary'] as String? ?? '',
     );
   }
+
+  bool get canReplan => origin.latitude != 0 && destination.latitude != 0;
 }
 
 class DriverProfile {
   DriverProfile({
+    this.carName = 'Nissan Leaf (40 kWh)',
+    this.batteryKwh = 39,
+    this.consumption = 16,
+    this.plug = 'CHAdeMO',
     this.reservePercent = 10,
-    this.scenarioTariffLkr,
-    this.chargingEfficiency,
+    this.tariffLkr,
+    this.chargingLossPercent,
   });
 
+  String carName;
+  double batteryKwh;
+  double consumption;
+  String plug;
   double reservePercent;
-  double? scenarioTariffLkr;
-  double? chargingEfficiency;
+  double? tariffLkr;
+  double? chargingLossPercent;
+
+  /// The API takes efficiency (0-1); people think in "% lost while charging".
+  double? get chargingEfficiency => chargingLossPercent == null ? null : 1 - chargingLossPercent! / 100;
+
+  DriverProfile copyWith({
+    String? carName,
+    double? batteryKwh,
+    double? consumption,
+    String? plug,
+    double? reservePercent,
+    double? Function()? tariffLkr,
+    double? Function()? chargingLossPercent,
+  }) {
+    return DriverProfile(
+      carName: carName ?? this.carName,
+      batteryKwh: batteryKwh ?? this.batteryKwh,
+      consumption: consumption ?? this.consumption,
+      plug: plug ?? this.plug,
+      reservePercent: reservePercent ?? this.reservePercent,
+      tariffLkr: tariffLkr != null ? tariffLkr() : this.tariffLkr,
+      chargingLossPercent: chargingLossPercent != null ? chargingLossPercent() : this.chargingLossPercent,
+    );
+  }
 
   Map<String, dynamic> toJson() => {
+        'car_name': carName,
+        'battery_kwh': batteryKwh,
+        'consumption_kwh_per_100km': consumption,
+        'plug': plug,
+        ...toCloudJson(),
+      };
+
+  /// Only the columns that exist in supabase/schema.sql.
+  Map<String, dynamic> toCloudJson() => {
         'reserve_percent': reservePercent,
-        'scenario_tariff_lkr': scenarioTariffLkr,
+        'scenario_tariff_lkr': tariffLkr,
         'charging_efficiency': chargingEfficiency,
       };
 
   factory DriverProfile.fromJson(Map<String, dynamic> json) {
+    final efficiency = (json['charging_efficiency'] as num?)?.toDouble();
+    final base = DriverProfile();
     return DriverProfile(
-      reservePercent: (json['reserve_percent'] as num?)?.toDouble() ?? 10,
-      scenarioTariffLkr: (json['scenario_tariff_lkr'] as num?)?.toDouble(),
-      chargingEfficiency: (json['charging_efficiency'] as num?)?.toDouble(),
+      carName: json['car_name'] as String? ?? base.carName,
+      batteryKwh: (json['battery_kwh'] as num?)?.toDouble() ?? base.batteryKwh,
+      consumption: (json['consumption_kwh_per_100km'] as num?)?.toDouble() ?? base.consumption,
+      plug: json['plug'] as String? ?? base.plug,
+      reservePercent: (json['reserve_percent'] as num?)?.toDouble() ?? base.reservePercent,
+      tariffLkr: (json['scenario_tariff_lkr'] as num?)?.toDouble(),
+      chargingLossPercent: efficiency == null ? null : ((1 - efficiency) * 100).roundToDouble(),
+    );
+  }
+
+  /// Applies the cloud columns on top of a locally saved profile.
+  DriverProfile withCloud(Map<String, dynamic> row) {
+    final cloud = DriverProfile.fromJson(row);
+    return copyWith(
+      reservePercent: cloud.reservePercent,
+      tariffLkr: () => cloud.tariffLkr,
+      chargingLossPercent: () => cloud.chargingLossPercent,
     );
   }
 }

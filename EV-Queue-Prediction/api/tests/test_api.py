@@ -76,25 +76,27 @@ def test_models_catalog(client):
         assert m["evaluation_metrics"] is not None
 
 
-def test_predict_queue_success(client):
-    r = client.post(
-        "/api/v1/predict/queue",
-        json={
-            "station_id": "ST01",
-            "current_queue_length": 3,
-            "timestamp": "2025-04-13T00:00:00",
-        },
-    )
+def test_predict_queue_success(client, station_payload):
+    # The selected queue model is an ML pipeline, so it needs the full feature row.
+    r = client.post("/api/v1/predict/queue", json=station_payload)
     assert r.status_code == 200, r.text
     body = r.json()
-    assert body["station_id"] == "ST01"
+    assert body["station_id"] == station_payload["station_id"]
     assert body["forecast_horizon_minutes"] == 30
     assert body["prediction_timestamp"] is not None
     assert body["forecast_timestamp"] is not None
-    assert body["predicted_queue_length"] == 3
-    assert body["raw_prediction"] == 3.0
     assert isinstance(body["predicted_queue_length"], int)
     assert body["predicted_queue_length"] >= 0
+    assert body["predicted_queue_length"] == max(0, round(body["raw_prediction"]))
+
+
+def test_predict_queue_without_features_is_rejected(client):
+    r = client.post(
+        "/api/v1/predict/queue",
+        json={"station_id": "ST01", "current_queue_length": 3, "timestamp": "2025-04-13T00:00:00"},
+    )
+    assert r.status_code == 422
+    assert "Missing required features" in r.text
 
 
 def test_predict_waiting_time_success(client, station_payload):

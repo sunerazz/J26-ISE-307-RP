@@ -9,7 +9,7 @@
 - Name: `target_queue_length_30min`
 - Definition: `current_queue_length` at the **same** `station_id` exactly **30 minutes** after the prediction timestamp.
 - Construction: exact timestamp match (`t + 30 min`).
-- Unmatched rows dropped (never filled with 0): **12**.
+- Unmatched rows dropped (never filled with 0): **10**.
 - Current queue is **not** used as the future target.
 
 ## Selected features (known at prediction time)
@@ -87,12 +87,12 @@
   "overlap_train_val": [],
   "overlap_train_test": [],
   "overlap_val_test": [],
-  "dropped_no_target": 12,
-  "dropped_lag_warmup": 24,
-  "unmatched_target_rows": 12,
-  "n_train_rows": 48360,
-  "n_val_rows": 10368,
-  "n_test_rows": 10344,
+  "dropped_no_target": 10,
+  "dropped_lag_warmup": 20,
+  "unmatched_target_rows": 10,
+  "n_train_rows": 40300,
+  "n_val_rows": 8640,
+  "n_test_rows": 8620,
   "feature_columns": [
     "is_weekend",
     "hour",

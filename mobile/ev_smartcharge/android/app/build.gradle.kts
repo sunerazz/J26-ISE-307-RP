@@ -31,9 +31,12 @@ android {
 
     buildTypes {
         release {
-            // TODO: Add your own signing config for the release build.
             // Signing with the debug keys for now, so `flutter run --release` works.
             signingConfig = signingConfigs.getByName("debug")
+            // Flutter turns on R8 shrinking. It removed SharedPreferencesApiRegistrar.getAll,
+            // so Supabase crashed on the phone. Keep the plugin methods.
+            isMinifyEnabled = false
+            isShrinkResources = false
         }
     }
 }

@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import sys
+from datetime import datetime, timedelta
+from functools import partial
 from pathlib import Path
 
 import pytest
@@ -13,7 +15,7 @@ sys.path.insert(0, str(ROOT))
 
 from bootstrap import load_component1, load_component2, load_component3, load_component4
 from explain import explanation_matches, template_explanation
-from orchestrate import TripRequest, build_recommendation
+from orchestrate import SRI_LANKA, TripRequest, build_recommendation
 
 VALID = dict(
     origin_latitude=6.9271,
@@ -49,6 +51,8 @@ class FakeRouter:
 def _deps(fail_route=False):
     component4 = load_component4()
     component3 = load_component3()
+    # Ranking tests use the original four Colombo listings as a fixed fixture.
+    component4["load_stations"] = partial(component4["load_stations"], component4["legacy_csv_path"])
     component4["provider"] = FakeRouter(component4["RouteLeg"], component4["RoutingError"], fail=fail_route)
     return {
         "component4": component4,
@@ -59,8 +63,19 @@ def _deps(fail_route=False):
     }
 
 
-def test_four_colombo_stations_load_from_csv():
+def test_inventory_has_ocm_listings_with_live_fields_unknown():
     stations = load_component4()["load_stations"]()
+    by_id = {row["station_id"]: row for row in stations}
+    assert len(stations) == 67
+    assert "TRACE" in by_id["ST001"]["station_name"]
+    assert by_id["ST001"]["tariff_dc_lkr_per_kwh"] == 120
+    assert all(row["waiting_time_min"] is None for row in stations)
+    assert all(row["availability_status"] == "unknown" for row in stations)
+
+
+def test_four_colombo_stations_load_from_csv():
+    component4 = load_component4()
+    stations = component4["load_stations"](component4["legacy_csv_path"])
     by_id = {row["station_id"]: row for row in stations}
     assert list(by_id) == ["ST001", "ST002", "ST003", "ST004"]
     assert "TRACE" in by_id["ST001"]["station_name"]
@@ -74,14 +89,48 @@ def test_four_colombo_stations_load_from_csv():
     assert by_id["ST003"]["tariff_lkr_per_kwh_listed"] == 120
 
 
+def test_area_model_matches_pannipitiya_and_skips_kandy():
+    from area_models import match_trained_area
+
+    near = match_trained_area(
+        {
+            "area": "Pannipitiya",
+            "city": "Colombo",
+            "station_name": "Ceylon Electricity Board - Pannipitiya",
+            "address": "High Level Rd",
+            "latitude": 6.8449,
+            "longitude": 79.9407,
+        }
+    )
+    assert near is not None
+    assert near["station_id"] == "ST04"
+    far = match_trained_area(
+        {
+            "area": "Kandy",
+            "city": "Kandy",
+            "station_name": "Kandy",
+            "address": "Kandy",
+            "latitude": 7.2906,
+            "longitude": 80.6337,
+        }
+    )
+    assert far is None
+
+
 def test_recommendation_uses_mock_routes_and_leaves_queue_unknown():
-    result = build_recommendation(TripRequest(**VALID), _deps(), explain=True)
+    deps = _deps()
+    deps["component1"] = load_component1()
+    result = build_recommendation(TripRequest(**VALID), deps, explain=True)
     assert result["direct_route"]["provider"] == "mock"
     assert result["recommended_route"]["provider"] == "mock"
     assert len(result["recommended_route"]["geometry"]) >= 2
-    assert result["recommended_station"]["station_id"] == "ST001"
-    assert result["recommended_station"]["queue_prediction"]["predicted_waiting_time_min"] is None
-    assert result["recommended_station"]["queue_prediction"]["observed_queue_length"] is None
+    queue = result["recommended_station"]["queue_prediction"]
+    assert queue["status"] == "area_model"
+    assert queue["predicted_queue_length"] is not None
+    assert queue["predicted_waiting_time_min"] is not None
+    assert queue["predicted_congestion_level"] in {"Low", "Medium", "High"}
+    assert queue["observed_queue_length"] is None
+    assert queue["training_data"] == "synthetic"
     assert result["recommended_station"]["availability_status"] == "unknown"
     assert result["energy_and_cost"]["energy_model_loaded"] is True
     assert result["energy_and_cost"]["energy_model_applied"] is False
@@ -144,6 +193,7 @@ def test_explanation_rejects_invented_availability_and_cost():
 def test_duration_model_requires_real_features_and_rejects_colombo():
     component2 = load_component2()
     deps = _deps()
+    deps["component1"] = load_component1()
     deps["component2"] = component2
     columns = component2["feature_columns"]
     temperature = next(column for column in columns if column.startswith("Temperature"))
@@ -175,7 +225,8 @@ def test_duration_model_requires_real_features_and_rejects_colombo():
     assert predicted["charging_duration"]["status"] == "predicted"
     assert predicted["charging_duration"]["predicted_charging_duration_min"] > 0
     assert predicted["charging_duration"]["used_in_ranking"] is False
-    assert predicted["recommended_station"]["queue_prediction"]["predicted_waiting_time_min"] is None
+    assert predicted["recommended_station"]["queue_prediction"]["status"] == "area_model"
+    assert predicted["recommended_station"]["queue_prediction"]["observed_queue_length"] is None
 
 
 def test_component1_models_load_and_synthetic_check_is_labelled():
@@ -198,7 +249,10 @@ def test_api_validation_stations_and_mocked_recommendation():
         assert health.json()["energy_model_loaded"] is True
         stations = client.get("/api/v1/colombo-stations")
         assert stations.status_code == 200
-        assert stations.json()["count"] == 4
+        assert stations.json()["count"] == 67
+        research = client.get("/api/v1/component4/research")
+        assert research.status_code == 200
+        assert research.json()["data_completeness"]["stations_in_inventory"] == 67
         assert stations.json()["stations"][0]["waiting_time_min"] is None
         bad = client.post("/api/v1/recommend", json={**VALID, "origin_latitude": 120})
         assert bad.status_code == 422
@@ -211,7 +265,12 @@ def test_api_validation_stations_and_mocked_recommendation():
         body = ok.json()
         assert body["direct_route"]["provider"] == "mock"
         assert body["live_queue_prediction"] is False
-        assert body["recommended_station"]["queue_prediction"]["status"] == "unavailable"
+        queue = body["recommended_station"]["queue_prediction"]
+        assert queue["observed_queue_length"] is None
+        assert queue["status"] in {"area_model", "unavailable"}
+        assert body["charging_plan"]["status"] == "no_charge_needed"
+        assert [row["strategy"] for row in body["strategy_comparison"]["rows"]][-1] == "optimised_plan"
+        assert body["routing_summary"]["stations_routed"] > 4
         app.state.bundle["component4"]["provider"] = FakeRouter(
             app.state.bundle["component4"]["RouteLeg"],
             app.state.bundle["component4"]["RoutingError"],
@@ -298,3 +357,56 @@ def test_energy_model_replaces_the_flat_rate_only_when_conditions_are_complete()
     assert "soc_end_pct" in used["models"]["energy"]["excluded_as_leakage"]
     ok, reason = explanation_matches(used["explanation"]["text"], used)
     assert ok, reason
+
+
+def test_timeline_adds_drive_wait_and_charge_in_order():
+    from orchestrate import _timeline
+
+    departure = datetime(2026, 10, 22, 9, 0, tzinfo=SRI_LANKA)
+    station = {
+        "included_in_ranking": True,
+        "origin_to_station": {"duration_min": 15.0},
+        "station_to_destination": {"duration_min": 20.0},
+        "queue_prediction": {"status": "area_model", "predicted_waiting_time_min": 10.0},
+        "listed_power_duration_min": 30.0,
+    }
+    timeline = _timeline(station, departure)
+    assert timeline["arrive_at_station_time"].startswith("2026-10-22T09:15")
+    assert timeline["start_charging_time"].startswith("2026-10-22T09:25")
+    assert timeline["charging_complete_time"].startswith("2026-10-22T09:55")
+    assert timeline["arrive_destination_time"].startswith("2026-10-22T10:15")
+    assert timeline["missing"] == []
+    # Without a queue forecast or a target charge level, those parts are named as missing, not set to zero.
+    bare = _timeline({**station, "queue_prediction": {"status": "unavailable"}, "listed_power_duration_min": None}, departure)
+    assert bare["charging_complete_time"] is None
+    assert len(bare["missing"]) == 2
+    assert _timeline({**station, "included_in_ranking": False}, departure) == {"available": False}
+
+
+def test_duration_and_cost_endpoints():
+    from service import app
+
+    with TestClient(app) as client:
+        schema = client.get("/api/v1/duration-schema").json()
+        features = {
+            column: schema["categories"][column][0] if column in schema["categories"] else 30
+            for column in schema["feature_columns"]
+        }
+        ok = client.post("/api/v1/duration/predict", json={"features": features, "charging_start_time": "2026-10-22T14:00"})
+        assert ok.status_code == 200, ok.text
+        body = ok.json()
+        minutes = body["predicted_charging_duration_min"]
+        expected = datetime(2026, 10, 22, 14, 0) + timedelta(minutes=minutes)
+        assert body["expected_completion_time"] == expected.isoformat(timespec="minutes")
+        assert body["test_metrics"]["mae_min"] > 0
+        colombo = client.post(
+            "/api/v1/duration/predict",
+            json={"features": {**features, "Charging Station Location": "Colombo"}},
+        )
+        assert colombo.status_code == 422
+        missing = client.post("/api/v1/duration/predict", json={"features": {}})
+        assert missing.status_code == 422 and "Nothing was guessed" in missing.text
+        cost = client.post("/api/v1/energy/cost", json={"energy_kwh": 9, "tariff_lkr_per_kwh": 100, "charging_efficiency": 0.9})
+        assert cost.status_code == 200
+        assert cost.json()["estimated_total"] == pytest.approx(1000)
+        assert client.get("/api/v1/unknown").status_code == 404

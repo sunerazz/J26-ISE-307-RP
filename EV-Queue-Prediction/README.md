@@ -10,11 +10,11 @@
 | Model 3 — Congestion (+30 min) | Implemented | `python run_congestion_pipeline.py` |
 
 > **Experiment label: SIMULATION-BASED.**  
-> Source CSV: `data/raw/component1_ev_queue_prediction_synthetic.csv`. Results must not be presented as real-world observed behaviour.
+> Source CSV: `data/raw/component1_ev_queue_prediction_sri_lanka.csv`. Station names are Sri Lankan places. The 15-minute queue, wait and congestion values are generated snapshots, not a field log.
 
 ## Dataset support
 
-- Regular **15-minute** station snapshots (6 stations, 2025-01-01 → 2025-04-30).
+- Regular **15-minute** station snapshots (5 stations: Nugegoda LECO, Rajagiriya, Malabe, Pannipitiya, Panadura; 2025-01-01 → 2025-04-30).
 - **Queue:** reconstruct `current_queue_length` at t+30 (CSV pre-computed target matched `queue_after_current_arrivals@t+30` instead).
 - **Waiting time:** reconstruct `estimated_waiting_time_now_min` at t+30 (CSV pre-computed `target_waiting_time_30min_min` matches this at **100%**). Values are **estimated/synthetic** station waits (often capped near 240 min), not measured arrival→charge-start session times.
 - **Congestion:** reconstruct `congestion_level_now` ∈ {Low, Medium, High} at t+30 (CSV pre-computed target matches at **100%**). Labels are **synthetic / rule-derived** (strongly tied to wait/queue), not independently observed real-world congestion audits.

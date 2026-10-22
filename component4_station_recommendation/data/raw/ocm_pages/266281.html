@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>Open Charge Map - Location Details: OCM-266281 Modern Technology Lanka</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" />
+    <meta name="author" content="openchargemap.org" />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="theme-color" content="#1f6f35" />
+
+    <script>
+        // apply the saved or preferred colour scheme before first paint to avoid a flash
+        (function () {
+            var stored = null;
+            try { stored = localStorage.getItem("ocm-theme"); } catch (e) { }
+            var theme = stored === "light" || stored === "dark" ? stored : (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+            document.documentElement.setAttribute("data-bs-theme", theme);
+        })();
+    </script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/v4-shims.min.css">
+    <link href="/css/site.css?v=OUvk4LV9e3sjlnvoFN2O_toAO7amEjk4UExaCOA69IA" rel="stylesheet" />
+
+    <!-- jQuery is loaded before Bootstrap so Bootstrap registers its jQuery plugins ($(..).modal(), .tab() etc.) used by existing pages -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha384-1H217gwSVyLSIfaLxHbE7dRb3v4mYCKbpQvzx0cegeju1MVsGrX5xXxAvs/HgeFs" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+
+    <!--fav and touch icons -->
+    <link rel="shortcut icon" href="/images/AppIcon_36x36.png">
+
+    <!-- Begin Cookie Consent plugin by Silktide - http://silktide.com/cookieconsent -->
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/cookieconsent2/3.0.3/cookieconsent.min.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cookieconsent2/3.0.3/cookieconsent.min.js"></script>
+    <script>
+        window.addEventListener("load", function () {
+            window.cookieconsent.initialise({
+                "palette": {
+                    "popup": {
+                        "background": "#1c2620",
+                        "text": "#f1f5f2"
+                    },
+                    "button": {
+                        "background": "#8ec760",
+                        "text": "#10210a"
+                    }
+                },
+                "theme": "edgeless",
+                "position": "bottom-right",
+                "content": {
+                    "href": "https://openchargemap.org/site/about/terms"
+                }
+            })
+        });
+    </script>
+    <!-- End Cookie Consent plugin -->
+
+    <script>
+        function mapLoaded() {
+            document.getElementById("map-loading").style.display = "none";
+        }
+    </script>
+
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-Z72QN2CCLC"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+
+        gtag('config', 'G-Z72QN2CCLC');
+    </script>
+</head>
+<body class=" d-flex flex-column min-vh-100">
+
+    <a class="visually-hidden-focusable ocm-skip-link" href="#main-content">Skip to content</a>
+
+    <nav class="navbar navbar-expand-lg ocm-navbar sticky-top" aria-label="Main navigation">
+        <div class="container-fluid ocm-navbar-inner">
+            <a class="navbar-brand" href="/">
+                <img src="/images/AppIcon_36x36.png" alt="" width="32" height="32" />
+                <span>Open Charge Map</span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="mainNav">
+                <ul class="navbar-nav me-auto">
+
+                    <li class="nav-item dropdown">
+                        <a href="/poi" class="nav-link dropdown-toggle active" role="button" data-bs-toggle="dropdown" aria-expanded="false"><span data-localize="ocm.navigation.browse.sectionTitle">Browse</span></a>
+                        <div class="dropdown-menu">
+                            <a class="dropdown-item" href="https://map.openchargemap.io"><i class="fa-solid fa-map-location-dot fa-fw me-2" aria-hidden="true"></i><span data-localize="ocm.general.map">Map</span></a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" href="/poi"><i class="fa-solid fa-list fa-fw me-2" aria-hidden="true"></i><span data-localize="ocm.navigation.browse.allLocations">All locations</span></a>
+                            <a class="dropdown-item" href="/country"><i class="fa-solid fa-earth-americas fa-fw me-2" aria-hidden="true"></i><span data-localize="ocm.navigation.browse.byCountry">By country</span></a>
+                        </div>
+                    </li>
+
+                    <li class="nav-item dropdown">
+                        <a href="https://community.openchargemap.org" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">Community</a>
+                        <div class="dropdown-menu">
+                            <a class="dropdown-item" href="https://community.openchargemap.org"><i class="fa-solid fa-comments fa-fw me-2" aria-hidden="true"></i>Discussions</a>
+                            <a class="dropdown-item" href="https://github.com/openchargemap/ocm-system/issues"><i class="fa-brands fa-github fa-fw me-2" aria-hidden="true"></i>GitHub</a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" href="/poi/activity"><i class="fa-solid fa-clock-rotate-left fa-fw me-2" aria-hidden="true"></i><span data-localize="ocm.navigation.browse.recentActivity">Recent activity</span></a>
+                            <a class="dropdown-item" href="/stats"><i class="fa-solid fa-chart-column fa-fw me-2" aria-hidden="true"></i><span data-localize="ocm.navigation.browse.statistics">Statistics</span></a>
+                            <div class="dropdown-divider"></div>
+                            <h6 class="dropdown-header">Awaiting approval</h6>
+                            <a class="dropdown-item" href="/poi?submissionstatustypeid=1" data-localize="ocm.navigation.browse.avaitingReview">New locations awaiting approval</a>
+                            <a class="dropdown-item" href="/poi?submissionstatustypeid=50" data-localize="ocm.navigation.browse.awaitingReviewImported">Imported locations awaiting approval</a>
+                            <a class="dropdown-item" href="/editqueue" data-localize="ocm.navigation.browse.editqueue">Edits awaiting approval</a>
+                        </div>
+                    </li>
+
+                    <li class="nav-item dropdown">
+                        <a href="/about" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false"><span data-localize="ocm.general.about">About</span></a>
+                        <div class="dropdown-menu">
+                            <a class="dropdown-item" href="/about" data-localize="ocm.general.about">About</a>
+                            <a class="dropdown-item" href="/develop#api" data-localize="ocm.navigation.develop.api">API and embedding</a>
+                            <a class="dropdown-item" href="/about/terms" data-localize="ocm.navigation.about.termsPrivacy">Terms &amp; privacy</a>
+                            <a class="dropdown-item" href="/about/guidance" data-localize="ocm.navigation.about.guidance">Guidance for contributors</a>
+                            <a class="dropdown-item" href="/profile/submitocpi">Submit an OCPI data feed</a>
+                            <a class="dropdown-item" href="/about/contact" data-localize="ocm.navigation.about.contact">Contact</a>
+                        </div>
+                    </li>
+
+                </ul>
+
+                <ul class="navbar-nav align-items-lg-center gap-lg-1">
+                    <li class="nav-item d-flex align-items-center">
+                        <a class="btn btn-sm ocm-btn-cta my-2 my-lg-0 me-lg-2" href="/about/datasharing"><i class="fa-solid fa-bolt me-1" aria-hidden="true"></i>Promote your <span class="d-none d-sm-inline">charging </span>network</a>
+                    </li>
+
+                    <li class="nav-item dropdown">
+                        <button class="nav-link dropdown-toggle ocm-theme-toggle" id="theme-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Colour theme">
+                            <i class="fa-solid fa-circle-half-stroke" aria-hidden="true" data-theme-icon></i><span class="d-lg-none ms-2">Theme</span>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="theme-toggle">
+                            <li><button type="button" class="dropdown-item" data-theme-value="light"><i class="fa-solid fa-sun fa-fw me-2" aria-hidden="true"></i>Light</button></li>
+                            <li><button type="button" class="dropdown-item" data-theme-value="dark"><i class="fa-solid fa-moon fa-fw me-2" aria-hidden="true"></i>Dark</button></li>
+                            <li><button type="button" class="dropdown-item" data-theme-value="auto"><i class="fa-solid fa-circle-half-stroke fa-fw me-2" aria-hidden="true"></i>Auto</button></li>
+                        </ul>
+                    </li>
+
+                        <li class="nav-item"><a class="nav-link" href="/profile/signin?redirectUrl=http%3A%2F%2Fopenchargemap.io%2Fpoi%2Fdetails%2F266281"><i class="fa-solid fa-right-to-bracket me-1" aria-hidden="true"></i><span data-localize="ocm.general.signIn">Sign in</span></a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+        <main id="main-content" class="site-content flex-grow-1">
+            <div class="container-xxl content">
+                
+
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/">Home</a></li>
+            <li class="breadcrumb-item"><a href="/poi">Browse</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Modern Technology Lanka, Sri Lanka</li>
+        </ol>
+    </nav>
+    
+
+
+
+
+    <div id="details-container" class="details-container details-plain">
+
+        <header class="ocm-page-header">
+            <div>
+                <div class="ocm-eyebrow" data-localize="ocm.details.sectionTitle">Charging location</div>
+                <h1 id="location-title">Modern Technology Lanka</h1>
+                <div class="ocm-page-header-meta">
+                    <span class="badge rounded-pill bg-body-tertiary text-body-secondary border">OCM-266281</span>
+                        <span class="badge rounded-pill bg-success-subtle text-success-emphasis" data-localize="ocm.reference.statusType.value_50">Operational</span>
+                        <span class="text-body-secondary small" data-localize="ocm.reference.usageType.value_4">Public - Membership Required</span>
+                </div>
+            </div>
+
+                <div class="ocm-page-header-actions">
+                        <span class="small text-body-secondary d-none d-md-inline" data-localize="ocm.details.editPrompt">To edit, add comments or upload photos</span>
+<a class="btn btn-primary" href="/profile/signin?redirectUrl=%2Fpoi%2Fdetails%2F266281" target="_blank">Sign in</a>                </div>
+        </header>
+
+
+        <div class="tabbable">
+            <ul class="nav nav-tabs responsive" id="poiTabs">
+                <li class="nav-item">
+                    <a class="nav-link active" href="#tab-general" data-bs-toggle="tab" data-localize="ocm.details.location.sectionTitle">Details</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#tab-map" data-bs-toggle="tab" data-localize="ocm.details.location.map">Map</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#tab-equipment" data-bs-toggle="tab" data-localize="ocm.details.equipment.sectionTitle">Equipment Info</a>
+                </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#tab-comments" data-bs-toggle="tab">
+                            <span data-localize="ocm.details.commentsAndRatings.sectionTitle">Comments</span>
+                            <span class="badge rounded-pill text-bg-secondary ms-1">0</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#tab-nearby" data-bs-toggle="tab" data-localize="ocm.details.placesNearby.sectionTitle">Places Nearby</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#tab-media" data-bs-toggle="tab">
+                            <span data-localize="ocm.details.mediaItems.sectionTitle">Photos</span>
+                            <span class="badge rounded-pill text-bg-secondary ms-1">0</span>
+                        </a>
+                    </li>
+            </ul>
+            <div class="tab-content responsive">
+                <div id="tab-general" class="tab-pane active">
+                    <div id="locationdetails-container">
+                        <div id="location-details">
+
+                                <div class="alert alert-warning d-flex gap-3">
+                                    <i class="fa-solid fa-triangle-exclamation fs-5 mt-1" aria-hidden="true"></i>
+                                    <div>
+                                        <div class="fw-semibold" data-localize="ocm.warningsErrors.oldData">This charging location has not been recently verified and you should not rely solely on this information for journeys.</div>
+                                        <div class="small mt-1">If you have visited this charging location recently please confirm that the information is accurate by adding a Comment or Check-In. If the details are inaccurate please <a href="/poi/edit/266281" class="alert-link" data-localize-id="link-edit">edit</a> them.</div>
+                                    </div>
+                                </div>
+
+                            <div class="row g-3">
+                                <div class="col-lg-8">
+                                    <div class="card">
+                                        <div class="card-body">
+                                            <div class="row g-4">
+                                                <div class="col-md-6">
+                                                    <h2 class="ocm-section-title" data-localize="ocm.details.location.address">Nearest Address</h2>
+                                                    <address class="mb-0">
+                                                        <div>299b Morris Rd</div>
+                                                        <div></div>
+                                                        <div>Galle</div>
+                                                        <div>Southern Province</div>
+                                                        <div>80000</div>
+                                                        <div>Sri Lanka</div>
+
+                                                            <div class="mt-3 d-grid gap-1">
+                                                                    <div><i class="fa-solid fa-phone fa-fw text-body-secondary" aria-hidden="true"></i> 0771480884</div>
+                                                            </div>
+                                                    </address>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <h2 class="ocm-section-title">Summary</h2>
+                                                    <dl class="ocm-facts mb-0">
+                                                            <dt data-localize="ocm.details.numberOfPoints">Number Of Stations/Bays</dt>
+                                                            <dd>1</dd>
+                                                            <dt data-localize="ocm.details.usageType">Usage</dt>
+                                                            <dd data-localize="ocm.reference.usageType.value_4">Public - Membership Required</dd>
+                                                            <dt data-localize="ocm.details.usageCost">Usage Cost</dt>
+                                                            <dd>70LKR/kWh</dd>
+                                                            <dt data-localize="ocm.details.operationalStatus">Operational Status</dt>
+                                                            <dd data-localize="ocm.reference.statusType.value_50">Operational</dd>
+                                                        <dt data-localize="ocm.details.location.latitude">Latitude</dt>
+                                                        <dd>6.069315662243753</dd>
+                                                        <dt data-localize="ocm.details.location.longitude">Longitude</dt>
+                                                        <dd>80.23406323762545</dd>
+                                                        <dt data-localize="ocm.details.refNumber">OCM Ref</dt>
+                                                        <dd>OCM-266281</dd>
+                                                    </dl>
+                                                </div>
+                                            </div>
+
+
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-4">
+                                        <div class="card">
+                                            <div class="card-body">
+                                                <h2 class="ocm-section-title" data-localize="ocm.details.operator.sectionTitle">Network/Operator</h2>
+                                                <div class="fw-semibold">chargeNET (lk)</div>
+                                                <div class="small text-break"><a href="http://chargenet.lk/">http://chargenet.lk/</a></div>
+                                                <div class="small">&#x2B;94-1-5551-551 </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="card">
+                                            <div class="card-body">
+                                                <h2 class="ocm-section-title" data-localize="ocm.details.dataProvider.sectionTitle">Data Provider</h2>
+                                                <div class="fw-semibold">Open Charge Map Contributors</div>
+                                                <div class="small text-break"><a href="http://openchargemap.org">http://openchargemap.org</a></div>
+
+
+                                                    <dl class="ocm-facts small mt-3 mb-0">
+                                                            <dt data-localize="ocm.details.dataProvider.license">Data License</dt>
+                                                            <dd>Licensed under Creative Commons Attribution 4.0 International (CC BY 4.0)</dd>
+                                                    </dl>
+                                            </div>
+                                        </div>
+
+                                        <div class="card">
+                                            <div class="card-body">
+                                                
+<div>
+    <h2 class="ocm-section-title">Data Quality Report</h2>
+
+        <div class="d-flex align-items-center gap-3 mb-3">
+            <div class="ocm-quality-score" aria-hidden="true">70</div>
+            <div>
+                <div class="fw-semibold">Data Quality Score</div>
+                <div class="small text-body-secondary">70 out of 100</div>
+            </div>
+        </div>
+        <ul class="list-unstyled small mb-0 d-grid gap-1">
+                <li class="d-flex gap-2">
+                    <i class="fa-solid fa-fw mt-1 fa-xmark text-warning" aria-hidden="true"></i>
+                    <span>User Feedback - No recent user verification.</span>
+                </li>
+                <li class="d-flex gap-2">
+                    <i class="fa-solid fa-fw mt-1 fa-xmark text-warning" aria-hidden="true"></i>
+                    <span>User Feedback - No comments or check-ins</span>
+                </li>
+                <li class="d-flex gap-2">
+                    <i class="fa-solid fa-fw mt-1 fa-xmark text-warning" aria-hidden="true"></i>
+                    <span>User Feedback - No photos</span>
+                </li>
+                <li class="d-flex gap-2">
+                    <i class="fa-solid fa-fw mt-1 fa-check text-success" aria-hidden="true"></i>
+                    <span>Data Completeness - Usage Type Known</span>
+                </li>
+                <li class="d-flex gap-2">
+                    <i class="fa-solid fa-fw mt-1 fa-check text-success" aria-hidden="true"></i>
+                    <span>Data Completeness - Operational Status Known</span>
+                </li>
+                <li class="d-flex gap-2">
+                    <i class="fa-solid fa-fw mt-1 fa-check text-success" aria-hidden="true"></i>
+                    <span>Data Completeness - Equipment Details Present</span>
+                </li>
+        </ul>
+</div>
+
+                                            </div>
+                                        </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="tab-map" class="tab-pane">
+                    <div id="map-container" class="ocm-embedded-map">
+                        <iframe id="map-app" title="Map" src="about:blank" allow="geolocation"></iframe>
+                    </div>
+                </div>
+                <div id="tab-equipment" class="tab-pane">
+                        
+<div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-3">
+        <div class="col">
+            <div class="card h-100 mb-0 ocm-equipment-card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start gap-2 mb-2">
+                        <h3 class="h6 mb-0">
+                            <i class="fa-solid fa-plug text-body-secondary me-1" aria-hidden="true"></i>
+                                <span data-localize="ocm.reference.connectionType.value_1">Type 1 (J1772)</span>
+                        </h3>
+                            <span class="badge rounded-pill bg-body-tertiary text-body-secondary border text-nowrap">1 present</span>
+                    </div>
+
+                    <div class="mb-3">
+                            <span class="badge rounded-pill bg-success-subtle text-success-emphasis" data-localize="ocm.reference.statusType.value_50">Operational</span>
+                    </div>
+
+                    <div class="ocm-equipment-specs">
+                            <div><span class="ocm-equipment-value">6.6</span> kW</div>
+                            <div><span class="ocm-equipment-value">220</span> V</div>
+                            <div><span class="ocm-equipment-value">30</span> A</div>
+                            <div data-localize="ocm.reference.supplyType.value_10">AC (Single-Phase)</div>
+                    </div>
+
+                </div>
+                <div class="card-footer small text-body-secondary">
+                    <i class="fa-solid fa-bolt me-1" aria-hidden="true"></i>OCM-CN-453121
+                </div>
+            </div>
+        </div>
+</div>
+
+                </div>
+                    <div id="tab-comments" class="tab-pane">
+                        <div class="row g-4">
+                            <div class="col-lg-5">
+                                    <div class="card">
+                                        <div class="card-body">
+                                            <h2 class="h5" data-localize="ocm.details.commentsAndRatings.addPrompt">Add your own comment/check-in for this location</h2>
+
+                                                <a href="/profile/signin?redirectUrl=%2Fpoi%2Fdetails%2F266281" class="btn btn-primary" target="_blank" data-localize="ocm.general.signIn">Sign In</a>
+                                        </div>
+                                    </div>
+                            </div>
+                            <div class="col-lg-7">
+                                
+                            </div>
+                        </div>
+                    </div>
+                    <div id="tab-nearby" class="tab-pane">
+
+                        <h2 class="h4" data-localize="ocm.details.placesNearby.chargingLocations">Other Charging Locations</h2>
+                        
+<p class="small text-body-secondary mb-2">
+        There are 4 matching results
+</p>
+<div class="results-list ocm-poi-list">
+        <article class="result ocm-poi-card">
+            <div class="d-flex justify-content-between align-items-start gap-3">
+                <h3 class="ocm-poi-card-title">
+                    <a class="stretched-link" href="/poi/details/264394">Galle EV Point </a>
+                </h3>
+                <div class="ocm-poi-card-counts text-body-secondary small text-nowrap">
+                </div>
+            </div>
+
+            <div class="ocm-poi-card-address">Southern Expy Access Rd, Walahanduwa, Sri Lanka, Galle, Southern Province, Sri Lanka</div>
+
+            <div class="ocm-poi-card-meta">
+                    <span><i class="fa-solid fa-location-arrow" aria-hidden="true"></i> 2.05 Miles</span>
+                    <span>Public - Membership Required</span>
+                        <span class="badge rounded-pill bg-success-subtle text-success-emphasis">Operational</span>
+
+                        <span><i class="fa-solid fa-bolt" aria-hidden="true"></i> Level 3:  High (Over 40kW)</span>
+                            <span><i class="fa-solid fa-plug" aria-hidden="true"></i> CHAdeMO</span>
+            </div>
+        </article>
+        <article class="result ocm-poi-card">
+            <div class="d-flex justify-content-between align-items-start gap-3">
+                <h3 class="ocm-poi-card-title">
+                    <a class="stretched-link" href="/poi/details/480695">Hikka PlugZone</a>
+                </h3>
+                <div class="ocm-poi-card-counts text-body-secondary small text-nowrap">
+                        <span title="Photos"><i class="fa-solid fa-camera" aria-hidden="true"></i> 2</span>
+                </div>
+            </div>
+
+            <div class="ocm-poi-card-address">Pinkanda, Dodanduwa, Hikkaduwa, Southern, 80240, Sri Lanka</div>
+
+            <div class="ocm-poi-card-meta">
+                    <span><i class="fa-solid fa-location-arrow" aria-hidden="true"></i> 8.1 Miles</span>
+                    <span>Public</span>
+                        <span class="badge rounded-pill bg-success-subtle text-success-emphasis">Operational</span>
+
+                        <span><i class="fa-solid fa-bolt" aria-hidden="true"></i> Level 3:  High (Over 40kW)</span>
+                            <span><i class="fa-solid fa-plug" aria-hidden="true"></i> Unknown</span>
+            </div>
+        </article>
+        <article class="result ocm-poi-card">
+            <div class="d-flex justify-content-between align-items-start gap-3">
+                <h3 class="ocm-poi-card-title">
+                    <a class="stretched-link" href="/poi/details/263924">Hikka Tranz by Cinnamon</a>
+                </h3>
+                <div class="ocm-poi-card-counts text-body-secondary small text-nowrap">
+                </div>
+            </div>
+
+            <div class="ocm-poi-card-address">Galle Road, Hikkaduwa, Hikkaduwa, Southern Province, Sri Lanka</div>
+
+            <div class="ocm-poi-card-meta">
+                    <span><i class="fa-solid fa-location-arrow" aria-hidden="true"></i> 10.1 Miles</span>
+                    <span>Public - Membership Required</span>
+                        <span class="badge rounded-pill bg-success-subtle text-success-emphasis">Operational</span>
+
+                        <span><i class="fa-solid fa-bolt" aria-hidden="true"></i> Level 2 : Medium (Over 2kW)</span>
+                            <span><i class="fa-solid fa-plug" aria-hidden="true"></i> Type 1 (J1772)</span>
+            </div>
+        </article>
+        <article class="result ocm-poi-card">
+            <div class="d-flex justify-content-between align-items-start gap-3">
+                <h3 class="ocm-poi-card-title">
+                    <a class="stretched-link" href="/poi/details/492048">Sigiri EV Plug Share Ahangama</a>
+                </h3>
+                <div class="ocm-poi-card-counts text-body-secondary small text-nowrap">
+                </div>
+            </div>
+
+            <div class="ocm-poi-card-address">Public Market Complex , Galle Matara Road , Ahangama, Southern, 80650, Sri Lanka</div>
+
+            <div class="ocm-poi-card-meta">
+                    <span><i class="fa-solid fa-location-arrow" aria-hidden="true"></i> 11.01 Miles</span>
+                    <span>Public</span>
+                        <span class="badge rounded-pill bg-success-subtle text-success-emphasis">Operational</span>
+
+                        <span><i class="fa-solid fa-bolt" aria-hidden="true"></i> Level 2 : Medium (Over 2kW)</span>
+                            <span><i class="fa-solid fa-plug" aria-hidden="true"></i> Unknown</span>
+            </div>
+        </article>
+</div>
+
+
+                    </div>
+                    <div id="tab-media" class="tab-pane">
+                        <div class="d-flex flex-wrap align-items-center gap-2 mb-3">
+                            <span data-localize="ocm.details.mediaItems.addPrompt">Upload your own photos for this location</span>
+<a class="btn btn-primary btn-sm" href="/profile/signin?redirectUrl=%2Fpoi%2Faddmediaitem%2F266281">Sign In</a>                        </div>
+                    </div>
+            </div>
+        </div>
+    </div>
+    <script>
+
+        var lat = 6.069315662243753; var lng = 80.23406323762545;
+
+
+            $(document).ready(function () {
+
+                //setup tabs
+
+                $('#poiTabs a').click(function (e) {
+                    e.preventDefault();
+                    $(this).tab('show');
+
+                    if (e.target.hash == "#tab-map") {
+                        // trigger map load
+
+                        var src = "https://map.openchargemap.io/?mode=embedded&latitude=6.069315662243753&longitude=80.23406323762545";
+                        if (document.getElementById("map-app").src != src) {
+                            document.getElementById("map-app").src = src;
+                        }
+                    }
+
+                });
+
+
+                        //fetch nearby places
+                        getNearbyPlaces(lat, lng, 2);
+                        });
+
+            function getLocationImage(pos) {
+            }
+
+            /*
+             * Construct the URL to call for the API request
+             */
+            function constructYelpURL(lat, lng, radius) {
+
+                var URL = "https://api.yelp.com/v2/search?" +
+                    "business_review_search?" +
+                    "callback=?&limit=10" +
+                    "&lat=" + lat +
+                    "&long=" + lng +
+                    "&radius=" + radius +
+                    "&ywsid=" + "ePh1dFy4Z-Gc56W2sFuSfw";
+                return encodeURI(URL);
+
+                //http://api.yelp.com/business_review_search?term=yelp&lat=37.788022&long=-122.399797&radius=10&limit=5&ywsid=XXXXXXXXXXXXXXXXXX
+            }
+
+            function getNearbyPlaces(lat, lng, radius) {
+
+                return;
+
+                var yelpRequestURL = constructYelpURL(lat, lng, radius);
+
+                $.getJSON(yelpRequestURL, function (data) {
+
+                    if (data != null) {
+                        var output = "";
+                        var poiList = data.businesses;
+
+                        for (var i = 0; i < poiList.length; i++) {
+                            var poi = poiList[i];
+                            output += "<div class='nearby-place'><img class='place-img' src='" + poi.photo_url_small + "' /> <h3>" + poi.name +
+                                            "&nbsp;<img src='" + poi.rating_img_url_small + "' />" +
+                                            (poi.categories.length > 0 ? " <small>" + poi.categories[0].name + "</small> " : "") +
+                                            "<small><a target='_blank' href='" + poi.url + "'>View More Details</a></small></h3>" +
+                                            "<div>Distance: " + (Math.round(poi.distance * 10) / 10) + "</div>" +
+                                            "</div>";
+                        }
+
+                        $("#nearby-poi").html(output);
+                    }
+                });
+            }
+
+            function sharePopup(url) {
+                window.open(url, "_blank");
+            }
+    </script>
+
+
+            </div>
+        </main>
+        <footer class="ocm-footer mt-auto">
+            <div class="container-xxl">
+                <div class="row gy-4">
+                    <div class="col-lg-5">
+                        <a class="ocm-footer-brand" href="/">
+                            <img src="/images/AppIcon_36x36.png" alt="" width="28" height="28" />
+                            <span>Open Charge Map</span>
+                        </a>
+                        <p class="mt-3 mb-3" data-localize="ocm.infoText.shortProjectSummary">Open Charge Map is a non-commercial, non-profit service hosted and supported by a community of businesses, charities, developers and interested parties around the world.</p>
+                        <div class="ocm-footer-social">
+                            <a href="https://www.facebook.com/openchargemap" title="Like us on Facebook" aria-label="Like us on Facebook" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-facebook-f" aria-hidden="true"></i></a>
+                            <a href="https://x.com/open_charge_map" title="Follow us on X" aria-label="Follow us on X" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-x-twitter" aria-hidden="true"></i></a>
+                            <a href="https://github.com/openchargemap/" title="Get involved on Github" aria-label="Get involved on Github" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-github" aria-hidden="true"></i></a>
+                            <a href="/about/contact" title="Contact Us" aria-label="Contact Us"><i class="fa-solid fa-envelope" aria-hidden="true"></i></a>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-4 col-lg-2 offset-lg-1">
+                        <h2 class="ocm-footer-heading">Explore</h2>
+                        <ul class="list-unstyled">
+                            <li><a href="https://map.openchargemap.io">Map</a></li>
+                            <li><a href="/poi">Browse locations</a></li>
+                            <li><a href="/country">By country</a></li>
+                            <li><a href="/stats">Statistics</a></li>
+                        </ul>
+                    </div>
+                    <div class="col-6 col-md-4 col-lg-2">
+                        <h2 class="ocm-footer-heading">Contribute</h2>
+                        <ul class="list-unstyled">
+                            <li><a href="/about/guidance">Contributor guidance</a></li>
+                            <li><a href="/about/datasharing">Share your data</a></li>
+                            <li><a href="https://community.openchargemap.org">Community</a></li>
+                            <li><a href="/about/funding">Funding</a></li>
+                        </ul>
+                    </div>
+                    <div class="col-6 col-md-4 col-lg-2">
+                        <h2 class="ocm-footer-heading">Project</h2>
+                        <ul class="list-unstyled">
+                            <li><a href="/about">About</a></li>
+                            <li><a href="/develop">API &amp; developers</a></li>
+                            <li><a href="/about/terms">Terms &amp; privacy</a></li>
+                            <li><a href="/about/contact">Contact</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </footer>
+
+    <script>
+        // colour theme picker (light / dark / auto)
+        (function () {
+            var media = window.matchMedia("(prefers-color-scheme: dark)");
+            var icons = { light: "fa-sun", dark: "fa-moon", auto: "fa-circle-half-stroke" };
+
+            function getStored() {
+                try { return localStorage.getItem("ocm-theme") || "auto"; } catch (e) { return "auto"; }
+            }
+
+            function apply(choice) {
+                var theme = choice === "auto" ? (media.matches ? "dark" : "light") : choice;
+                document.documentElement.setAttribute("data-bs-theme", theme);
+
+                var icon = document.querySelector("[data-theme-icon]");
+                if (icon) {
+                    icon.classList.remove("fa-sun", "fa-moon", "fa-circle-half-stroke");
+                    icon.classList.add(icons[choice] || icons.auto);
+                }
+                document.querySelectorAll("[data-theme-value]").forEach(function (btn) {
+                    btn.classList.toggle("active", btn.getAttribute("data-theme-value") === choice);
+                });
+            }
+
+            document.querySelectorAll("[data-theme-value]").forEach(function (btn) {
+                btn.addEventListener("click", function () {
+                    var choice = btn.getAttribute("data-theme-value");
+                    try { localStorage.setItem("ocm-theme", choice); } catch (e) { }
+                    apply(choice);
+                });
+            });
+
+            media.addEventListener("change", function () {
+                if (getStored() === "auto") apply("auto");
+            });
+
+            apply(getStored());
+        })();
+    </script>
+
+    
+
+
+<script>window.__CF$cv$params={r:'a4e5f113f8200a72',t:'MTc5MjY0NTI2MQ==',u:'01a161fbe92977be84a7b6dcd94734d8',ut:'MOTfkv6gkHbXJ1ClOF5cAbsr01tNKM9KGUqVEZJRh7Q-1792645261-1.2.1.1-v31fqO3OVBa2.wuQNtMQe2iNFpvhtGYj0fNvj8WWdXm5UjgZghAJXSEEc.QAYzKDKtnTYcpuTFcAFtFzcM_ENDore4g8fDM3_qIS3PszDM4',i:60};(function(){if(!document.body)return;var s=document.createElement('script');s.src='/cdn-cgi/challenge-platform/scripts/precursor/main.js';document.head.appendChild(s);})();</script></body>
+</html>

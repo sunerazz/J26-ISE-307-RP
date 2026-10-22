@@ -1,0 +1,153 @@
+{
+  "retrieved_on": "2026-10-22",
+  "source": "Open Charge Map public location pages, country Sri Lanka",
+  "license": "Creative Commons Attribution 4.0 International (CC BY 4.0), \u00a9 Open Charge Map contributors",
+  "listings_in_snapshot": 68,
+  "duplicate_listings": [
+    "ST063"
+  ],
+  "stations_in_inventory": 67,
+  "operational_listings": 66,
+  "in_greater_colombo": 18,
+  "with_dc_fast_charging": 37,
+  "original_station_count": 4,
+  "fields": [
+    {
+      "field": "connector_types_listed",
+      "label": "Connector types",
+      "original_csv_filled": 4,
+      "original_csv_total": 4,
+      "same_four_stations_now_filled": 4,
+      "inventory_filled": 67,
+      "inventory_total": 67
+    },
+    {
+      "field": "connector_details",
+      "label": "Per-connector count, kW and AC/DC",
+      "original_csv_filled": 0,
+      "original_csv_total": 4,
+      "same_four_stations_now_filled": 4,
+      "inventory_filled": 67,
+      "inventory_total": 67
+    },
+    {
+      "field": "max_power_kw_listed",
+      "label": "Maximum listed power",
+      "original_csv_filled": 4,
+      "original_csv_total": 4,
+      "same_four_stations_now_filled": 4,
+      "inventory_filled": 67,
+      "inventory_total": 67
+    },
+    {
+      "field": "number_of_points",
+      "label": "Number of charging points",
+      "original_csv_filled": 0,
+      "original_csv_total": 4,
+      "same_four_stations_now_filled": 4,
+      "inventory_filled": 67,
+      "inventory_total": 67
+    },
+    {
+      "field": "tariff_lkr_per_kwh_numeric",
+      "label": "Usable LKR/kWh tariff (for your plug type)",
+      "original_csv_filled": 1,
+      "original_csv_total": 4,
+      "same_four_stations_now_filled": 4,
+      "inventory_filled": 48,
+      "inventory_total": 67
+    },
+    {
+      "field": "usage_type",
+      "label": "Usage / access type",
+      "original_csv_filled": 0,
+      "original_csv_total": 4,
+      "same_four_stations_now_filled": 4,
+      "inventory_filled": 67,
+      "inventory_total": 67
+    },
+    {
+      "field": "phone",
+      "label": "Contact phone",
+      "original_csv_filled": 0,
+      "original_csv_total": 4,
+      "same_four_stations_now_filled": 4,
+      "inventory_filled": 62,
+      "inventory_total": 67
+    },
+    {
+      "field": "opening_hours_listed",
+      "label": "Opening hours",
+      "original_csv_filled": 0,
+      "original_csv_total": 4,
+      "same_four_stations_now_filled": 1,
+      "inventory_filled": 2,
+      "inventory_total": 67
+    },
+    {
+      "field": "availability_realtime_known",
+      "label": "Live availability",
+      "original_csv_filled": 0,
+      "original_csv_total": 4,
+      "same_four_stations_now_filled": 0,
+      "inventory_filled": 0,
+      "inventory_total": 67
+    },
+    {
+      "field": "queue_length_current",
+      "label": "Current queue length",
+      "original_csv_filled": 0,
+      "original_csv_total": 4,
+      "same_four_stations_now_filled": 0,
+      "inventory_filled": 0,
+      "inventory_total": 67
+    },
+    {
+      "field": "waiting_time_min",
+      "label": "Current waiting time",
+      "original_csv_filled": 0,
+      "original_csv_total": 4,
+      "same_four_stations_now_filled": 0,
+      "inventory_filled": 0,
+      "inventory_total": 67
+    }
+  ],
+  "corrections_to_original_rows": [
+    {
+      "station_id": "ST001",
+      "field": "max_power_kw_listed",
+      "original": "30",
+      "rebuilt": "24",
+      "why": "The original value came from the '30kW DCFC' comment text. The listing's equipment record gives the connector power."
+    },
+    {
+      "station_id": "ST002",
+      "field": "max_power_kw_listed",
+      "original": "30",
+      "rebuilt": "24",
+      "why": "The original value came from the '30kW DCFC' comment text. The listing's equipment record gives the connector power."
+    },
+    {
+      "station_id": "ST003",
+      "field": "max_power_kw_listed",
+      "original": "30",
+      "rebuilt": "18",
+      "why": "The original value came from the '30kW DCFC' comment text. The listing's equipment record gives the connector power."
+    },
+    {
+      "station_id": "ST003",
+      "field": "tariff_lkr_per_kwh_listed",
+      "original": "120",
+      "rebuilt": "120 DC",
+      "why": "Rebuilt from the per-level rates in the current listing comments (L3 = DC, L2 = AC)."
+    },
+    {
+      "station_id": "ST004",
+      "field": "tariff_lkr_per_kwh_listed",
+      "original": "80 listed; verify current tariff",
+      "rebuilt": "70 AC",
+      "why": "Rebuilt from the per-level rates in the current listing comments (L3 = DC, L2 = AC)."
+    }
+  ],
+  "still_unknown": "Live availability, queue length and waiting time are not published by Open Charge Map. They stay blank and are never set to zero."
+}

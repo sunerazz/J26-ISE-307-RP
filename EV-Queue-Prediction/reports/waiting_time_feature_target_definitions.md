@@ -15,7 +15,7 @@
 - Name: `target_waiting_time_30min_min`
 - Definition: expected station waiting time (`estimated_waiting_time_now_min`) for a new arrival at the **same** `station_id` exactly **30 minutes** after the prediction timestamp.
 - Construction: exact timestamp match (`t + 30 min`).
-- Unmatched rows dropped (never filled with 0): **12**.
+- Unmatched rows dropped (never filled with 0): **10**.
 - Current `estimated_waiting_time_now_min` is a feature, not the future target.
 - Future queue length is **not** reused as the waiting-time target.
 
@@ -105,12 +105,12 @@
   "task": "waiting_time_30min",
   "wait_column": "estimated_waiting_time_now_min",
   "target_column": "target_waiting_time_30min_min",
-  "dropped_no_target": 12,
-  "dropped_lag_warmup": 24,
-  "unmatched_target_rows": 12,
-  "n_train_rows": 48360,
-  "n_val_rows": 10368,
-  "n_test_rows": 10344,
+  "dropped_no_target": 10,
+  "dropped_lag_warmup": 20,
+  "unmatched_target_rows": 10,
+  "n_train_rows": 40300,
+  "n_val_rows": 8640,
+  "n_test_rows": 8620,
   "feature_columns": [
     "is_weekend",
     "hour",
@@ -156,7 +156,7 @@
   ],
   "target_unit": "minutes",
   "target_min_train": 0.0,
-  "target_max_train": 240.0,
-  "target_zero_fraction_train": 0.423697270471464
+  "target_max_train": 180.0,
+  "target_zero_fraction_train": 0.0017866004962779156
 }
 ```
