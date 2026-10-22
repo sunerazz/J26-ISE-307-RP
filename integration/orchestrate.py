@@ -2,13 +2,16 @@
 
 from __future__ import annotations
 
+import copy
 import logging
+import re
 from datetime import datetime, timedelta, timezone
 from typing import Any
 
 from pydantic import BaseModel, Field
 
 from area_models import match_trained_area
+from conditions import automatic_conditions
 
 logger = logging.getLogger("integration.orchestrate")
 
@@ -27,9 +30,10 @@ QUEUE_REASON = (
 )
 
 DURATION_REASON = (
-    "The Component 2 model predicts a charging-session duration from a separate dataset. "
-    "Its station locations are US cities, and target SOC is not one of its inputs. "
-    "It was not applied to this Colombo station. No duration was invented."
+    "The Component 2 model predicts charging minutes from battery size, charger power, "
+    "the charge on arrival, and the requested end charge. "
+    "In its training table the duration is that energy divided by power, and it matches the clock. "
+    "It was not applied because those inputs were not available. No duration was invented."
 )
 
 
@@ -54,6 +58,12 @@ class TripRequest(BaseModel):
     # Local departure time for the trip timeline. Defaults to now in Sri Lanka.
     departure_time: datetime | None = None
     stop_overhead_min: float = Field(default=5, ge=0, le=60)
+    # When energy_conditions is not sent, read weather and road elevation for this trip.
+    auto_conditions: bool = True
+    vehicle_mass_kg: float = Field(default=1650, gt=500, le=4000)
+    ac_on: bool = True
+    traffic_level: str | None = None
+    road_type: str | None = None
     include_explanation: bool = True
     follow_up_question: str | None = None
 
@@ -91,7 +101,7 @@ def _timeline(station: dict, departure: datetime) -> dict[str, Any]:
     if wait is None:
         missing.append("waiting time (no queue forecast for this charger)")
     if charge is None:
-        missing.append("charging time (no target charge level was given)")
+        missing.append("charging time (the Component 2 duration model did not return a session length)")
     start_charging = arrive + timedelta(minutes=wait or 0)
     done = start_charging + timedelta(minutes=charge or 0)
     arrive_destination = done + timedelta(minutes=onward["duration_min"]) if onward.get("duration_min") is not None else None
@@ -108,7 +118,11 @@ def _timeline(station: dict, departure: datetime) -> dict[str, Any]:
         "basis": (
             "Road times from the routing provider (not live traffic)"
             + (", the Component 1 synthetic waiting-time forecast for the nearest trained town" if wait is not None else "")
-            + (", and charging at the listed kW of your plug (real chargers taper, so expect longer)." if charge is not None else ".")
+            + (
+                ", and the Component 2 charging-duration model for the session length."
+                if charge is not None
+                else "."
+            )
         ),
     }
 
@@ -126,6 +140,108 @@ def _congestion_metrics(report: dict | None) -> dict | None:
         "baseline_most_frequent_accuracy": baseline.get("accuracy"),
         "baseline_most_frequent_macro_f1": baseline.get("macro_f1"),
     }
+
+
+def _out_of_range(deps: dict[str, Any], record: dict[str, Any]) -> list[dict[str, Any]]:
+    ranges = (deps.get("component3") or {}).get("feature_ranges") or {}
+    flagged = []
+    for name, (low, high) in ranges.items():
+        value = record.get(name)
+        if isinstance(value, (int, float)) and not isinstance(value, bool) and (value < low or value > high):
+            flagged.append({"feature": name, "value": value, "training_min": low, "training_max": high})
+    return flagged
+
+
+def _trip_energy(body: "TripRequest", deps: dict[str, Any], direct: dict | None, energy_ctx: dict) -> dict[str, Any] | None:
+    """Battery needed for the direct drive: the Component 3 model next to the car's consumption rate."""
+    if not direct or not direct.get("distance_km"):
+        return None
+    km = direct["distance_km"]
+    rate = _road_kwh(body, km)
+    model = direct.get("model_only_energy_kwh")
+    used = max(model, rate) if model is not None else rate
+    record = {
+        "distance_km": km,
+        "trip_duration_min": direct.get("duration_min"),
+        "average_speed_kmh": km / (direct["duration_min"] / 60.0) if direct.get("duration_min") else None,
+        "battery_capacity_kwh": body.usable_battery_capacity_kwh,
+        "soc_start_pct": body.current_soc_percent,
+        **(body.energy_conditions or {}),
+    }
+    return {
+        "distance_km": km,
+        "duration_min": direct.get("duration_min"),
+        "model_kwh": model,
+        "rate_kwh": rate,
+        "used_kwh": used,
+        "used_basis": (
+            "Component 3 model" if model is not None and model >= rate else "your car's consumption rate"
+        ),
+        "battery_percent_needed": _soc_points(body, used),
+        "arrival_soc_percent": body.current_soc_percent - _soc_points(body, used),
+        "model_kwh_per_100km": model / km * 100 if model is not None else None,
+        "rate_kwh_per_100km": body.consumption_kwh_per_100km,
+        "can_finish_without_charging": body.current_soc_percent - _soc_points(body, used) >= body.minimum_reserve_percent,
+        "model_applied": bool(energy_ctx.get("applied")),
+        "out_of_training_range": _out_of_range(deps, record) if model is not None else [],
+        "note": (
+            "Battery checks use the larger of the two estimates, so a low model prediction never makes a trip look "
+            "possible when your car's own consumption rate says it is not."
+        ),
+    }
+
+
+class _Point:
+    """A latitude/longitude pair in the shape the routing provider reads."""
+
+    def __init__(self, latitude: float, longitude: float):
+        self.latitude = latitude
+        self.longitude = longitude
+
+
+def _prepare_energy(body: "TripRequest", deps: dict[str, Any], departure: datetime) -> tuple["TripRequest", dict | None, float]:
+    """Read trip conditions and pick the consumption rate the route planner uses.
+
+    The energy model needs the direct road (distance, time, climb), so that road is
+    requested first; the routing client caches it, so planning does not ask again.
+    Returns the request with conditions filled in, where they came from, and the
+    planning rate: the larger of your rate and the model's rate on the direct road.
+    """
+    trip_conditions = None
+    consumption = body.consumption_kwh_per_100km
+    if body.energy_conditions is None and not body.auto_conditions:
+        return body, None, consumption
+    try:
+        leg = deps["component4"]["provider"].route(
+            _Point(body.origin_latitude, body.origin_longitude),
+            _Point(body.destination_latitude, body.destination_longitude),
+        )
+        direct = leg.model_dump()
+    except Exception:  # noqa: BLE001 — routing errors are reported by the planner below
+        return body, None, consumption
+    if body.energy_conditions is None:
+        conditions, trip_conditions = automatic_conditions(
+            (body.origin_latitude, body.origin_longitude),
+            direct,
+            departure,
+            body.vehicle_mass_kg,
+            body.ac_on,
+            body.traffic_level,
+            body.road_type,
+            **(deps.get("condition_fetchers") or {}),
+        )
+        if conditions is not None:
+            body = body.model_copy(update={"energy_conditions": conditions})
+    ctx = _energy_context(body, deps)
+    if ctx["applied"] and direct.get("distance_km") and direct.get("duration_min"):
+        try:
+            model_kwh = _predict_leg_kwh(
+                body, deps, ctx, direct["distance_km"], direct["duration_min"], body.current_soc_percent
+            )
+            consumption = max(consumption, model_kwh / direct["distance_km"] * 100.0)
+        except Exception:  # noqa: BLE001
+            logger.exception("Energy model failed on the direct road; planning uses your rate")
+    return body, trip_conditions, consumption
 
 
 def _plan_arrival(plan: dict | None, departure: datetime) -> str | None:
@@ -228,8 +344,8 @@ def rank_candidates(stations: list[dict], weights: dict[str, float]) -> str:
         f"Feasible stations are ranked only after battery and connector checks. "
         f"Compared factors: {used}. "
         f"Left out because they were missing or not comparable: {', '.join(omitted) if omitted else 'none'}. "
-        "Missing values were not set to zero. A lower detour, wait, listed-power duration or scenario cost scores higher. "
-        "Listed-power duration is kilowatt-hours divided by the listed kW. It is not the Component 2 model. "
+        "Missing values were not set to zero. A lower detour, wait, Component 2 session duration or scenario cost scores higher. "
+        "Session duration is the saved Component 2 model. Listed kilowatts are not used for that time. "
         "An infeasible station cannot win on score."
     )
 
@@ -333,30 +449,41 @@ def _predict_leg_kwh(
     if distance_km is None or duration_min is None or duration_min <= 0:
         raise ValueError("Road distance or duration is missing, so the energy model was not given a speed.")
     component3 = deps["component3"]
+    conditions = dict(ctx["conditions"])
+    route_km = ctx.get("route_km")
+    if route_km:
+        # Climb and descent were measured over the whole direct route; each leg gets its share by distance.
+        share = distance_km / route_km
+        conditions["elevation_gain_m"] = conditions["elevation_gain_m"] * share
+        conditions["elevation_loss_m"] = conditions["elevation_loss_m"] * share
     record = {
         "distance_km": distance_km,
         "trip_duration_min": duration_min,
         "average_speed_kmh": distance_km / (duration_min / 60.0),
         "battery_capacity_kwh": body.usable_battery_capacity_kwh,
         "soc_start_pct": soc_start,
-        **ctx["conditions"],
+        **conditions,
     }
     prediction = component3["predict_energy"](record, pipeline=component3["pipeline"], meta=component3["meta"])
     return float(prediction["predicted_energy_kwh"])
 
 
-def _model_battery(body: TripRequest, energy_kwh: float) -> dict[str, Any]:
+def _model_battery(body: TripRequest, energy_kwh: float, rate_kwh: float | None = None) -> dict[str, Any]:
     available = body.usable_battery_capacity_kwh * body.current_soc_percent / 100.0
     reserve = body.usable_battery_capacity_kwh * body.minimum_reserve_percent / 100.0
     above = available - reserve
-    status = "feasible" if energy_kwh <= above else "infeasible"
+    # Safety: never plan on less energy than the car's own consumption rate gives.
+    used = max(energy_kwh, rate_kwh) if rate_kwh is not None else energy_kwh
+    status = "feasible" if used <= above else "infeasible"
     return {
         "status": status,
-        "estimated_energy_kwh": energy_kwh,
+        "estimated_energy_kwh": used,
+        "model_energy_kwh": energy_kwh,
+        "rate_energy_kwh": rate_kwh,
         "energy_above_reserve_kwh": above,
-        "method": "component3_energy_model",
+        "method": "larger of the Component 3 model and your consumption rate",
         "assumptions": [
-            "Energy is the saved model prediction for this road leg.",
+            "Energy is the larger of the saved model prediction for this road leg and road km times your consumption rate.",
             "Distance and duration come from the routing provider.",
             "Average speed is that distance divided by that duration.",
             "The trip conditions in the request were used as supplied.",
@@ -380,6 +507,8 @@ def _apply_energy_model(body: TripRequest, deps: dict[str, Any], routed: dict, s
     try:
         direct = routed.get("direct_route")
         direct_kwh = None
+        if direct and direct.get("distance_km"):
+            ctx["route_km"] = direct["distance_km"]
         if direct:
             direct_kwh = _predict_leg_kwh(
                 body,
@@ -423,9 +552,11 @@ def _apply_energy_model(body: TripRequest, deps: dict[str, Any], routed: dict, s
             "reason": f"The energy model was not applied: {exc} Drive energy uses the consumption figure you entered.",
         }
     if direct is not None and direct_kwh is not None:
-        direct["model_energy_kwh"] = direct_kwh
+        direct["model_only_energy_kwh"] = direct_kwh
+        direct["model_energy_kwh"] = max(direct_kwh, _road_kwh(body, direct["distance_km"]))
     for station, energy, onward_kwh in prepared:
-        battery = _model_battery(body, energy)
+        leg_km = (station.get("origin_to_station") or {}).get("distance_km")
+        battery = _model_battery(body, energy, _road_kwh(body, leg_km) if leg_km is not None else None)
         station["battery"] = battery
         station["drive_energy_model"] = {
             "predicted_energy_kwh": energy,
@@ -433,7 +564,8 @@ def _apply_energy_model(body: TripRequest, deps: dict[str, Any], routed: dict, s
             "training_data": "synthetic",
         }
         if onward_kwh is not None:
-            station["onward_model_energy_kwh"] = onward_kwh
+            onward_km = (station.get("station_to_destination") or {}).get("distance_km")
+            station["onward_model_energy_kwh"] = max(onward_kwh, _road_kwh(body, onward_km)) if onward_km else onward_kwh
         if battery["status"] != "feasible":
             station["included_in_ranking"] = False
             station["rank"] = None
@@ -560,9 +692,8 @@ def _plain_station_summary(body: TripRequest, station: dict) -> str:
     elif energy is not None:
         text = f"Charging {arrival:.0f}% → {body.target_soc_percent:.0f}% adds about {energy:.1f} kWh"
         minutes = station.get("listed_power_duration_min")
-        power = station.get("max_power_kw_listed")
-        if minutes is not None and power:
-            text += f", roughly {minutes:.0f} min at the listed {power:g} kW (real chargers are usually slower)"
+        if minutes:
+            text += f". The Component 2 duration model estimates {minutes:.0f} min for a session"
         parts.append(text + ".")
     elif plan.get("minimum_target_soc_percent") is not None and not plan.get("full_charge_insufficient"):
         parts.append(
@@ -589,6 +720,51 @@ def _road_points(leg: dict | None) -> list[list[float]] | None:
     if not isinstance(geometry, list) or len(geometry) < 2:
         return None
     return geometry
+
+
+def _shape(deps: dict[str, Any], start: tuple[float, float], end: tuple[float, float]) -> list[list[float]] | None:
+    """Road line between two points from the routing provider, or None. Cached by the provider."""
+    try:
+        leg = deps["component4"]["provider"].route(_Point(*start), _Point(*end))
+    except Exception:  # noqa: BLE001 — a missing line is reported as missing, never drawn straight
+        return None
+    return _road_points(leg.model_dump())
+
+
+def _with_road_shape(station: dict | None, body: "TripRequest", deps: dict[str, Any]) -> dict | None:
+    """The planner draws road shapes only for its own top stations; the final pick may differ, so fill it in."""
+    if station is None:
+        return None
+    here = (station["latitude"], station["longitude"])
+    for key, start, end in (
+        ("origin_to_station", (body.origin_latitude, body.origin_longitude), here),
+        ("station_to_destination", here, (body.destination_latitude, body.destination_longitude)),
+    ):
+        leg = station.get(key)
+        if isinstance(leg, dict) and _road_points(leg) is None:
+            geometry = _shape(deps, start, end)
+            if geometry is not None:
+                leg["geometry"] = geometry
+    return station
+
+
+def _plan_road(plan: dict | None, body: "TripRequest", deps: dict[str, Any]) -> dict[str, Any]:
+    """Road line through every stop of the charging plan, or the direct road when no stop is needed."""
+    stops = (plan or {}).get("stops") or []
+    points = [(body.origin_latitude, body.origin_longitude)]
+    points += [(stop["latitude"], stop["longitude"]) for stop in stops]
+    points.append((body.destination_latitude, body.destination_longitude))
+    line: list[list[float]] = []
+    for start, end in zip(points, points[1:]):
+        part = _shape(deps, start, end)
+        if part is None:
+            return {"geometry": None, "stops": len(stops), "note": "A road line for part of the plan was not returned. No straight line was drawn."}
+        line += part[1:] if line and part[0] == line[-1] else part
+    return {
+        "geometry": line,
+        "stops": len(stops),
+        "note": "Road line through the charging plan's stops, from the routing provider.",
+    }
 
 
 def _recommended_road(station: dict | None) -> dict[str, Any]:
@@ -774,7 +950,7 @@ def _duration(body: TripRequest, deps: dict[str, Any]) -> dict[str, Any]:
                 "predicted_charging_duration_min": None,
                 "reason": (
                     f"{column} must be one of the training values {allowed}. "
-                    "Colombo was not substituted for a US city."
+                    "A different value was not substituted."
                 ),
                 "used_in_ranking": False,
             }
@@ -799,11 +975,9 @@ def _duration(body: TripRequest, deps: dict[str, Any]) -> dict[str, Any]:
         "training_location_used": features.get("Charging Station Location"),
         "used_in_ranking": False,
         "reason": (
-            "This is one session-duration prediction from the saved random-forest pipeline. "
-            f"The location label sent to the model was {features.get('Charging Station Location')}, "
-            "which is a training category, not a Colombo station. Target SOC was not an input. "
-            "The same number is not copied onto each Colombo station and is not a ranking factor. "
-            "Test R² for this model is negative, so the value is a weak statistical estimate."
+            "This is one session-duration prediction from the saved Component 2 model. "
+            "The inputs are battery size, charger power, start charge, and requested end charge. "
+            "The training duration was generated as that energy divided by power, and it matches the clock."
         ),
     }
 
@@ -927,7 +1101,9 @@ def _model_catalog(
             "loaded": deps.get("component2") is not None,
             "model_name": (deps.get("component2") or {}).get("selected_model"),
             "test_metrics": (deps.get("component2") or {}).get("metrics"),
-            "applied_per_colombo_station": False,
+            "applied_to_station_charge_time": any(
+                station.get("duration_source") == "component2" for station in stations
+            ),
         },
         "energy": {
             "loaded": bool((deps.get("component3") or {}).get("energy_model_loaded")),
@@ -955,12 +1131,112 @@ def _weights(body: TripRequest) -> dict[str, float]:
     return weights
 
 
+def _session_record(battery_kwh: float, rate_kw: float, start_soc: float, end_soc: float) -> dict[str, float]:
+    return {
+        "Battery Capacity (kWh)": battery_kwh,
+        "Charging Rate (kW)": rate_kw,
+        "State of Charge (Start %)": start_soc,
+        "State of Charge (End %)": end_soc,
+    }
+
+
+def _predict_session_minutes(
+    deps: dict[str, Any],
+    battery_kwh: float | None,
+    rate_kw: float | None,
+    start_soc: float | None,
+    end_soc: float | None,
+) -> tuple[float | None, str]:
+    """Ask Component 2 for one session. Missing inputs stay missing."""
+    component2 = deps.get("component2")
+    if not component2:
+        return None, (
+            "Charging time was not calculated. The Component 2 duration model is not loaded, "
+            "and listed kilowatts were not used instead."
+        )
+    if None in (battery_kwh, rate_kw, start_soc, end_soc):
+        return None, (
+            "Charging time was not calculated. Battery size, charger power, or a charge level was missing. "
+            "The missing value was not guessed, and listed kilowatts were not used instead."
+        )
+    record = _session_record(float(battery_kwh), float(rate_kw), float(start_soc), float(end_soc))
+    columns = component2.get("feature_columns") or []
+    missing = [column for column in columns if record.get(column) in (None, "")]
+    if missing:
+        return None, (
+            "Charging time was not calculated. The duration model still needs: "
+            + ", ".join(missing)
+            + ". Those values were not guessed."
+        )
+    try:
+        prediction = component2["predict_duration"](
+            record, pipeline=component2["pipeline"], meta=component2["meta"]
+        )
+    except Exception as exc:  # noqa: BLE001
+        logger.exception("Duration model failed for a station")
+        return None, f"The duration model failed: {exc}"
+    minutes = float(prediction["predicted_charging_duration_min"])
+    model_name = prediction.get("model_name") or component2.get("selected_model")
+    return minutes, (
+        f"Charging time is the Component 2 {model_name} model, using battery size, this charger's power, "
+        f"and the rise from {float(start_soc):.0f}% to {float(end_soc):.0f}%. "
+        "The training sessions were generated so duration equals the clock and energy equals power times time."
+    )
+
+
+def _plan_session_times(plan: dict | None, deps: dict[str, Any], battery_kwh: float) -> dict | None:
+    """Show the Component 2 session length on each planned stop that actually charges.
+
+    The route planner still decides where a stop is needed from battery energy.
+    The minutes shown for those stops come from Component 2.
+    """
+    if not isinstance(plan, dict) or deps.get("component2") is None:
+        return plan
+    plan = copy.deepcopy(plan)
+    old = 0.0
+    new = 0.0
+    for stop in plan.get("stops") or []:
+        previous = stop.get("charging_min")
+        if not isinstance(previous, (int, float)) or previous <= 0:
+            continue
+        minutes, _note = _predict_session_minutes(
+            deps,
+            battery_kwh,
+            stop.get("charging_power_kw"),
+            stop.get("arrival_soc_percent"),
+            stop.get("departure_soc_percent"),
+        )
+        if minutes is None:
+            continue
+        old += float(previous)
+        stop["charging_min"] = minutes
+        new += minutes
+    totals = plan.get("totals")
+    if isinstance(totals, dict) and old:
+        totals["charging_min"] = float(totals.get("charging_min") or 0) - old + new
+        if isinstance(totals.get("total_min"), (int, float)):
+            totals["total_min"] = float(totals["total_min"]) - old + new
+        text = plan.get("explanation") or ""
+        plan["explanation"] = re.sub(
+            r"About \d+ min in total: \d+ min driving, \d+ min charging at listed power",
+            (
+                f"About {totals['total_min']:.0f} min in total: {totals['drive_min']:.0f} min driving, "
+                f"{totals['charging_min']:.0f} min charging from the Component 2 duration model"
+            ),
+            text,
+            count=1,
+        )
+    return plan
+
+
 def build_recommendation(body: TripRequest, deps: dict[str, Any], explain=True) -> dict[str, Any]:
     if deps.get("component4") is None:
         raise RuntimeError(deps.get("errors", {}).get("component4") or "Route optimizer is not loaded.")
     component4 = deps["component4"]
     weights = _weights(body)
     request_payload = body.model_dump()
+    departure = _departure(body)
+    body, trip_conditions, planning_consumption = _prepare_energy(body, deps, departure)
     c4_body = component4["RecommendRequest"](
         origin_latitude=body.origin_latitude,
         origin_longitude=body.origin_longitude,
@@ -968,7 +1244,9 @@ def build_recommendation(body: TripRequest, deps: dict[str, Any], explain=True) 
         destination_longitude=body.destination_longitude,
         current_soc_percent=body.current_soc_percent,
         usable_battery_capacity_kwh=body.usable_battery_capacity_kwh,
-        consumption_kwh_per_100km=body.consumption_kwh_per_100km,
+        # The more cautious of your rate and the energy model's rate for this road, so the station
+        # checks and the charging plan agree with the battery figures shown for the trip.
+        consumption_kwh_per_100km=planning_consumption,
         minimum_reserve_percent=body.minimum_reserve_percent,
         required_connector=body.required_connector,
         maximum_detour_km=body.maximum_detour_km,
@@ -986,24 +1264,31 @@ def build_recommendation(body: TripRequest, deps: dict[str, Any], explain=True) 
     stations.extend(routed_data.get("alternatives") or [])
     energy_ctx = _apply_energy_model(body, deps, routed_data, stations)
     area_forecasts: dict[str, dict | None] = {}
-    departure = _departure(body)
     for station in stations:
         station["queue_prediction"] = _queue_block(station, deps, area_forecasts)
         plan = _station_plan(body, station)
         station["trip_plan"] = plan
         kwh = plan["charging_energy_kwh"]
-        # Listed kW of the driver's plug at this station; the station maximum when no plug was named.
         power = station.get("charging_power_kw") or station.get("max_power_kw_listed")
-        minutes = kwh / power * 60.0 if kwh is not None and power else None
+        end_soc = body.target_soc_percent if body.target_soc_percent is not None else plan.get("minimum_target_soc_percent")
+        if kwh is not None and kwh <= 0:
+            minutes = 0.0
+            note = "No session: the battery on arrival is already at the target, so Component 2 was not asked for a charge time."
+            source = "not_needed"
+        else:
+            minutes, note = _predict_session_minutes(
+                deps,
+                body.usable_battery_capacity_kwh,
+                power,
+                plan.get("arrival_soc_percent"),
+                end_soc,
+            )
+            source = "component2" if minutes is not None else "unavailable"
         station["estimated_charging_duration_min"] = minutes
         station["estimated_charging_cost_lkr"] = None
         station["listed_power_duration_min"] = minutes
-        station["listed_power_duration_note"] = (
-            "Minutes equal charging kWh divided by the listed maximum kW, assuming that power is delivered continuously. "
-            "Real chargers taper, so expect longer. This is not the Component 2 model."
-            if minutes is not None
-            else "Listed-power duration was not calculated."
-        )
+        station["duration_source"] = source
+        station["listed_power_duration_note"] = note
         station_energy = _energy_and_cost(body, deps, kwh, CHARGING_NOTE, energy_ctx) if kwh is not None else None
         station_cost = (station_energy or {}).get("scenario_cost")
         station["scenario_cost_lkr"] = station_cost["estimated_total"] if station_cost else None
@@ -1044,7 +1329,8 @@ def build_recommendation(body: TripRequest, deps: dict[str, Any], explain=True) 
         "recommended_station": recommended,
         "alternatives": ranked[1:] + others,
         "direct_route": routed_data.get("direct_route"),
-        "recommended_route": _recommended_road(recommended),
+        "recommended_route": _recommended_road(_with_road_shape(recommended, body, deps)),
+        "plan_route": _plan_road(routed_data.get("charging_plan"), body, deps),
         "inputs": request_payload,
         "warnings": warnings,
         "ranking_summary": ranking_summary,
@@ -1065,12 +1351,17 @@ def build_recommendation(body: TripRequest, deps: dict[str, Any], explain=True) 
         "station_count": len(stations),
         "trip_check": _trip_check(body, routed_data.get("direct_route")),
         # Component 4 route optimisation: multi-stop plan, baseline rules and routing cost.
-        "charging_plan": routed_data.get("charging_plan"),
+        "charging_plan": _plan_session_times(
+            routed_data.get("charging_plan"), deps, body.usable_battery_capacity_kwh
+        ),
         "strategy_comparison": routed_data.get("strategy_comparison"),
         "routing_summary": routed_data.get("routing_summary"),
         "inventory_summary": routed_data.get("inventory_summary"),
         "departure_time": _clock(departure),
         "plan_arrival_time": _plan_arrival(routed_data.get("charging_plan"), departure),
+        "trip_conditions": trip_conditions,
+        "planning_consumption_kwh_per_100km": planning_consumption,
+        "trip_energy": _trip_energy(body, deps, routed_data.get("direct_route"), energy_ctx),
     }
     if not recommended:
         result["warnings"].append(

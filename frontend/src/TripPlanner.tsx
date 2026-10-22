@@ -782,7 +782,7 @@ function KeyStats({ station }: { station: TripStation }) {
         <dd>{fmtPct(plan.arrival_soc_percent)}</dd>
       </div>
       <div>
-        <dt>{plan.charging_energy_kwh !== null ? 'Charge time (listed kW)' : 'Charge to at least'}</dt>
+        <dt>{plan.charging_energy_kwh !== null ? 'Charge time (duration model)' : 'Charge to at least'}</dt>
         <dd>
           {plan.charging_energy_kwh !== null
             ? fmtMinutes(station.listed_power_duration_min)
@@ -1114,7 +1114,7 @@ function ChargingPlanPanel({ plan }: { plan: ChargingPlan }) {
             <dd>{fmtMinutes(totals.drive_min)}</dd>
           </div>
           <div>
-            <dt>Charging (listed kW)</dt>
+            <dt>Charging (duration model)</dt>
             <dd>{fmtMinutes(totals.charging_min)}</dd>
           </div>
           <div>

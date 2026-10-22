@@ -12,27 +12,32 @@
 - `Battery Capacity (kWh)`: Vehicle specification known at start. A few values look unrealistic and are retained, not dropped.
 - `Charging Rate (kW)`: Treated as charger power available at the start of the session. It is not equal to energy/duration in this file. 66 missing values are imputed from the training fold only.
 - `State of Charge (Start %)`: Initial SOC is known when charging starts. Nine values exceed 100% and are retained.
-- `Distance Driven (since last charge) (km)`: Known before the new charging session. Missing values are imputed on the training fold only.
-- `Vehicle Age (years)`: Vehicle attribute known at prediction time.
-- `Temperature (Â°C)`: Ambient temperature recorded with the session and treated as known at prediction time.
-- `Vehicle Model`: Known before charging starts.
-- `Charging Station Location`: Known when the driver selects a station.
-- `Time of Day`: Derived from the start time and available when charging begins.
-- `Day of Week`: Derived from the start date and available when charging begins.
-- `Charger Type`: Known from the selected charger (Level 1, Level 2, DC Fast Charger).
-- `User Type`: Driver category known before the session.
+- `State of Charge (End %)`: Available at charging start.
 
 ## Excluded columns
 
 - `Charging Duration (hours)`: Target source column (hours). Converted to minutes; never an input.
+- `Charging Duration (minutes)`: Same target already stored in hours. Not an input.
 - `charging_duration_min`: Modelling target.
-- `Charging End Time`: Known only when the session finishes; would reveal duration.
-- `State of Charge (End %)`: Observed after charging completes.
-- `Energy Consumed (kWh)`: Session energy is an outcome, not known when charging starts. 66 values are missing.
+- `Charging End Time`: Set to start time plus the generated duration, so it would reveal the target.
+- `Energy Consumed (kWh)`: Generated as charging rate times duration. It is the same information as the target.
 - `Charging Cost (USD)`: Billing result of the session, not an input available as a duration cause at start.
+- `Illustrative Tariff (LKR/kWh)`: Constant 120 in this table, and not a cause of session length.
+- `Illustrative Charging Cost (LKR)`: Derived from energy and the illustrative tariff. Energy is an outcome.
 - `User ID`: Unique row identifier (1,320 distinct values). Not a generalisable feature.
-- `Charging Station ID`: 462 sparse station IDs. Known at start, but too high-cardinality to generalise; excluded.
-- `Charging Start Time`: Used only to order the chronological split, not as a raw model feature. Time of day and day of week are used instead.
+- `Station ID`: One-to-one with the place name. Not a model feature.
+- `Charging Station ID`: 462 sparse station IDs. Not a model feature.
+- `Charging Start Time`: Used only to order the chronological split, not as a model feature.
+- `Distance Driven (since last charge) (km)`: Not used. This table's duration does not depend on distance.
+- `Vehicle Age (years)`: Not used. This table's duration does not depend on vehicle age.
+- `Vehicle Model`: Not used. Duration is defined from the battery size, not the model name.
+- `Charging Station Location`: Place label only. Duration does not depend on which of the five names is stored.
+- `Station Area`: One-to-one with Charging Station Location. Not a model feature.
+- `Time of Day`: Set from the start clock for the table. Not a cause of the generated duration.
+- `Day of Week`: Set from the start date. Not a cause of the generated duration.
+- `Charger Type`: The charging rate already carries the power. The type name is not a second feature.
+- `User Type`: Not a cause of the generated duration.
+- `Temperature (°C)`: Not a cause of the generated duration. The file header may show a broken degree sign.
 
 ## Split
 
@@ -65,32 +70,15 @@
     "Battery Capacity (kWh)",
     "Charging Rate (kW)",
     "State of Charge (Start %)",
-    "Distance Driven (since last charge) (km)",
-    "Vehicle Age (years)",
-    "Temperature (\u00c2\u00b0C)",
-    "Vehicle Model",
-    "Charging Station Location",
-    "Time of Day",
-    "Day of Week",
-    "Charger Type",
-    "User Type"
+    "State of Charge (End %)"
   ],
   "temperature_column": "Temperature (\u00c2\u00b0C)",
   "numeric_features": [
     "Battery Capacity (kWh)",
     "Charging Rate (kW)",
     "State of Charge (Start %)",
-    "Distance Driven (since last charge) (km)",
-    "Vehicle Age (years)",
-    "Temperature (\u00c2\u00b0C)"
+    "State of Charge (End %)"
   ],
-  "categorical_features": [
-    "Vehicle Model",
-    "Charging Station Location",
-    "Time of Day",
-    "Day of Week",
-    "Charger Type",
-    "User Type"
-  ]
+  "categorical_features": []
 }
 ```

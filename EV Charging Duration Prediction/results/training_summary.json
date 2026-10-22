@@ -1,33 +1,35 @@
 {
-  "selected_model": "random_forest",
+  "selected_model": "xgboost",
   "selected_params": {
-    "n_estimators": 300,
-    "max_depth": 16,
-    "min_samples_leaf": 4
+    "n_estimators": 200,
+    "max_depth": 4,
+    "learning_rate": 0.05,
+    "subsample": 0.9,
+    "colsample_bytree": 0.9
   },
   "validation": {
     "median_baseline": {
-      "mae_min": 56.19339210954555,
-      "rmse_min": 69.98052151951805,
-      "r2": -0.0007335350582950984,
+      "mae_min": 78.97174180153492,
+      "rmse_min": 214.26150625680552,
+      "r2": -0.0677469877514012,
       "n": 192
     },
     "linear_regression": {
-      "mae_min": 56.515904373853736,
-      "rmse_min": 71.24266498714852,
-      "r2": -0.03715679678173789,
+      "mae_min": 60.30207167586999,
+      "rmse_min": 169.5556630181521,
+      "r2": 0.33134107401576085,
       "n": 192
     },
     "random_forest": {
-      "mae_min": 56.038786752949534,
-      "rmse_min": 69.90180148541161,
-      "r2": 0.0015166187940626186,
+      "mae_min": 24.81084439273401,
+      "rmse_min": 107.63712764388048,
+      "r2": 0.730533831479379,
       "n": 192
     },
     "xgboost": {
-      "mae_min": 56.8923150247001,
-      "rmse_min": 71.59993199856477,
-      "r2": -0.047585126608338246,
+      "mae_min": 22.495923622429615,
+      "rmse_min": 97.22305739890808,
+      "r2": 0.7801539858408545,
       "n": 192
     }
   },
@@ -59,32 +61,15 @@
       "Battery Capacity (kWh)",
       "Charging Rate (kW)",
       "State of Charge (Start %)",
-      "Distance Driven (since last charge) (km)",
-      "Vehicle Age (years)",
-      "Temperature (\u00c2\u00b0C)",
-      "Vehicle Model",
-      "Charging Station Location",
-      "Time of Day",
-      "Day of Week",
-      "Charger Type",
-      "User Type"
+      "State of Charge (End %)"
     ],
     "temperature_column": "Temperature (\u00c2\u00b0C)",
     "numeric_features": [
       "Battery Capacity (kWh)",
       "Charging Rate (kW)",
       "State of Charge (Start %)",
-      "Distance Driven (since last charge) (km)",
-      "Vehicle Age (years)",
-      "Temperature (\u00c2\u00b0C)"
+      "State of Charge (End %)"
     ],
-    "categorical_features": [
-      "Vehicle Model",
-      "Charging Station Location",
-      "Time of Day",
-      "Day of Week",
-      "Charger Type",
-      "User Type"
-    ]
+    "categorical_features": []
   }
 }

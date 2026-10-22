@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:geolocator/geolocator.dart';
 
@@ -7,14 +9,23 @@ import 'config.dart';
 import 'format.dart';
 import 'local_store.dart';
 import 'models.dart';
+import 'services.dart';
 
 class AppState extends ChangeNotifier {
-  AppState({ApiClient? api, CloudStore? store})
+  AppState({ApiClient? api, CloudStore? store, PlaceServices? services, this.locateOnStart = true})
       : _api = api ?? ApiClient(),
-        _store = store ?? CloudStore();
+        _store = store ?? CloudStore(),
+        services = services ?? PlaceServices();
 
   final ApiClient _api;
   final CloudStore _store;
+  final PlaceServices services;
+
+  /// Ask for the phone's location when the app opens. Tests turn this off.
+  final bool locateOnStart;
+
+  /// Weather now at the trip start, shown before searching.
+  Weather? weather;
 
   bool ready = false;
 
@@ -52,8 +63,22 @@ class AppState extends ChangeNotifier {
     trips = await _store.loadTrips();
     ready = true;
     notifyListeners();
+    if (locateOnStart) {
+      // Start from where the phone is. If that fails, the preset start stays and the driver can pick one.
+      unawaited(useCurrentLocation());
+    } else {
+      unawaited(refreshWeather());
+    }
     // Also wakes the server up before the first search.
     await refreshStations();
+  }
+
+  Future<void> refreshWeather() async {
+    final place = origin;
+    final now = await services.weather(place.latitude, place.longitude);
+    if (place != origin) return;
+    weather = now;
+    notifyListeners();
   }
 
   Future<void> refreshStations() async {
@@ -72,7 +97,9 @@ class AppState extends ChangeNotifier {
 
   void setOrigin(Place place) {
     origin = place;
+    weather = null;
     notifyListeners();
+    unawaited(refreshWeather());
   }
 
   void setDestination(Place place) {
@@ -84,7 +111,9 @@ class AppState extends ChangeNotifier {
     final previous = origin;
     origin = destination;
     destination = previous;
+    weather = null;
     notifyListeners();
+    unawaited(refreshWeather());
   }
 
   void setBatteryNow(double value) {
@@ -116,6 +145,8 @@ class AppState extends ChangeNotifier {
         locationSettings: const LocationSettings(accuracy: LocationAccuracy.high, timeLimit: Duration(seconds: 15)),
       );
       origin = Place('My location', position.latitude, position.longitude, isCurrentLocation: true);
+      weather = null;
+      unawaited(refreshWeather());
       return null;
     } catch (_) {
       return 'Could not find your location. Try again outdoors, or pick an area from the list.';
@@ -156,6 +187,9 @@ class AppState extends ChangeNotifier {
         'target_soc_percent': chargeTo,
         'user_tariff_lkr_per_kwh': profile.tariffLkr,
         'charging_efficiency': profile.chargingEfficiency,
+        // Weather and road climb are read by the server for this trip; these describe the car.
+        'vehicle_mass_kg': vehicleMassFor(profile.carName),
+        'ac_on': true,
         'include_explanation': false,
       });
       latest = result;

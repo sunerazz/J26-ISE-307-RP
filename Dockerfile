@@ -39,6 +39,8 @@ COPY component3_energy_cost_estimation/src /app/component3_energy_cost_estimatio
 COPY component3_energy_cost_estimation/models/energy_consumption_pipeline.joblib /app/component3_energy_cost_estimation/models/energy_consumption_pipeline.joblib
 COPY component3_energy_cost_estimation/models/energy_consumption_pipeline_meta.joblib /app/component3_energy_cost_estimation/models/energy_consumption_pipeline_meta.joblib
 COPY component3_energy_cost_estimation/results/test_metrics.json /app/component3_energy_cost_estimation/results/test_metrics.json
+# Training inputs, read only for their min/max so out-of-range requests can be flagged.
+COPY component3_energy_cost_estimation/data/processed/train.csv /app/component3_energy_cost_estimation/data/processed/train.csv
 
 # Component 2: charging-duration model.
 COPY ["EV Charging Duration Prediction/src", "/app/EV Charging Duration Prediction/src"]

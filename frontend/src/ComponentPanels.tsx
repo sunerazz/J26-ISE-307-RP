@@ -80,9 +80,9 @@ export function DurationPanel() {
   return (
     <div>
       <p className="banner">
-        Component 2 · AI-based charging-duration prediction and expected completion time. The model was trained on
-        charging sessions from five US cities, so pick one of them as the location. It is not applied to each Colombo
-        charger; the trip planner shows a completion time from road time, predicted wait and listed charger power.
+        Component 2 · AI-based charging-duration prediction and expected completion time. The inputs are battery
+        size, charger power, start charge, and requested end charge. The trip planner uses this model for the
+        charging minutes.
       </p>
       <section className="panel controls">
         <h2 className="step">Session details</h2>

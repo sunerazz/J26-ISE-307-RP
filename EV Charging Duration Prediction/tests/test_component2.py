@@ -28,7 +28,7 @@ from src.train_models import build_pipeline  # noqa: E402
 def test_dataset_loads_and_target_is_usable():
     df = load_raw()
     assert len(df) == 1320
-    assert df.shape[1] == 20
+    assert df.shape[1] == 24
     assert TARGET_HOURS_COL in df.columns
     hours = pd.to_numeric(df[TARGET_HOURS_COL])
     assert hours.notna().all()
@@ -42,13 +42,15 @@ def test_no_target_leakage_features():
     features = feature_columns(df)
     blocked = {
         "Charging Duration (hours)",
+        "Charging Duration (minutes)",
         "charging_duration_min",
         "Charging End Time",
-        "State of Charge (End %)",
         "Energy Consumed (kWh)",
         "Charging Cost (USD)",
+        "Illustrative Charging Cost (LKR)",
     }
     assert blocked.isdisjoint(features)
+    assert "State of Charge (End %)" in features
     for name in blocked:
         assert name in EXCLUDED_FEATURES
 
@@ -90,7 +92,7 @@ def test_saved_pipeline_loads_and_clips_negative_duration():
     row.update(
         {
             "Vehicle Model": "Nissan Leaf",
-            "Charging Station Location": "Houston",
+            "Charging Station Location": "Nugegoda LECO",
             "Time of Day": "Morning",
             "Day of Week": "Monday",
             "Charger Type": "Level 2",

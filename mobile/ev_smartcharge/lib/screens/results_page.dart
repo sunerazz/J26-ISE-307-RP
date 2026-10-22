@@ -6,6 +6,7 @@ import '../app_state.dart';
 import '../config.dart';
 import '../format.dart';
 import '../models.dart';
+import '../services.dart';
 import '../shell.dart';
 import '../theme.dart';
 import '../widgets/common.dart';
@@ -57,7 +58,7 @@ class ResultsPage extends StatelessWidget {
     final skipped = result.alternatives.length - others.length;
     final mapped = [
       for (final station in result.all)
-        if (station.id == best?.id || (station.included && (station.rank ?? 99) <= 5) || planIds.contains(station.id)) station,
+        if (station.id == best?.id || (station.included && (station.rank ?? 99) <= 4) || planIds.contains(station.id)) station,
     ];
     return Scaffold(
       appBar: AppBar(title: Text(best == null ? 'No charger found' : 'Your best charger')),
@@ -65,18 +66,20 @@ class ResultsPage extends StatelessWidget {
         padding: const EdgeInsets.fromLTRB(16, 4, 16, 32),
         children: [
           RouteMap(
-            height: 260,
-            line: result.routeGeometry.map((pair) => LatLng(pair[0], pair[1])).toList(),
+            height: 280,
+            line: result.lineToDraw(multiStop: multiStop).map((pair) => LatLng(pair[0], pair[1])).toList(),
             pins: [
               MapPin(
                 point: LatLng(state.origin.latitude, state.origin.longitude),
                 label: 'Start',
-                color: AppColors.good,
+                color: AppColors.brand,
+                icon: Icons.trip_origin_rounded,
               ),
               MapPin(
                 point: LatLng(state.destination.latitude, state.destination.longitude),
-                label: state.destination.name,
-                color: AppColors.bad,
+                label: 'Destination',
+                color: AppColors.gold,
+                icon: Icons.flag_rounded,
               ),
               for (final station in mapped)
                 MapPin(
@@ -87,24 +90,25 @@ class ResultsPage extends StatelessWidget {
                           ? 'Best: ${_short(station.name)}'
                           : _short(station.name),
                   color: planIds.contains(station.id) && multiStop
-                      ? AppColors.info
+                      ? AppColors.cyan
                       : station.id == best?.id
-                      ? AppColors.brand
-                      : station.included
-                          ? const Color(0xFF475569)
-                          : const Color(0xFF94A3B8),
+                          ? AppColors.brand
+                          : AppColors.muted,
                   icon: Icons.ev_station_rounded,
                   emphasis: station.id == best?.id,
                 ),
             ],
           ),
           const SizedBox(height: 14),
+          _TripOverview(result: result, state: state),
+          const SizedBox(height: 12),
           if (result.canFinishWithoutCharging) ...[
             Notice(
               tone: Tone.good,
               title: 'You can make it without charging',
               text: 'You’d reach ${state.destination.name} with about '
-                  '${fmtPercent(result.destinationPercentWithoutCharging)} battery. Charging on the way is optional.',
+                  '${fmtPercent(result.energy?.arrivalPercent ?? result.destinationPercentWithoutCharging)} battery. '
+                  'Charging on the way is optional.',
             ),
             const SizedBox(height: 12),
           ],
@@ -129,7 +133,7 @@ class ResultsPage extends StatelessWidget {
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Icon(Icons.check_rounded, color: AppColors.good, size: 20),
+                          const Icon(Icons.check_circle_rounded, color: AppColors.brand, size: 20),
                           const SizedBox(width: 10),
                           Expanded(child: Text(reason, style: const TextStyle(height: 1.35))),
                         ],
@@ -205,7 +209,7 @@ class _PlanCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final stops = plan.stops;
     return Panel(
-      highlight: AppColors.info,
+      highlight: AppColors.cyan,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -225,10 +229,10 @@ class _PlanCard extends StatelessWidget {
                 children: [
                   CircleAvatar(
                     radius: 14,
-                    backgroundColor: AppColors.info,
+                    backgroundColor: AppColors.cyan,
                     child: Text(
                       '${stops.indexOf(stop) + 1}',
-                      style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w800),
+                      style: const TextStyle(color: AppColors.background, fontSize: 13, fontWeight: FontWeight.w800),
                     ),
                   ),
                   const SizedBox(width: 10),
@@ -251,7 +255,7 @@ class _PlanCard extends StatelessWidget {
             ),
           Text(
             'Reach $destination with about ${fmtPercent(plan.arrivalPercent)}. '
-            'Charging times assume full listed power.',
+            'Charging minutes are the Component 2 duration model, from battery size, charger power, and the charge levels.',
             style: const TextStyle(color: AppColors.muted, fontSize: 12.5),
           ),
           const SizedBox(height: 12),
@@ -277,6 +281,210 @@ String _short(String name) {
   return cleaned.length <= 18 ? cleaned : '${cleaned.substring(0, 17)}…';
 }
 
+String _traffic(String? level) => switch (level) {
+      'high' => 'Heavy traffic',
+      'low' => 'Light traffic',
+      'medium' => 'Moderate traffic',
+      _ => 'Traffic unknown',
+    };
+
+String _road(String? type) => switch (type) {
+      'highway' => 'Highway',
+      'urban' => 'City roads',
+      'mixed' => 'Mixed roads',
+      _ => 'Roads unknown',
+    };
+
+/// Distance, time, battery needed, energy use and the conditions they were estimated for.
+class _TripOverview extends StatelessWidget {
+  const _TripOverview({required this.result, required this.state});
+  final TripResult result;
+  final AppState state;
+
+  @override
+  Widget build(BuildContext context) {
+    final energy = result.energy;
+    final direct = result.direct;
+    final weather = result.weather ?? state.weather;
+    final km = energy?.distanceKm ?? direct?.distanceKm;
+    final minutes = energy?.durationMin ?? direct?.durationMin;
+    // Older servers do not send trip_energy; then use road distance × the car's consumption rate.
+    final profile = state.profile;
+    final rateKwh = km == null ? null : km * profile.consumption / 100;
+    final needed = energy?.percentNeeded ?? (rateKwh == null ? null : rateKwh / profile.batteryKwh * 100);
+    final usedKwh = energy?.usedKwh ?? rateKwh;
+    final arrival = energy?.arrivalPercent ??
+        result.destinationPercentWithoutCharging ??
+        (needed == null ? null : state.batteryNow - needed);
+    final arrivalColor = arrival == null
+        ? AppColors.muted
+        : arrival < state.profile.reservePercent
+            ? AppColors.bad
+            : arrival < 25
+                ? AppColors.warn
+                : AppColors.brand;
+    final perKm = energy?.usesModel == true ? energy?.modelPer100km : (energy?.ratePer100km ?? profile.consumption);
+    final unusual = energy?.unusualInputs ?? const <String>[];
+    return Panel(
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 14),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Text('Your trip', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800)),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  '${fmtKm(km)} · ${fmtMinutes(minutes)}',
+                  textAlign: TextAlign.right,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(fontWeight: FontWeight.w800, color: AppColors.muted),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 14),
+          MetricGrid(
+            children: [
+              MetricTile(
+                icon: Icons.battery_charging_full_rounded,
+                value: needed == null ? '—' : '${needed.round()}%',
+                label: 'battery needed',
+                caption: usedKwh == null ? null : '${fmtKwh(usedKwh)} for the drive',
+                color: AppColors.cyan,
+              ),
+              MetricTile(
+                icon: Icons.battery_5_bar_rounded,
+                value: arrival != null && arrival < 0 ? 'Not enough' : fmtPercent(arrival),
+                label: 'when you arrive',
+                caption: arrival != null && arrival < 0
+                    ? 'short by ${(-arrival).round()}% — charge on the way'
+                    : 'without charging',
+                color: arrivalColor,
+              ),
+              MetricTile(
+                icon: Icons.speed_rounded,
+                value: perKm == null ? '—' : perKm.toStringAsFixed(1),
+                label: 'kWh per 100 km',
+                caption: energy?.usesModel == true ? 'AI estimate for this route' : 'your car’s usual rate',
+                color: AppColors.brand,
+              ),
+              MetricTile(
+                icon: weather == null ? Icons.thermostat_rounded : _weatherIcon(weather),
+                value: weather == null ? '—' : '${weather.temperatureC.round()}°C',
+                label: weather?.text ?? 'weather unavailable',
+                caption: weather?.humidity == null ? 'at your start' : '${weather!.humidity}% humidity at start',
+                color: AppColors.gold,
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Wrap(
+            spacing: 6,
+            runSpacing: 6,
+            children: [
+              if (result.climbMeters != null) Tag('↑ ${result.climbMeters!.round()} m climb', icon: Icons.terrain_rounded),
+              if (result.descentMeters != null) Tag('↓ ${result.descentMeters!.round()} m descent'),
+              if (result.trafficLevel != null) Tag(_traffic(result.trafficLevel), icon: Icons.traffic_rounded),
+              if (result.roadType != null) Tag(_road(result.roadType), icon: Icons.add_road_rounded),
+            ],
+          ),
+          if (energy != null) ...[
+            const SizedBox(height: 12),
+            _EnergyCompare(energy: energy),
+          ],
+          if (unusual.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.only(top: 10),
+              child: Text(
+                'This trip’s ${unusual.join(', ')} ${unusual.length == 1 ? 'is' : 'are'} beyond what the AI energy model '
+                'learned from, so we plan with whichever estimate is higher.',
+                style: const TextStyle(color: AppColors.muted, fontSize: 12, height: 1.35),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+IconData _weatherIcon(Weather weather) {
+  final code = weather.code;
+  if (code >= 95) return Icons.thunderstorm_rounded;
+  if (code >= 51) return Icons.water_drop_rounded;
+  if (code == 45 || code == 48) return Icons.foggy;
+  if (code >= 2) return Icons.cloud_rounded;
+  return weather.isDay ? Icons.wb_sunny_rounded : Icons.nightlight_round;
+}
+
+/// The AI energy model next to the car's own rate, as two bars. The larger one is used for safety.
+class _EnergyCompare extends StatelessWidget {
+  const _EnergyCompare({required this.energy});
+  final TripEnergy energy;
+
+  @override
+  Widget build(BuildContext context) {
+    final model = energy.modelKwh;
+    final rate = energy.rateKwh;
+    final top = [model ?? 0, rate ?? 0].reduce((a, b) => a > b ? a : b);
+    Widget bar(String label, double? value, Color color, bool used) {
+      final share = value == null || top <= 0 ? 0.0 : value / top;
+      return Padding(
+        padding: const EdgeInsets.symmetric(vertical: 4),
+        child: Row(
+          children: [
+            SizedBox(
+              width: 112,
+              child: Text(label, style: TextStyle(fontSize: 12.5, color: used ? AppColors.ink : AppColors.muted, fontWeight: FontWeight.w700)),
+            ),
+            Expanded(
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(6),
+                child: LinearProgressIndicator(
+                  value: share,
+                  minHeight: 8,
+                  backgroundColor: AppColors.background,
+                  color: used ? color : color.withValues(alpha: 0.45),
+                ),
+              ),
+            ),
+            const SizedBox(width: 10),
+            SizedBox(
+              width: 64,
+              child: Text(
+                value == null ? 'not run' : fmtKwh(value),
+                textAlign: TextAlign.right,
+                style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w800, color: used ? AppColors.ink : AppColors.muted),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    return Container(
+      padding: const EdgeInsets.fromLTRB(12, 8, 12, 8),
+      decoration: BoxDecoration(color: AppColors.surfaceHigh, borderRadius: BorderRadius.circular(14)),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          bar('AI energy model', model, AppColors.cyan, energy.usesModel),
+          bar('Your car’s rate', rate, AppColors.brand, !energy.usesModel),
+          const SizedBox(height: 2),
+          Text(
+            model == null
+                ? 'Live weather or road height was unavailable, so this uses your car’s usual rate.'
+                : 'We plan with the higher of the two, so the battery check is never too optimistic.',
+            style: const TextStyle(fontSize: 11.5, color: AppColors.muted),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 class _BestCard extends StatelessWidget {
   const _BestCard({required this.result, required this.station, required this.plugLabel});
   final TripResult result;
@@ -287,102 +495,127 @@ class _BestCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final state = context.read<AppState>();
     final hasCost = state.profile.tariffLkr != null;
+    final congestion = station.congestion;
+    final congestionColor = switch (congestion) {
+      'Low' => AppColors.good,
+      'Medium' => AppColors.warn,
+      'High' => AppColors.bad,
+      _ => AppColors.muted,
+    };
     return Panel(
       highlight: AppColors.brand,
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Tag('Best match', tone: Tone.good, icon: Icons.star_rounded),
-          const SizedBox(height: 10),
-          Text(station.name, style: const TextStyle(fontSize: 21, fontWeight: FontWeight.w800)),
-          const SizedBox(height: 2),
-          Text(station.area.isEmpty ? station.address : station.area, style: const TextStyle(color: AppColors.muted)),
-          const SizedBox(height: 10),
           Wrap(
-            spacing: 6,
+            alignment: WrapAlignment.spaceBetween,
+            spacing: 8,
             runSpacing: 6,
             children: [
+              const Tag('Best match', tone: Tone.good, icon: Icons.star_rounded),
               Tag(fmtPower(station.powerKw), tone: Tone.info, icon: Icons.bolt_rounded),
-              Tag('$plugLabel plug', tone: Tone.good, icon: Icons.power_rounded),
             ],
           ),
-          const SizedBox(height: 14),
-          Row(
-            children: [
-              Stat(
-                icon: Icons.alt_route_rounded,
-                value: (station.detourKm ?? 0) <= 0.05 ? 'On route' : '+${fmtMinutes(station.detourMin)}',
-                label: (station.detourKm ?? 0) <= 0.05 ? 'no detour' : 'extra drive (${fmtKm(station.detourKm)})',
-              ),
-              const SizedBox(width: 8),
-              Stat(
-                icon: Icons.battery_3_bar_rounded,
-                value: fmtPercent(station.arrivalPercent),
-                label: 'battery when you arrive',
-              ),
-              const SizedBox(width: 8),
-              _chargeStat(state),
-              if (hasCost) ...[
-                const SizedBox(width: 8),
-                Stat(icon: Icons.payments_outlined, value: fmtLkr(station.costLkr), label: 'estimated cost'),
-              ],
-            ],
+          const SizedBox(height: 12),
+          Text(station.name, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w800, letterSpacing: -0.4)),
+          const SizedBox(height: 2),
+          Text(
+            [
+              station.area.isEmpty ? station.address : station.area,
+              (station.detourKm ?? 0) <= 0.05 ? 'on your route' : '+${fmtMinutes(station.detourMin)} detour',
+            ].join(' · '),
+            style: const TextStyle(color: AppColors.muted),
           ),
-          if (station.chargeMinutes != null && (station.chargeKwh ?? 0) > 0)
-            const Padding(
-              padding: EdgeInsets.only(top: 8),
-              child: Text(
-                'Charging time assumes the charger runs at full power. It’s often a bit slower.',
-                style: TextStyle(fontSize: 12, color: AppColors.muted),
+          if (station.chargingDoneAt != null) ...[
+            const SizedBox(height: 14),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(16),
+                gradient: LinearGradient(colors: [AppColors.brand.withValues(alpha: 0.16), AppColors.cyan.withValues(alpha: 0.08)]),
+                border: Border.all(color: AppColors.brand.withValues(alpha: 0.35)),
               ),
-            ),
-          const SizedBox(height: 8),
-          Row(
-            children: [
-              Stat(
-                icon: Icons.groups_rounded,
-                value: station.hasQueueEstimate ? '${station.queueVehicles}' : '—',
-                label: 'queue in 30 min',
-              ),
-              const SizedBox(width: 8),
-              Stat(
-                icon: Icons.hourglass_bottom_rounded,
-                value: station.hasQueueEstimate ? fmtMinutes(station.waitingMinutes) : '—',
-                label: 'est. waiting',
-              ),
-              const SizedBox(width: 8),
-              Stat(
-                icon: Icons.traffic_rounded,
-                value: station.hasQueueEstimate ? (station.congestion ?? '—') : '—',
-                label: 'congestion',
-              ),
-            ],
-          ),
-          if (station.queueNote != null)
-            Padding(
-              padding: const EdgeInsets.only(top: 8),
-              child: Text(station.queueNote!, style: const TextStyle(fontSize: 12, color: AppColors.muted)),
-            ),
-          if (station.chargingDoneAt != null)
-            Padding(
-              padding: const EdgeInsets.only(top: 10),
               child: Row(
                 children: [
-                  const Icon(Icons.schedule_rounded, size: 18, color: AppColors.brand),
-                  const SizedBox(width: 6),
+                  const Icon(Icons.schedule_rounded, color: AppColors.brand),
+                  const SizedBox(width: 10),
                   Expanded(
-                    child: Text(
-                      'Charging done by ${fmtClock(station.chargingDoneAt)}'
-                      '${station.destinationAt != null ? ' · at destination ${fmtClock(station.destinationAt)}' : ''}',
-                      style: const TextStyle(fontWeight: FontWeight.w700),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Charging done by ${fmtClock(station.chargingDoneAt)}',
+                          style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 15.5),
+                        ),
+                        if (station.destinationAt != null)
+                          Text(
+                            'At your destination by ${fmtClock(station.destinationAt)}',
+                            style: const TextStyle(color: AppColors.muted, fontSize: 12.5),
+                          ),
+                      ],
                     ),
                   ),
                 ],
               ),
             ),
+          ],
+          const SizedBox(height: 12),
+          MetricGrid(
+            children: [
+              MetricTile(
+                icon: Icons.groups_rounded,
+                value: station.hasQueueEstimate ? '${station.queueVehicles} cars' : '—',
+                label: 'queue in 30 min',
+                color: AppColors.cyan,
+              ),
+              MetricTile(
+                icon: Icons.hourglass_bottom_rounded,
+                value: station.hasQueueEstimate ? fmtMinutes(station.waitingMinutes) : '—',
+                label: 'expected wait',
+                color: AppColors.gold,
+              ),
+              MetricTile(
+                icon: Icons.traffic_rounded,
+                value: station.hasQueueEstimate ? (congestion ?? '—') : '—',
+                label: 'how busy',
+                color: congestionColor,
+              ),
+              _chargeTile(state),
+              MetricTile(
+                icon: Icons.battery_3_bar_rounded,
+                value: fmtPercent(station.arrivalPercent),
+                label: 'battery on arrival',
+                color: AppColors.brand,
+              ),
+              MetricTile(
+                icon: Icons.payments_outlined,
+                value: hasCost ? fmtLkr(station.costLkr) : 'Add price',
+                label: 'charging cost',
+                color: AppColors.gold,
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          Text(
+            station.hasQueueEstimate
+                ? 'Queue and wait are a 30-minute forecast for ${station.queueArea ?? 'the nearest town'}'
+                    '${station.queueAreaKm != null ? ' (${station.queueAreaKm!.toStringAsFixed(1)} km away)' : ''}'
+                    ' from a simulation-trained model — not a live count at this charger.'
+                : 'No queue forecast: this charger is far from the towns the queue model covers.',
+            style: const TextStyle(fontSize: 12, color: AppColors.muted, height: 1.35),
+          ),
+          if (station.chargeMinutes != null && (station.chargeKwh ?? 0) > 0)
+            const Padding(
+              padding: EdgeInsets.only(top: 4),
+              child: Text(
+                'Charging time is the Component 2 duration model, from your battery, this charger’s power, and the charge levels.',
+                style: TextStyle(fontSize: 12, color: AppColors.muted),
+              ),
+            ),
           if (!hasCost)
             Padding(
-              padding: const EdgeInsets.only(top: 4),
+              padding: const EdgeInsets.only(top: 2),
               child: TextButton(
                 style: TextButton.styleFrom(padding: EdgeInsets.zero),
                 onPressed: () {
@@ -393,14 +626,18 @@ class _BestCard extends StatelessWidget {
               ),
             ),
           const SizedBox(height: 12),
-          FilledButton.icon(
-            onPressed: () => openDirections(
-              origin: state.origin.isCurrentLocation ? null : LatLng(state.origin.latitude, state.origin.longitude),
-              via: LatLng(station.latitude, station.longitude),
-              destination: LatLng(state.destination.latitude, state.destination.longitude),
+          DecoratedBox(
+            decoration: BoxDecoration(gradient: AppColors.accentGradient, borderRadius: BorderRadius.circular(18)),
+            child: FilledButton.icon(
+              style: FilledButton.styleFrom(backgroundColor: Colors.transparent, shadowColor: Colors.transparent),
+              onPressed: () => openDirections(
+                origin: state.origin.isCurrentLocation ? null : LatLng(state.origin.latitude, state.origin.longitude),
+                via: LatLng(station.latitude, station.longitude),
+                destination: LatLng(state.destination.latitude, state.destination.longitude),
+              ),
+              icon: const Icon(Icons.navigation_rounded),
+              label: const Text('Start navigation'),
             ),
-            icon: const Icon(Icons.navigation_rounded),
-            label: const Text('Start navigation'),
           ),
           const SizedBox(height: 10),
           OutlinedButton.icon(
@@ -413,25 +650,26 @@ class _BestCard extends StatelessWidget {
     );
   }
 
-  Widget _chargeStat(AppState state) {
+  Widget _chargeTile(AppState state) {
     final kwh = station.chargeKwh;
     if (station.fullChargeNotEnough) {
-      return const Stat(icon: Icons.ev_station_rounded, value: '100%', label: 'may not be enough');
+      return const MetricTile(icon: Icons.ev_station_rounded, value: '100%', label: 'may not be enough', color: AppColors.bad);
     }
     if (kwh == null) {
-      return Stat(
+      return MetricTile(
         icon: Icons.ev_station_rounded,
         value: fmtPercent(station.minimumTargetPercent),
         label: 'charge to at least',
       );
     }
     if (kwh <= 0) {
-      return Stat(icon: Icons.ev_station_rounded, value: 'Not needed', label: 'already at ${state.chargeTo}%');
+      return MetricTile(icon: Icons.ev_station_rounded, value: 'Not needed', label: 'already at ${state.chargeTo}%');
     }
-    return Stat(
+    return MetricTile(
       icon: Icons.ev_station_rounded,
       value: fmtMinutes(station.chargeMinutes),
-      label: 'to charge to ${state.chargeTo}%',
+      label: 'duration model',
+      caption: '+${fmtKwh(kwh)}',
     );
   }
 }
@@ -457,7 +695,7 @@ class _OptionTile extends StatelessWidget {
       child: Row(
         children: [
           CircleAvatar(
-            backgroundColor: station.included ? AppColors.brandSoft : const Color(0xFFF0F2F1),
+            backgroundColor: station.included ? AppColors.brandSoft : AppColors.neutralSoft,
             child: Icon(
               Icons.ev_station_rounded,
               color: station.included ? AppColors.brand : AppColors.muted,

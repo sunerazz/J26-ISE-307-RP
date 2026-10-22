@@ -1,3 +1,5 @@
+import 'services.dart';
+
 /// A named point a trip can start or end at.
 class Place {
   const Place(this.name, this.latitude, this.longitude, {this.isCurrentLocation = false});
@@ -131,13 +133,15 @@ class RankedStation {
 
   Map<String, dynamic> get _timeline => Map<String, dynamic>.from((json['timeline'] as Map?) ?? const {});
 
-  /// Clock time charging should finish: drive there, predicted wait, then charging at listed power.
+  /// Clock time charging should finish: drive there, predicted wait, then the Component 2 session length.
   String? get chargingDoneAt => _timeline['charging_complete_time'] as String?;
   String? get destinationAt => _timeline['arrive_destination_time'] as String?;
   int? get queueVehicles => (_queue['predicted_queue_length'] as num?)?.round();
   double? get waitingMinutes => (_queue['predicted_waiting_time_min'] as num?)?.toDouble();
   String? get congestion => _queue['predicted_congestion_level'] as String?;
   String? get queueNote => _queue['reason'] as String?;
+  String? get queueArea => _queue['trained_area'] as String?;
+  double? get queueAreaKm => (_queue['distance_km'] as num?)?.toDouble();
 
   double? get arrivalPercent => (_plan['arrival_soc_percent'] as num?)?.toDouble();
   double? get minimumTargetPercent => (_plan['minimum_target_soc_percent'] as num?)?.toDouble();
@@ -189,10 +193,75 @@ class TripResult {
   String? get strategySummary => (json['strategy_comparison'] as Map?)?['summary'] as String?;
   List<List<double>> get routeGeometry => _points((json['recommended_route'] as Map?)?['geometry']);
 
+  /// Road line through every stop of a multi-stop charging plan.
+  List<List<double>> get planGeometry => _points((json['plan_route'] as Map?)?['geometry']);
+
+  /// The direct road from start to destination, used when no charger line exists.
+  List<List<double>> get directGeometry => _points((json['direct_route'] as Map?)?['geometry']);
+
+  /// The line to draw: the plan's stops when it needs several, else the best charger, else the direct road.
+  List<List<double>> lineToDraw({required bool multiStop}) {
+    if (multiStop && planGeometry.length >= 2) return planGeometry;
+    if (routeGeometry.length >= 2) return routeGeometry;
+    return directGeometry;
+  }
+
   Map<String, dynamic> get _tripCheck => Map<String, dynamic>.from((json['trip_check'] as Map?) ?? const {});
   bool get canFinishWithoutCharging => _tripCheck['can_finish_without_charging'] == true;
   double? get destinationPercentWithoutCharging =>
       (_tripCheck['soc_at_destination_without_charging_percent'] as num?)?.toDouble();
+
+  TripEnergy? get energy {
+    final raw = json['trip_energy'];
+    return raw is Map ? TripEnergy(Map<String, dynamic>.from(raw)) : null;
+  }
+
+  Map<String, dynamic> get _conditions => Map<String, dynamic>.from((json['trip_conditions'] as Map?) ?? const {});
+  Weather? get weather => Weather.fromJson(_conditions['weather']);
+  Map<String, dynamic> get _elevation => Map<String, dynamic>.from((_conditions['elevation'] as Map?) ?? const {});
+  double? get climbMeters => (_elevation['elevation_gain_m'] as num?)?.toDouble();
+  double? get descentMeters => (_elevation['elevation_loss_m'] as num?)?.toDouble();
+  String? get trafficLevel => _conditions['traffic_level'] as String?;
+  String? get roadType => _conditions['road_type'] as String?;
+  String? get planArrivalTime => json['plan_arrival_time'] as String?;
+}
+
+/// Battery needed for the direct drive: the AI energy model next to the car's own consumption rate.
+class TripEnergy {
+  TripEnergy(this.json);
+  final Map<String, dynamic> json;
+
+  double? _num(String key) => (json[key] as num?)?.toDouble();
+  double? get distanceKm => _num('distance_km');
+  double? get durationMin => _num('duration_min');
+  double? get modelKwh => _num('model_kwh');
+  double? get rateKwh => _num('rate_kwh');
+  double? get usedKwh => _num('used_kwh');
+  double? get percentNeeded => _num('battery_percent_needed');
+  double? get arrivalPercent => _num('arrival_soc_percent');
+  double? get modelPer100km => _num('model_kwh_per_100km');
+  double? get ratePer100km => _num('rate_kwh_per_100km');
+  bool get modelApplied => json['model_applied'] == true;
+  bool get usesModel => json['used_basis'] == 'Component 3 model';
+  bool get canFinish => json['can_finish_without_charging'] == true;
+
+  /// Inputs outside what the energy model was trained on, in plain words.
+  List<String> get unusualInputs {
+    const words = {
+      'elevation_gain_m': 'hill climb',
+      'elevation_loss_m': 'descent',
+      'battery_capacity_kwh': 'battery size',
+      'distance_km': 'trip length',
+      'average_speed_kmh': 'speed',
+      'vehicle_mass_kg': 'car weight',
+      'ambient_temperature_c': 'temperature',
+    };
+    final raw = (json['out_of_training_range'] as List?) ?? const [];
+    return [
+      for (final item in raw.whereType<Map>())
+        words[item['feature']] ?? item['feature'].toString(),
+    ];
+  }
 }
 
 /// The least-time charging plan from the route optimiser: zero, one or several stops.

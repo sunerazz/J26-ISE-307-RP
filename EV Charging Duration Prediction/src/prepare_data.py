@@ -31,8 +31,7 @@ from src.inspect_dataset import load_raw, temperature_column  # noqa: E402
 
 
 def feature_columns(frame: pd.DataFrame) -> list[str]:
-    temp = temperature_column(frame.columns)
-    cols = NUMERIC_FEATURES + [temp] + CATEGORICAL_FEATURES
+    cols = list(NUMERIC_FEATURES) + list(CATEGORICAL_FEATURES)
     missing = [c for c in cols if c not in frame.columns]
     if missing:
         raise ValueError(f"Expected feature columns are missing: {missing}")

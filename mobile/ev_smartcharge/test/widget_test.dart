@@ -8,6 +8,7 @@ import 'package:ev_smartcharge/format.dart';
 import 'package:ev_smartcharge/main.dart';
 import 'package:ev_smartcharge/models.dart';
 import 'package:ev_smartcharge/screens/results_page.dart';
+import 'package:ev_smartcharge/services.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
@@ -31,6 +32,15 @@ class MemoryStore extends CloudStore {
   Future<void> addTrip(SavedTrip trip, List<SavedTrip> all) async => saved = all;
   @override
   Future<void> clearTrips() async => saved = [];
+}
+
+/// No weather or place-search calls in tests.
+class OfflineServices extends PlaceServices {
+  @override
+  Future<Weather?> weather(double latitude, double longitude) async =>
+      const Weather(temperatureC: 29.4, text: 'Partly cloudy', code: 2, isDay: true);
+  @override
+  Future<List<Place>> search(String query, {double? nearLatitude, double? nearLongitude}) async => const [];
 }
 
 String fixture(String name) => File('test/fixtures/$name').readAsStringSync();
@@ -123,7 +133,7 @@ void main() {
       tester.view.physicalSize = const Size(1080, 2400);
       tester.view.devicePixelRatio = 2.6;
       addTearDown(tester.view.reset);
-      final state = AppState(api: api ?? fakeApi(), store: MemoryStore());
+      final state = AppState(api: api ?? fakeApi(), store: MemoryStore(), services: OfflineServices(), locateOnStart: false);
       await tester.runAsync(state.load);
       await tester.pumpWidget(SmartChargeApp(state: state));
       await tester.pump();
@@ -168,14 +178,23 @@ void main() {
       await tester.pumpWidget(MaterialApp(home: ResultsPage(result: state.latest!)).wrapWith(state));
       await tester.pump();
       expect(find.text('Your best charger'), findsOneWidget);
-      expect(find.text('Vortex Energy / ChargeNET'), findsOneWidget);
+      // The trip overview (battery needed, energy use, weather) comes first.
+      expect(find.text('Your trip'), findsOneWidget);
+      expect(find.text('battery needed'), findsOneWidget);
+      await tester.scrollUntilVisible(find.text('You can make it without charging'), 300);
       expect(find.text('You can make it without charging'), findsOneWidget);
+      await tester.scrollUntilVisible(find.text('Vortex Energy / ChargeNET'), 300);
+      expect(find.text('Vortex Energy / ChargeNET'), findsOneWidget);
+      await tester.scrollUntilVisible(find.text('Start navigation'), 300);
       expect(find.text('Start navigation'), findsOneWidget);
     });
 
     testWidgets('server failure shows a friendly message', (tester) async {
       await pumpApp(tester, api: fakeApi(recommendStatus: 503));
       await tester.scrollUntilVisible(find.text('Find best charger'), 200);
+      // Built in the scroll cache is not enough to tap it; bring it on screen.
+      await tester.ensureVisible(find.text('Find best charger'));
+      await tester.pump();
       await tester.runAsync(() async {
         await tester.tap(find.text('Find best charger'));
         await Future<void>.delayed(const Duration(milliseconds: 50));
@@ -190,6 +209,9 @@ void main() {
       state.setBatteryNow(5);
       await tester.pump();
       await tester.scrollUntilVisible(find.text('Find best charger'), 200);
+      // Built in the scroll cache is not enough to tap it; bring it on screen.
+      await tester.ensureVisible(find.text('Find best charger'));
+      await tester.pump();
       await tester.tap(find.text('Find best charger'));
       await tester.pump();
       expect(find.textContaining('at or below your safety reserve'), findsOneWidget);

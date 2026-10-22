@@ -4,7 +4,8 @@ from __future__ import annotations
 
 import json
 import os
-from dataclasses import dataclass
+import time
+from dataclasses import dataclass, field
 from typing import Protocol
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
@@ -40,6 +41,11 @@ class OsrmRoutingProvider:
     base_url: str | None = None
     timeout_seconds: float = 12.0
     name: str = "osrm"
+    # Successful answers are reused for a few minutes, so asking for the same road twice
+    # (for example the direct route before and during planning) sends one request.
+    cache_seconds: float = 600.0
+    cache_size: int = 256
+    _cache: dict[str, tuple[float, dict]] = field(default_factory=dict, repr=False)
 
     def __post_init__(self) -> None:
         configured = self.base_url or os.getenv("OSRM_BASE_URL") or "https://router.project-osrm.org"
@@ -70,6 +76,16 @@ class OsrmRoutingProvider:
         return parse_osrm_table(payload, len(points))
 
     def _get_json(self, url: str) -> dict:
+        cached = self._cache.get(url)
+        if cached is not None and time.monotonic() - cached[0] < self.cache_seconds:
+            return cached[1]
+        payload = self._fetch_json(url)
+        if len(self._cache) >= self.cache_size:
+            self._cache.pop(next(iter(self._cache)))
+        self._cache[url] = (time.monotonic(), payload)
+        return payload
+
+    def _fetch_json(self, url: str) -> dict:
         request = Request(url, headers={"User-Agent": "colombo-ev-route-prototype/1.0"})
         try:
             with urlopen(request, timeout=self.timeout_seconds) as response:

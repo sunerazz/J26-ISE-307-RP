@@ -25,9 +25,11 @@ def load_raw(path: Path | None = None) -> pd.DataFrame:
     path = path or RAW_DATA_PATH
     if not path.exists():
         raise FileNotFoundError(
-            f"Dataset not found at {path}. Place the original "
-            "'Component 2 ev_charging_patterns (2).xlsx' in data/raw/."
+            f"Dataset not found at {path}. Place "
+            "component2_charging_duration_sri_lanka_5_stations.csv in data/raw/."
         )
+    if path.suffix.lower() == ".csv":
+        return pd.read_csv(path)
     return pd.read_excel(path)
 
 
@@ -39,6 +41,9 @@ def temperature_column(columns) -> str:
 
 
 def inspect(df: pd.DataFrame) -> dict:
+    df = df.copy()
+    df[START_TIME_COL] = pd.to_datetime(df[START_TIME_COL], errors="coerce")
+    df["Charging End Time"] = pd.to_datetime(df["Charging End Time"], errors="coerce")
     temp = temperature_column(df.columns)
     report = {
         "source_path": str(RAW_DATA_PATH),
@@ -87,11 +92,42 @@ def inspect(df: pd.DataFrame) -> dict:
     }
     report["temperature_column"] = temp
     report["excluded_features"] = EXCLUDED_FEATURES
+    clock_hours = (
+        pd.to_datetime(df["Charging End Time"]) - pd.to_datetime(df[START_TIME_COL])
+    ).dt.total_seconds() / 3600.0
+    clock_corr = float(clock_hours.corr(hours))
+    paired = df.dropna(subset=["Energy Consumed (kWh)", "Charging Rate (kW)"])
+    energy_rate_corr = float(
+        paired["Energy Consumed (kWh)"].corr(
+            paired["Charging Rate (kW)"] * paired[TARGET_HOURS_COL]
+        )
+    )
+    locations = df["Charging Station Location"].value_counts().to_dict()
+    report["clock_versus_labelled_duration_correlation"] = clock_corr
+    report["energy_versus_rate_times_duration_correlation"] = energy_rate_corr
+    report["location_counts"] = {str(k): int(v) for k, v in locations.items()}
     report["data_limitations"] = [
-        "Duration in hours does not match Charging End Time minus Charging Start Time (near-zero correlation). The labelled duration column is used as the target, not the clock difference.",
-        "Energy consumed is almost uncorrelated with duration, and charging rate is not equal to energy/duration. Treat the table as a noisy or synthetic session table, not a physically consistent meter log.",
-        "A small number of SOC values exceed 100 percent and some end SOC values are below start SOC.",
-        "1,320 sessions over about eight weeks and five vehicle models is a small sample for strong generalisation claims.",
+        (
+            "Place names are five Sri Lankan labels: "
+            + ", ".join(f"{name} ({count})" for name, count in locations.items())
+            + ". Each label has the same number of rows, which is a generated balance, not evidence of equal real demand."
+        ),
+        (
+            f"Labelled duration matches Charging End Time minus Charging Start Time "
+            f"(correlation {clock_corr:.3f}). The duration column is that clock difference."
+        ),
+        (
+            f"Energy consumed matches charging rate times labelled duration "
+            f"(correlation {energy_rate_corr:.3f}). "
+            "Both identities were generated from battery capacity, the SOC rise, and charging rate. "
+            "This is not a meter log from those chargers."
+        ),
+        (
+            f"SOC start outside 0–100: {report['soc_start_outside_0_100']}. "
+            f"SOC end outside 0–100: {report['soc_end_outside_0_100']}. "
+            f"SOC end below start: {report['soc_end_below_start']}."
+        ),
+        "A low error means the model recovered that generated formula. It does not mean the minutes were measured at the chargers.",
     ]
     return report
 

@@ -1,6 +1,6 @@
 # Charging duration evaluation
 
-Selected model (lowest validation MAE): **random_forest**.
+Selected model (lowest validation MAE): **xgboost**.
 
 Metrics are in **minutes** and were computed from model predictions. Raw regression metrics are unclipped.
 
@@ -9,27 +9,27 @@ Metrics are in **minutes** and were computed from model predictions. Raw regress
 ```json
 {
   "median_baseline": {
-    "mae_min": 56.19339210954555,
-    "rmse_min": 69.98052151951805,
-    "r2": -0.0007335350582950984,
+    "mae_min": 78.97174180153492,
+    "rmse_min": 214.26150625680552,
+    "r2": -0.0677469877514012,
     "n": 192
   },
   "linear_regression": {
-    "mae_min": 56.515904373853736,
-    "rmse_min": 71.24266498714852,
-    "r2": -0.03715679678173789,
+    "mae_min": 60.30207167586999,
+    "rmse_min": 169.5556630181521,
+    "r2": 0.33134107401576085,
     "n": 192
   },
   "random_forest": {
-    "mae_min": 56.038786752949534,
-    "rmse_min": 69.90180148541161,
-    "r2": 0.0015166187940626186,
+    "mae_min": 24.81084439273401,
+    "rmse_min": 107.63712764388048,
+    "r2": 0.730533831479379,
     "n": 192
   },
   "xgboost": {
-    "mae_min": 56.8923150247001,
-    "rmse_min": 71.59993199856477,
-    "r2": -0.047585126608338246,
+    "mae_min": 22.495923622429615,
+    "rmse_min": 97.22305739890808,
+    "r2": 0.7801539858408545,
     "n": 192
   }
 }
@@ -39,21 +39,21 @@ Metrics are in **minutes** and were computed from model predictions. Raw regress
 
 ```json
 {
-  "mae_min": 53.639470500286734,
-  "rmse_min": 62.59605044048705,
-  "r2": -0.048412952620795924,
+  "mae_min": 13.261844058922373,
+  "rmse_min": 36.90297856307612,
+  "r2": 0.8876449841222401,
   "n": 216
 }
 ```
 
-Share of negative raw predictions: 0.0.
+Share of negative raw predictions: 0.032407407407407406.
 Operational predictions from `predict_duration` are clipped at 0 minutes. Clipped test metrics:
 
 ```json
 {
-  "mae_min": 53.639470500286734,
-  "rmse_min": 62.59605044048705,
-  "r2": -0.048412952620795924,
+  "mae_min": 13.107318329681178,
+  "rmse_min": 36.8775965965067,
+  "r2": 0.8877994871262319,
   "n": 216
 }
 ```
@@ -66,4 +66,4 @@ Operational predictions from `predict_duration` are clipped at 0 minutes. Clippe
 - A high R² should be read together with MAE in minutes and the median baseline.
 - This model does not predict queue length, waiting time, or congestion.
 
-Saved pipeline: `C:\Users\Charuka\Desktop\thanuka resarch\system\component2_charging_duration\models\charging_duration_pipeline.joblib`
+Saved pipeline: `C:\Users\Charuka\Desktop\thanuka resarch\system\EV Charging Duration Prediction\models\charging_duration_pipeline.joblib`

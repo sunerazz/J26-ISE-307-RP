@@ -67,6 +67,17 @@ def _env_url(name: str) -> str:
     return os.getenv(name, "").strip().rstrip("/")
 
 
+def _feature_ranges(path: Path, meta: dict) -> dict[str, tuple[float, float]]:
+    """Min and max of each numeric training input, to flag a request outside what the model saw."""
+    numeric = list(meta.get("numeric_features") or [])
+    if not path.exists() or not numeric:
+        return {}
+    import pandas as pd
+
+    frame = pd.read_csv(path, usecols=lambda column: column in numeric)
+    return {column: (float(frame[column].min()), float(frame[column].max())) for column in frame.columns}
+
+
 def load_component3() -> dict[str, Any]:
     _activate(C3)
     cost_mod = importlib.import_module("src.calculate_charging_cost")
@@ -104,6 +115,7 @@ def load_component3() -> dict[str, Any]:
             "categories": meta.get("categories") or {},
             "feature_columns": list(meta.get("feature_columns") or []),
             "selected_model": meta.get("selected_model"),
+            "feature_ranges": _feature_ranges(C3 / "data" / "processed" / "train.csv", meta),
             "condition_features": [
                 "elevation_gain_m",
                 "elevation_loss_m",

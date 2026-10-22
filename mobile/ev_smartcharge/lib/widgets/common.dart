@@ -30,18 +30,125 @@ class Panel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      clipBehavior: Clip.antiAlias,
-      shape: highlight == null
-          ? null
-          : RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20),
-              side: BorderSide(color: highlight!, width: 1.5),
-            ),
-      child: InkWell(
-        onTap: onTap,
-        child: Padding(padding: padding, child: child),
+    final glow = highlight;
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(22),
+        gradient: const LinearGradient(
+          colors: [AppColors.surfaceHigh, AppColors.surface],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        border: Border.all(color: glow?.withValues(alpha: 0.55) ?? AppColors.line, width: glow == null ? 1 : 1.4),
+        boxShadow: [
+          if (glow != null) BoxShadow(color: glow.withValues(alpha: 0.18), blurRadius: 28, spreadRadius: -6),
+          const BoxShadow(color: Color(0x66000000), blurRadius: 18, offset: Offset(0, 8)),
+        ],
       ),
+      child: Material(
+        type: MaterialType.transparency,
+        borderRadius: BorderRadius.circular(22),
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
+          onTap: onTap,
+          child: Padding(padding: padding, child: child),
+        ),
+      ),
+    );
+  }
+}
+
+/// A headline number with an icon and caption, for the trip dashboard.
+class MetricTile extends StatelessWidget {
+  const MetricTile({
+    super.key,
+    required this.icon,
+    required this.value,
+    required this.label,
+    this.color = AppColors.brand,
+    this.caption,
+  });
+
+  final IconData icon;
+  final String value;
+  final String label;
+  final Color color;
+  final String? caption;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.fromLTRB(14, 14, 14, 12),
+      decoration: BoxDecoration(
+        color: AppColors.surfaceHigh,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: AppColors.line),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(7),
+            decoration: BoxDecoration(color: color.withValues(alpha: 0.14), borderRadius: BorderRadius.circular(11)),
+            child: Icon(icon, size: 18, color: color),
+          ),
+          const SizedBox(height: 10),
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            alignment: Alignment.centerLeft,
+            child: Text(value, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w800, letterSpacing: -0.5)),
+          ),
+          const SizedBox(height: 2),
+          Text(label, style: const TextStyle(fontSize: 12.5, color: AppColors.muted, fontWeight: FontWeight.w600)),
+          if (caption != null) ...[
+            const SizedBox(height: 4),
+            Text(caption!, style: TextStyle(fontSize: 11.5, color: color.withValues(alpha: 0.9))),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+/// Two-column grid of MetricTiles that keeps rows the same height.
+class MetricGrid extends StatelessWidget {
+  const MetricGrid({super.key, required this.children});
+  final List<Widget> children;
+
+  @override
+  Widget build(BuildContext context) {
+    final rows = <Widget>[];
+    for (var i = 0; i < children.length; i += 2) {
+      rows.add(
+        IntrinsicHeight(
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Expanded(child: children[i]),
+              const SizedBox(width: 10),
+              Expanded(child: i + 1 < children.length ? children[i + 1] : const SizedBox()),
+            ],
+          ),
+        ),
+      );
+      if (i + 2 < children.length) rows.add(const SizedBox(height: 10));
+    }
+    return Column(children: rows);
+  }
+}
+
+/// Text painted with the brand gradient, for hero numbers.
+class GradientText extends StatelessWidget {
+  const GradientText(this.text, {super.key, required this.style});
+  final String text;
+  final TextStyle style;
+
+  @override
+  Widget build(BuildContext context) {
+    return ShaderMask(
+      blendMode: BlendMode.srcIn,
+      shaderCallback: (bounds) => AppColors.accentGradient.createShader(bounds),
+      child: Text(text, style: style),
     );
   }
 }
@@ -59,7 +166,7 @@ enum Tone { good, warn, bad, info, neutral }
     case Tone.info:
       return (fg: AppColors.info, bg: AppColors.infoSoft);
     case Tone.neutral:
-      return (fg: AppColors.muted, bg: const Color(0xFFF0F2F1));
+      return (fg: AppColors.muted, bg: AppColors.neutralSoft);
   }
 }
 
@@ -155,7 +262,7 @@ class Stat extends StatelessWidget {
     return Expanded(
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 6),
-        decoration: BoxDecoration(color: AppColors.background, borderRadius: BorderRadius.circular(14)),
+        decoration: BoxDecoration(color: AppColors.surfaceHigh, borderRadius: BorderRadius.circular(14)),
         child: Column(
           children: [
             Icon(icon, size: 20, color: AppColors.brand),

@@ -1,19 +1,20 @@
 {
-  "source_path": "C:\\Users\\Charuka\\Desktop\\thanuka resarch\\system\\component2_charging_duration\\data\\raw\\Component 2 ev_charging_patterns (2).xlsx",
+  "source_path": "C:\\Users\\Charuka\\Desktop\\thanuka resarch\\system\\EV Charging Duration Prediction\\data\\raw\\component2_charging_duration_sri_lanka_5_stations.csv",
   "n_rows": 1320,
-  "n_columns": 20,
+  "n_columns": 24,
   "columns": [
     "User ID",
+    "Station ID",
+    "Charging Station Location",
+    "Station Area",
     "Vehicle Model",
     "Battery Capacity (kWh)",
     "Charging Station ID",
-    "Charging Station Location",
     "Charging Start Time",
     "Charging End Time",
     "Energy Consumed (kWh)",
     "Charging Duration (hours)",
     "Charging Rate (kW)",
-    "Charging Cost (USD)",
     "Time of Day",
     "Day of Week",
     "State of Charge (Start %)",
@@ -22,20 +23,24 @@
     "Temperature (\u00c2\u00b0C)",
     "Vehicle Age (years)",
     "Charger Type",
-    "User Type"
+    "User Type",
+    "Charging Duration (minutes)",
+    "Illustrative Tariff (LKR/kWh)",
+    "Illustrative Charging Cost (LKR)"
   ],
   "dtypes": {
     "User ID": "object",
+    "Station ID": "object",
+    "Charging Station Location": "object",
+    "Station Area": "object",
     "Vehicle Model": "object",
     "Battery Capacity (kWh)": "float64",
     "Charging Station ID": "object",
-    "Charging Station Location": "object",
     "Charging Start Time": "datetime64[ns]",
     "Charging End Time": "datetime64[ns]",
     "Energy Consumed (kWh)": "float64",
     "Charging Duration (hours)": "float64",
     "Charging Rate (kW)": "float64",
-    "Charging Cost (USD)": "float64",
     "Time of Day": "object",
     "Day of Week": "object",
     "State of Charge (Start %)": "float64",
@@ -44,11 +49,12 @@
     "Temperature (\u00c2\u00b0C)": "float64",
     "Vehicle Age (years)": "float64",
     "Charger Type": "object",
-    "User Type": "object"
+    "User Type": "object",
+    "Charging Duration (minutes)": "float64",
+    "Illustrative Tariff (LKR/kWh)": "float64",
+    "Illustrative Charging Cost (LKR)": "float64"
   },
   "missing_counts": {
-    "Energy Consumed (kWh)": 66,
-    "Charging Rate (kW)": 66,
     "Distance Driven (since last charge) (km)": 66
   },
   "duplicate_rows": 0,
@@ -57,16 +63,16 @@
   "target_modelling_unit": "minutes",
   "conversion": "charging_duration_min = Charging Duration (hours) * 60",
   "duration_hours": {
-    "min": 0.0953144165458864,
-    "median": 2.258136073508825,
-    "mean": 2.2693773889553466,
-    "max": 7.63514475934223,
+    "min": 0.0072216303447279,
+    "median": 0.8602633246987916,
+    "mean": 1.505366791286625,
+    "max": 40.66245870039705,
     "non_positive": 0,
     "missing": 0
   },
-  "soc_start_outside_0_100": 9,
-  "soc_end_outside_0_100": 23,
-  "soc_end_below_start": 268,
+  "soc_start_outside_0_100": 0,
+  "soc_end_outside_0_100": 0,
+  "soc_end_below_start": 0,
   "battery_kwh_below_10": 8,
   "battery_kwh_above_120": 17,
   "timestamp_min": "2024-01-01 00:00:00",
@@ -87,19 +93,19 @@
       "DC Fast Charger": 430
     },
     "Time of Day": {
-      "Evening": 362,
-      "Morning": 336,
-      "Night": 312,
-      "Afternoon": 310
+      "Night": 440,
+      "Morning": 385,
+      "Afternoon": 275,
+      "Evening": 220
     },
     "Day of Week": {
-      "Saturday": 205,
-      "Tuesday": 200,
-      "Wednesday": 197,
-      "Sunday": 191,
-      "Friday": 188,
-      "Monday": 185,
-      "Thursday": 154
+      "Monday": 192,
+      "Tuesday": 192,
+      "Wednesday": 192,
+      "Thursday": 192,
+      "Friday": 192,
+      "Saturday": 192,
+      "Sunday": 168
     },
     "User Type": {
       "Commuter": 476,
@@ -107,29 +113,52 @@
       "Casual Driver": 407
     },
     "Charging Station Location": {
-      "Los Angeles": 297,
-      "San Francisco": 264,
-      "Houston": 262,
-      "New York": 255,
-      "Chicago": 242
+      "Pannipitiya": 264,
+      "Malabe": 264,
+      "Nugegoda LECO": 264,
+      "Panadura": 264,
+      "Rajagiriya": 264
     }
   },
   "temperature_column": "Temperature (\u00c2\u00b0C)",
   "excluded_features": {
     "Charging Duration (hours)": "Target source column (hours). Converted to minutes; never an input.",
+    "Charging Duration (minutes)": "Same target already stored in hours. Not an input.",
     "charging_duration_min": "Modelling target.",
-    "Charging End Time": "Known only when the session finishes; would reveal duration.",
-    "State of Charge (End %)": "Observed after charging completes.",
-    "Energy Consumed (kWh)": "Session energy is an outcome, not known when charging starts. 66 values are missing.",
+    "Charging End Time": "Set to start time plus the generated duration, so it would reveal the target.",
+    "Energy Consumed (kWh)": "Generated as charging rate times duration. It is the same information as the target.",
     "Charging Cost (USD)": "Billing result of the session, not an input available as a duration cause at start.",
+    "Illustrative Tariff (LKR/kWh)": "Constant 120 in this table, and not a cause of session length.",
+    "Illustrative Charging Cost (LKR)": "Derived from energy and the illustrative tariff. Energy is an outcome.",
     "User ID": "Unique row identifier (1,320 distinct values). Not a generalisable feature.",
-    "Charging Station ID": "462 sparse station IDs. Known at start, but too high-cardinality to generalise; excluded.",
-    "Charging Start Time": "Used only to order the chronological split, not as a raw model feature. Time of day and day of week are used instead."
+    "Station ID": "One-to-one with the place name. Not a model feature.",
+    "Charging Station ID": "462 sparse station IDs. Not a model feature.",
+    "Charging Start Time": "Used only to order the chronological split, not as a model feature.",
+    "Distance Driven (since last charge) (km)": "Not used. This table's duration does not depend on distance.",
+    "Vehicle Age (years)": "Not used. This table's duration does not depend on vehicle age.",
+    "Vehicle Model": "Not used. Duration is defined from the battery size, not the model name.",
+    "Charging Station Location": "Place label only. Duration does not depend on which of the five names is stored.",
+    "Station Area": "One-to-one with Charging Station Location. Not a model feature.",
+    "Time of Day": "Set from the start clock for the table. Not a cause of the generated duration.",
+    "Day of Week": "Set from the start date. Not a cause of the generated duration.",
+    "Charger Type": "The charging rate already carries the power. The type name is not a second feature.",
+    "User Type": "Not a cause of the generated duration.",
+    "Temperature (\u00b0C)": "Not a cause of the generated duration. The file header may show a broken degree sign."
+  },
+  "clock_versus_labelled_duration_correlation": 0.9999999993810399,
+  "energy_versus_rate_times_duration_correlation": 1.0,
+  "location_counts": {
+    "Pannipitiya": 264,
+    "Malabe": 264,
+    "Nugegoda LECO": 264,
+    "Panadura": 264,
+    "Rajagiriya": 264
   },
   "data_limitations": [
-    "Duration in hours does not match Charging End Time minus Charging Start Time (near-zero correlation). The labelled duration column is used as the target, not the clock difference.",
-    "Energy consumed is almost uncorrelated with duration, and charging rate is not equal to energy/duration. Treat the table as a noisy or synthetic session table, not a physically consistent meter log.",
-    "A small number of SOC values exceed 100 percent and some end SOC values are below start SOC.",
-    "1,320 sessions over about eight weeks and five vehicle models is a small sample for strong generalisation claims."
+    "Place names are five Sri Lankan labels: Pannipitiya (264), Malabe (264), Nugegoda LECO (264), Panadura (264), Rajagiriya (264). Each label has the same number of rows, which is a generated balance, not evidence of equal real demand.",
+    "Labelled duration matches Charging End Time minus Charging Start Time (correlation 1.000). The duration column is that clock difference.",
+    "Energy consumed matches charging rate times labelled duration (correlation 1.000). Both identities were generated from battery capacity, the SOC rise, and charging rate. This is not a meter log from those chargers.",
+    "SOC start outside 0\u2013100: 0. SOC end outside 0\u2013100: 0. SOC end below start: 0.",
+    "A low error means the model recovered that generated formula. It does not mean the minutes were measured at the chargers."
   ]
 }

@@ -48,6 +48,9 @@ class FakeRouter:
         )
 
 
+OFFLINE = {"weather_fetcher": lambda latitude, longitude: None, "elevation_fetcher": lambda geometry: None}
+
+
 def _deps(fail_route=False):
     component4 = load_component4()
     component3 = load_component3()
@@ -60,6 +63,8 @@ def _deps(fail_route=False):
         "component2": None,
         "component1": None,
         "errors": {},
+        # Tests never call the weather or elevation services.
+        "condition_fetchers": OFFLINE,
     }
 
 
@@ -150,19 +155,29 @@ def test_low_battery_recommends_nobody():
     assert all(item["battery"]["status"] == "infeasible" for item in result["alternatives"])
 
 
-def test_listed_power_duration_changes_rank_and_missing_tariff_stays_empty():
+def test_charge_time_comes_from_component2_not_listed_power():
     body = TripRequest(**{**VALID, "target_soc_percent": 100})
-    result = build_recommendation(body, _deps(), explain=False)
+    without_model = build_recommendation(body, _deps(), explain=False)
+    # 40 kWh * (100 - 77) / 100 = 9.2 kWh. Divided by 30 kW that would be 18.4 min.
+    # That listed-power figure must not be used when the duration model is absent.
+    assert without_model["recommended_station"]["trip_plan"]["arrival_soc_percent"] == pytest.approx(77.0)
+    assert without_model["recommended_station"]["trip_plan"]["charging_energy_kwh"] == pytest.approx(9.2)
+    assert without_model["recommended_station"]["listed_power_duration_min"] is None
+    assert without_model["recommended_station"]["duration_source"] == "unavailable"
+    assert without_model["recommended_station"]["scenario_cost_lkr"] is None
+
+    deps = _deps()
+    deps["component2"] = load_component2()
+    result = build_recommendation(body, deps, explain=False)
     by_id = {result["recommended_station"]["station_id"]: result["recommended_station"]}
     for item in result["alternatives"]:
         by_id[item["station_id"]] = item
-    # Mock legs are 8 km at 15 kWh/100 km: 1.2 kWh, so the car arrives at 77%, not 80%.
-    # 40 kWh * (100 - 77) / 100 = 9.2 kWh; 9.2 / 30 kW * 60 = 18.4 min.
-    assert by_id["ST001"]["trip_plan"]["arrival_soc_percent"] == pytest.approx(77.0)
-    assert by_id["ST001"]["listed_power_duration_min"] == pytest.approx(18.4)
+    assert by_id["ST001"]["duration_source"] == "component2"
+    assert by_id["ST001"]["listed_power_duration_min"] > 0
+    # Same arrival charge and the same target. The slower charger takes longer.
+    assert by_id["ST004"]["max_power_kw_listed"] < by_id["ST001"]["max_power_kw_listed"]
     assert by_id["ST004"]["listed_power_duration_min"] > by_id["ST001"]["listed_power_duration_min"]
-    assert by_id["ST004"]["rank"] == 4
-    assert by_id["ST001"]["scenario_cost_lkr"] is None
+    assert "Component 2" in by_id["ST001"]["listed_power_duration_note"]
     assert "not treated as zero" in by_id["ST001"]["ranking_explanation"]
 
 
@@ -190,13 +205,11 @@ def test_explanation_rejects_invented_availability_and_cost():
     assert explanation_matches(template_explanation(result), result)[0] is True
 
 
-def test_duration_model_requires_real_features_and_rejects_colombo():
+def test_duration_model_uses_battery_power_and_charge_levels():
     component2 = load_component2()
     deps = _deps()
     deps["component1"] = load_component1()
     deps["component2"] = component2
-    columns = component2["feature_columns"]
-    temperature = next(column for column in columns if column.startswith("Temperature"))
     missing = build_recommendation(
         TripRequest(**{**VALID, "duration_features": {"Vehicle Model": "Nissan Leaf"}}),
         deps,
@@ -208,19 +221,14 @@ def test_duration_model_requires_real_features_and_rejects_colombo():
         "Battery Capacity (kWh)": 40,
         "Charging Rate (kW)": 30,
         "State of Charge (Start %)": 20,
-        "Distance Driven (since last charge) (km)": 15,
-        "Vehicle Age (years)": 3,
-        temperature: 28,
-        "Vehicle Model": "Nissan Leaf",
-        "Charging Station Location": "Colombo",
-        "Time of Day": "Morning",
-        "Day of Week": "Monday",
-        "Charger Type": "DC Fast Charger",
-        "User Type": "Commuter",
+        "State of Charge (End %)": 80,
     }
-    rejected = build_recommendation(TripRequest(**{**VALID, "duration_features": record}), deps, explain=False)
-    assert rejected["charging_duration"]["status"] == "unavailable"
-    record["Charging Station Location"] = "New York"
+    leaked = build_recommendation(
+        TripRequest(**{**VALID, "duration_features": {**record, "Charging End Time": "2024-01-01 02:00:00"}}),
+        deps,
+        explain=False,
+    )
+    assert leaked["charging_duration"]["status"] == "unavailable"
     predicted = build_recommendation(TripRequest(**{**VALID, "duration_features": record}), deps, explain=False)
     assert predicted["charging_duration"]["status"] == "predicted"
     assert predicted["charging_duration"]["predicted_charging_duration_min"] > 0
@@ -256,6 +264,7 @@ def test_api_validation_stations_and_mocked_recommendation():
         assert stations.json()["stations"][0]["waiting_time_min"] is None
         bad = client.post("/api/v1/recommend", json={**VALID, "origin_latitude": 120})
         assert bad.status_code == 422
+        app.state.bundle["condition_fetchers"] = OFFLINE
         app.state.bundle["component4"]["provider"] = FakeRouter(
             app.state.bundle["component4"]["RouteLeg"],
             app.state.bundle["component4"]["RoutingError"],
@@ -352,7 +361,9 @@ def test_energy_model_replaces_the_flat_rate_only_when_conditions_are_complete()
     used = build_recommendation(TripRequest(**{**VALID, "energy_conditions": CONDITIONS}), _deps(), explain=True)
     assert used["energy_and_cost"]["energy_model_applied"] is True
     assert used["models"]["energy"]["training_data"] == "synthetic"
-    assert used["recommended_station"]["battery"]["method"] == "component3_energy_model"
+    assert used["recommended_station"]["battery"]["method"] == "larger of the Component 3 model and your consumption rate"
+    battery = used["recommended_station"]["battery"]
+    assert battery["estimated_energy_kwh"] == max(battery["model_energy_kwh"], battery["rate_energy_kwh"])
     assert used["recommended_station"]["drive_energy_model"]["predicted_energy_kwh"] > 0
     assert "soc_end_pct" in used["models"]["energy"]["excluded_as_leakage"]
     ok, reason = explanation_matches(used["explanation"]["text"], used)
@@ -399,14 +410,91 @@ def test_duration_and_cost_endpoints():
         expected = datetime(2026, 10, 22, 14, 0) + timedelta(minutes=minutes)
         assert body["expected_completion_time"] == expected.isoformat(timespec="minutes")
         assert body["test_metrics"]["mae_min"] > 0
-        colombo = client.post(
+        leaked = client.post(
             "/api/v1/duration/predict",
-            json={"features": {**features, "Charging Station Location": "Colombo"}},
+            json={"features": {**features, "Charging End Time": "2024-01-01 02:00:00"}},
         )
-        assert colombo.status_code == 422
+        assert leaked.status_code == 422
         missing = client.post("/api/v1/duration/predict", json={"features": {}})
         assert missing.status_code == 422 and "Nothing was guessed" in missing.text
         cost = client.post("/api/v1/energy/cost", json={"energy_kwh": 9, "tariff_lkr_per_kwh": 100, "charging_efficiency": 0.9})
         assert cost.status_code == 200
         assert cost.json()["estimated_total"] == pytest.approx(1000)
         assert client.get("/api/v1/unknown").status_code == 404
+
+
+def test_automatic_conditions_feed_the_energy_model_and_trip_energy():
+    deps = _deps()
+    deps["condition_fetchers"] = {
+        "weather_fetcher": lambda latitude, longitude: {"temperature_c": 31.0, "weather_text": "Clear sky"},
+        "elevation_fetcher": lambda geometry: {"elevation_gain_m": 40.0, "elevation_loss_m": 12.0},
+    }
+    result = build_recommendation(TripRequest(**VALID), deps, explain=False)
+    assert result["energy_and_cost"]["energy_model_applied"] is True
+    conditions = result["trip_conditions"]
+    assert conditions["weather"]["temperature_c"] == 31.0
+    assert conditions["elevation"]["elevation_gain_m"] == 40.0
+    assert conditions["road_type"] in {"urban", "mixed", "highway"}
+    energy = result["trip_energy"]
+    assert energy["rate_kwh"] == pytest.approx(1.2)
+    assert energy["used_kwh"] == max(energy["model_kwh"], energy["rate_kwh"])
+    assert energy["arrival_soc_percent"] == pytest.approx(80 - energy["used_kwh"] / 40 * 100)
+
+
+def test_missing_weather_leaves_the_energy_model_off():
+    result = build_recommendation(TripRequest(**VALID), _deps(), explain=False)
+    assert result["energy_and_cost"]["energy_model_applied"] is False
+    assert "weather (Open-Meteo did not answer)" in result["trip_conditions"]["missing"]
+    assert result["trip_energy"]["model_kwh"] is None
+    assert result["trip_energy"]["used_kwh"] == pytest.approx(1.2)
+
+
+def test_elevation_profile_ignores_small_noise():
+    from conditions import fetch_elevation_profile
+    import conditions
+
+    original = conditions._get
+    conditions._get = lambda url, timeout: {"elevation": [10, 11, 10, 30, 29, 60, 40]}
+    try:
+        profile = fetch_elevation_profile([[6.9, 79.8]] * 7)
+    finally:
+        conditions._get = original
+    assert profile["elevation_gain_m"] == pytest.approx(50.0)
+    assert profile["elevation_loss_m"] == pytest.approx(20.0)
+
+
+def test_plan_and_trip_energy_agree_on_charging():
+    deps = _deps()
+    deps["condition_fetchers"] = {
+        "weather_fetcher": lambda latitude, longitude: {"temperature_c": 31.0, "weather_text": "Clear sky"},
+        "elevation_fetcher": lambda geometry: {"elevation_gain_m": 40.0, "elevation_loss_m": 12.0},
+    }
+    for soc in (12, 14, 16, 30, 80):
+        result = build_recommendation(TripRequest(**{**VALID, "current_soc_percent": soc}), deps, explain=False)
+        energy = result["trip_energy"]
+        assert result["planning_consumption_kwh_per_100km"] >= VALID["consumption_kwh_per_100km"]
+        no_charge = result["charging_plan"]["status"] == "no_charge_needed"
+        # A plan that skips charging must match a trip the battery figures say can be finished.
+        assert no_charge == energy["can_finish_without_charging"], (soc, energy, result["charging_plan"]["status"])
+
+
+def test_recommended_station_always_gets_a_road_line():
+    from orchestrate import _plan_road, _with_road_shape
+
+    deps = _deps()
+    body = TripRequest(**VALID)
+    # The planner leaves road shapes off stations outside its own top three.
+    station = {
+        "latitude": 6.9,
+        "longitude": 79.87,
+        "origin_to_station": {"distance_km": 3.0, "duration_min": 8.0, "geometry": None},
+        "station_to_destination": {"distance_km": 5.0, "duration_min": 9.0, "geometry": None},
+    }
+    shaped = _with_road_shape(station, body, deps)
+    assert len(shaped["origin_to_station"]["geometry"]) >= 2
+    assert len(shaped["station_to_destination"]["geometry"]) >= 2
+    plan = {"stops": [{"latitude": 6.9, "longitude": 79.87}, {"latitude": 6.88, "longitude": 79.88}]}
+    route = _plan_road(plan, body, deps)
+    assert route["stops"] == 2 and len(route["geometry"]) >= 2
+    failing = _deps(fail_route=True)
+    assert _plan_road(plan, body, failing)["geometry"] is None

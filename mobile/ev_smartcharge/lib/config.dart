@@ -19,11 +19,10 @@ const String supabaseAnonKey = String.fromEnvironment(
       'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF1eHlvbnd2ZnBmam9uemh1YmdmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI1OTA0NjgsImV4cCI6MjEwODE2NjQ2OH0.lmEKFrHviVfH5gXZSw0uRFgm1C5t8Pw4TtXfjCVS2xs',
 );
 
-/// MapTiler key. Override with --dart-define=MAPTILER_API_KEY=...
-const String mapTilerApiKey = String.fromEnvironment(
-  'MAPTILER_API_KEY',
-  defaultValue: 'xWz4UiO2ASthMCT3JTim',
-);
+/// Optional MapTiler key, passed with --dart-define=MAPTILER_API_KEY=...
+/// Empty by default: the map uses CARTO's free dark tiles, which need no key.
+/// (The key previously built in was refused by MapTiler with HTTP 403.)
+const String mapTilerApiKey = String.fromEnvironment('MAPTILER_API_KEY');
 
 bool get supabaseConfigured => supabaseUrl.isNotEmpty && supabaseAnonKey.isNotEmpty;
 bool get mapTilerConfigured => mapTilerApiKey.isNotEmpty;
@@ -128,3 +127,14 @@ const carPresets = <CarPreset>[
   CarPreset('Nissan Leaf e+ (62 kWh)', 59, 17, 'CHAdeMO'),
   CarPreset('BYD Atto 3', 60, 17, 'CCS2'),
 ];
+
+/// Kerb weight plus about 100 kg for driver and a passenger, for the energy model.
+/// Manufacturer kerb weights: Leaf 40 kWh 1,580 kg; Leaf e+ 1,748 kg; Atto 3 1,750 kg.
+double vehicleMassFor(String carName) {
+  const masses = {
+    'Nissan Leaf (40 kWh)': 1680.0,
+    'Nissan Leaf e+ (62 kWh)': 1850.0,
+    'BYD Atto 3': 1850.0,
+  };
+  return masses[carName] ?? 1750.0;
+}

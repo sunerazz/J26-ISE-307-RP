@@ -34,7 +34,7 @@ if METRICS_PATH.exists():
 app = FastAPI(
     title="EV charging duration model",
     version="1.0.0",
-    description="Component 2 session-duration model. Locations are the US cities in the training set.",
+    description="Component 2 session-duration model. Inputs are battery size, charger power, start charge, and requested end charge.",
 )
 
 

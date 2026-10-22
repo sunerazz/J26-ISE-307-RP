@@ -162,8 +162,9 @@ def duration_schema() -> dict:
         "numeric_features": component2["meta"].get("numeric_features") or [],
         "categories": component2["categories"],
         "note": (
-            "These fields belong to the saved duration model. Station location values are US cities from that dataset. "
-            "Do not send a Colombo name. Leave the form unused if you do not want this separate estimate."
+            "These fields belong to the saved duration model: battery size, charger power, "
+            "start charge, and requested end charge. "
+            "The training duration was generated as that energy divided by power, and it matches the clock."
         ),
     }
 
@@ -224,7 +225,7 @@ def duration_predict(body: DurationRequest) -> dict:
             raise HTTPException(status_code=422, detail=f"{column} must be one of the training values {allowed}.")
     try:
         prediction = component2["predict_duration"](
-            {column: features[column] for column in columns},
+            features,
             pipeline=component2.get("pipeline"),
             meta=component2.get("meta"),
         )
@@ -238,9 +239,9 @@ def duration_predict(body: DurationRequest) -> dict:
         "charging_start_time": None,
         "expected_completion_time": None,
         "note": (
-            "One session-duration prediction from the saved Component 2 pipeline. Its training sessions are from "
-            "five US cities, so the location must be one of them. Test R² is near zero, so treat the value as a "
-            "rough statistical estimate, not a guarantee."
+            "One session-duration prediction from the saved Component 2 pipeline. "
+            "The training duration matches the clock and energy matches power times time, "
+            "because those sessions were generated from battery size, the charge rise, and charger power."
         ),
     }
     if body.charging_start_time is not None:

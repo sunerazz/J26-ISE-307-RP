@@ -26,31 +26,14 @@
     "Battery Capacity (kWh)",
     "Charging Rate (kW)",
     "State of Charge (Start %)",
-    "Distance Driven (since last charge) (km)",
-    "Vehicle Age (years)",
-    "Temperature (\u00c2\u00b0C)",
-    "Vehicle Model",
-    "Charging Station Location",
-    "Time of Day",
-    "Day of Week",
-    "Charger Type",
-    "User Type"
+    "State of Charge (End %)"
   ],
   "temperature_column": "Temperature (\u00c2\u00b0C)",
   "numeric_features": [
     "Battery Capacity (kWh)",
     "Charging Rate (kW)",
     "State of Charge (Start %)",
-    "Distance Driven (since last charge) (km)",
-    "Vehicle Age (years)",
-    "Temperature (\u00c2\u00b0C)"
+    "State of Charge (End %)"
   ],
-  "categorical_features": [
-    "Vehicle Model",
-    "Charging Station Location",
-    "Time of Day",
-    "Day of Week",
-    "Charger Type",
-    "User Type"
-  ]
+  "categorical_features": []
 }

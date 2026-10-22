@@ -10,18 +10,18 @@ Predict the expected charging duration in **minutes** from information available
 
 ## Dataset
 
-- File: `data/raw/Component 2 ev_charging_patterns (2).xlsx`
-- Verified size: 1,320 rows × 20 columns
+- File: `data/raw/component2_charging_duration_sri_lanka_5_stations.csv`
+- Verified size: 1,320 rows × 24 columns
 - Source duration column: `Charging Duration (hours)`
 - Model target: `charging_duration_min` = hours × 60
 
-The table is noisy: labelled duration does not match end time minus start time, and energy is almost uncorrelated with duration. SOC values above 100% were kept. Do not treat scores as real-world charging-meter accuracy.
+Place names are Nugegoda LECO, Rajagiriya, Malabe, Pannipitiya, and Panadura, 264 rows each. The table was rebuilt so labelled duration equals end time minus start time, and energy equals charging rate times that duration. Both come from battery capacity times the SOC rise. This is a generated table, not a meter log.
 
 ## Leakage
 
-Inputs are limited to features known at session start (vehicle, start SOC, charger type, charging rate, temperature, age, location, time of day, day of week, user type, distance since last charge).
+Inputs are the four values that define the generated session: battery capacity, charging rate, start SOC, and requested end SOC.
 
-Excluded: duration itself, end time, end SOC, energy consumed, charging cost, user ID, station ID, and the raw start timestamp (used only to order the split).
+Excluded: duration, end time, energy, illustrative tariff and cost, and the other columns (place, vehicle, time of day, charger type, age, distance). Those columns do not define the generated duration. End time and energy would repeat the target.
 
 Details: `results/feature_definitions.md`.
 
@@ -55,14 +55,14 @@ Validation MAE (minutes), n = 192:
 
 | Model | MAE | RMSE | R² |
 |---|---:|---:|---:|
-| Median baseline | 56.19 | 69.98 | −0.001 |
-| Linear regression | 56.52 | 71.24 | −0.037 |
-| **Random forest (selected)** | **56.04** | **69.90** | **0.002** |
-| XGBoost | 56.89 | 71.60 | −0.048 |
+| **XGBoost (selected), 200 trees, depth 4, learning rate 0.05** | **22.50** | **97.22** | **0.780** |
+| Random forest, 300 trees, depth 12, min leaf 2 | 24.81 | 107.64 | 0.731 |
+| Linear regression | 60.30 | 169.56 | 0.331 |
+| Median baseline | 78.97 | 214.26 | −0.068 |
 
-Held-out test, random forest, n = 216: MAE 53.64 minutes, RMSE 62.60 minutes, R² −0.048.
+Held-out test, XGBoost, n = 216: MAE 13.26 minutes, RMSE 36.90 minutes, R² 0.888. About 3.2% of raw test predictions were negative and are clipped to zero when serving. The published MAE above is the raw figure.
 
-The forest wins validation by a fraction of a minute over the median. R² near or below zero means the features in this table do not explain charging duration. That matches the data-quality finding that duration, energy, and clock time are almost unrelated.
+XGBoost wins because the generated duration is battery × SOC rise / rate, which is not a straight line and is not a constant. The low error means the model recovered that formula. It does not mean the minutes were measured at the chargers.
 
 ## Outputs
 

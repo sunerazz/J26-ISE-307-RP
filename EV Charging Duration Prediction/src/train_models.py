@@ -75,12 +75,10 @@ def make_preprocessor(numeric: list[str], categorical: list[str], scale: bool) -
             ("onehot", encoder),
         ]
     )
-    return ColumnTransformer(
-        [
-            ("num", numeric_pipe, numeric),
-            ("cat", categorical_pipe, categorical),
-        ]
-    )
+    transformers = [("num", numeric_pipe, numeric)]
+    if categorical:
+        transformers.append(("cat", categorical_pipe, categorical))
+    return ColumnTransformer(transformers)
 
 
 def build_pipeline(model, numeric: list[str], categorical: list[str], scale: bool) -> Pipeline:

@@ -18,11 +18,12 @@ from src.config import META_PATH, PIPELINE_PATH  # noqa: E402
 
 FORBIDDEN = {
     "Charging Duration (hours)",
+    "Charging Duration (minutes)",
     "charging_duration_min",
     "Charging End Time",
-    "State of Charge (End %)",
     "Energy Consumed (kWh)",
     "Charging Cost (USD)",
+    "Illustrative Charging Cost (LKR)",
 }
 
 
